@@ -74,10 +74,6 @@
     <ManifestTimestampUrl>http://timestamp.digicert.com</ManifestTimestampUrl>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DigitalPlatform.MarcQuery, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>dll\DigitalPlatform.MarcQuery.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=2.0.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.11\lib\net45\log4net.dll</HintPath>
     </Reference>
@@ -237,6 +233,16 @@
     <Compile Include="MarcKernel\MarcHeaderStruct.cs" />
     <Compile Include="MarcKernel\MarcUtil.cs" />
     <Compile Include="MarcKernel\MarcXmlWriter.cs" />
+    <Compile Include="MarcQuery\MarcField.cs" />
+    <Compile Include="MarcQuery\MarcHeader.cs" />
+    <Compile Include="MarcQuery\MarcLoader.cs" />
+    <Compile Include="MarcQuery\MarcNavigator.cs" />
+    <Compile Include="MarcQuery\MarcNode.cs" />
+    <Compile Include="MarcQuery\MarcNodeList.cs" />
+    <Compile Include="MarcQuery\MarcQuery.cs" />
+    <Compile Include="MarcQuery\MarcRecord.cs" />
+    <Compile Include="MarcQuery\MarcSubfield.cs" />
+    <Compile Include="MarcQuery\NaviItem.cs" />
     <Compile Include="WarnDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -369,11 +375,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="dll\DigitalPlatform.MarcQuery.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
