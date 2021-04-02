@@ -69,7 +69,6 @@ namespace dp2mini
             string batchNo = this.textBox_batchNo.Text;
 
 
-
             // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
             this._cancel.Dispose();
             this._cancel = new CancellationTokenSource();
@@ -128,7 +127,6 @@ namespace dp2mini
                     goto ERROR1;
                 }
 
-
                 {
                     //ProgressEstimate estimate = new ProgressEstimate();
 
@@ -143,7 +141,7 @@ namespace dp2mini
                         AutoCache = false,
                         CacheDir = "",
                         LogType = LogType.OperLog,//logType,
-                        Filter = "setEntity",// setReaderInfo",
+                        Filter = "",// setReaderInfo",
                         ServerVersion = ""//serverVersion
                     };
 
@@ -175,20 +173,12 @@ namespace dp2mini
                             }
                             catch (Exception ex)
                             {
-
-
                                 throw new ChannelException(channel.ErrorCode, strError);
-
                             }
 
                             string strOperation = DomUtil.GetElementText(dom.DocumentElement, "operation");
-                            if (strOperation == "setEntity")
+                            //if (strOperation == "setEntity")
                             {
-                                //nRet = TraceSetReaderInfo(
-                                //    dom,
-                                //    info,
-                                //    out strError);
-
                                 this.Invoke((Action)(() =>
                                 {
                                    nRet= this.LoadLog(dom, out strError);
@@ -196,10 +186,8 @@ namespace dp2mini
                                         throw new Exception(strError);
                                 }
                                 ));
-
                             }
-                            else
-                                continue;
+
 
                             if (nRet == -1)
                             {
@@ -227,27 +215,6 @@ namespace dp2mini
                         //channel.Timeout = old_timeout;
                     }
                 }
-
-
-
-                //for (int i = 0; i < 5; i++)
-                //{
-                //    this.Invoke((Action)(() =>
-                //{
-
-                //    this.textBox1.Text += i.ToString() + "\r\n";
-
-                //    //// 任务栏显示信息
-                //    //this._mainForm.SetStatusMessage("命中总数'" + lTotalCount + "'条，"
-                //    //    + "其中预约到书'" + todoCount + "'条，"
-                //    //    + "超过保留期或读者自己取消'" + outofCount + "'条，"
-                //    //    + "已创建到备书单'" + inNoteCount + "'条。");
-                //}));
-
-
-
-
-
                 return;
             }
             catch (Exception ex)
@@ -264,7 +231,6 @@ namespace dp2mini
                     this.Cursor = oldCursor;
 
                     this._mainForm.ReturnChannel(channel);
-                    //this._mainForm.ReturnDp2Channel(channel);
                 }
                 ));
             }

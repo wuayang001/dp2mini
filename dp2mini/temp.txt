@@ -1,0 +1,231 @@
+﻿        // 同步
+        // 注：中途遇到异常(例如 Loader 抛出异常)，可能会丢失 INSERT_BATCH 条以内的日志记录写入 operlog 表
+        // parameters:
+        //      strLastDate   处理中断或者结束时返回最后处理过的日期
+        //      last_index  处理或中断返回时最后处理过的位置。以后继续处理的时候可以从这个偏移开始
+        // return:
+        //      -1  出错
+        //      0   中断
+        //      1   完成
+        public ReplicationResult DoReplication(
+            LibraryChannel channel,
+            string strStartDate,
+            string strEndDate,
+            LogType logType,
+            string serverVersion,
+            CancellationToken token)
+        {
+            string strLastDate = "";
+            long last_index = -1;    // -1 表示尚未处理
+
+            // bool bUserChanged = false;
+            ProcessInfo info = new ProcessInfo();
+
+            // strStartDate 里面可能会包含 ":1-100" 这样的附加成分
+            StringUtil.ParseTwoPart(strStartDate,
+                ":",
+                out string strLeft,
+                out string strRight);
+            strStartDate = strLeft;
+
+            if (string.IsNullOrEmpty(strStartDate) == true)
+            {
+                return new ReplicationResult
+                {
+                    Value = -1,
+                    ErrorInfo = "DoReplication() 出错: strStartDate 参数值不应为空"
+                };
+            }
+
+            try
+            {
+                int nRet = OperLogLoader.MakeLogFileNames(strStartDate,
+                    strEndDate,
+                    true,  // 是否包含扩展名 ".log"
+                    out List<string> dates,
+                    out string strWarning,
+                    out string strError);
+                if (nRet == -1)
+                {
+                    return new ReplicationResult
+                    {
+                        Value = -1,
+                        ErrorInfo = strError
+                    };
+                }
+
+                if (dates.Count > 0 && string.IsNullOrEmpty(strRight) == false)
+                {
+                    dates[0] = dates[0] + ":" + strRight;
+                }
+
+                // using (SQLiteConnection connection = new SQLiteConnection(this._connectionString))
+                {
+                    ProgressEstimate estimate = new ProgressEstimate();
+
+                    OperLogLoader loader = new OperLogLoader
+                    {
+                        Channel = channel,
+                        Stop = null, //  this.Progress;
+                                     // loader.owner = this;
+                        Estimate = estimate,
+                        Dates = dates,
+                        Level = 0,  // 2019/7/23 注：2 最简略。不知何故以前用了这个级别。缺点是 oldRecord 元素缺乏 InnerText
+                        AutoCache = false,
+                        CacheDir = "",
+                        LogType = logType,
+                        Filter = "setReaderInfo",
+                        ServerVersion = serverVersion
+                    };
+
+                    TimeSpan old_timeout = channel.Timeout;
+                    channel.Timeout = new TimeSpan(0, 2, 0);   // 二分钟
+
+                    loader.Prompt += Loader_Prompt;
+                    try
+                    {
+                        // int nRecCount = 0;
+
+                        string strLastItemDate = "";
+                        long lLastItemIndex = -1;
+                        // TODO: 计算遍历耗费的时间。如果太短了，要想办法让调主知道这一点，放缓重新调用的节奏，以避免 CPU 和网络资源太高
+                        foreach (OperLogItem item in loader)
+                        {
+                            token.ThrowIfCancellationRequested();
+
+                            //if (stop != null)
+                            //    stop.SetMessage("正在同步 " + item.Date + " " + item.Index.ToString() + " " + estimate.Text + "...");
+
+                            if (string.IsNullOrEmpty(item.Xml) == true)
+                                goto CONTINUE;
+
+                            XmlDocument dom = new XmlDocument();
+                            try
+                            {
+                                dom.LoadXml(item.Xml);
+                            }
+                            catch (Exception ex)
+                            {
+
+                                if (this.HasLoaderPrompt())
+                                {
+                                    strError = logType.ToString() + "日志记录 " + item.Date + " " + item.Index.ToString() + " XML 装入 DOM 的时候发生错误: " + ex.Message;
+                                    MessagePromptEventArgs e = new MessagePromptEventArgs
+                                    {
+                                        MessageText = strError + "\r\n\r\n是否跳过此条继续处理?\r\n\r\n(确定: 跳过;  取消: 停止全部操作)",
+                                        IncludeOperText = true,
+                                        // + "\r\n\r\n是否跳过此条继续处理?",
+                                        Actions = "yes,cancel"
+                                    };
+                                    Loader_Prompt(channel, e);
+                                    if (e.ResultAction == "cancel")
+                                        throw new ChannelException(channel.ErrorCode, strError);
+                                    else if (e.ResultAction == "yes")
+                                        continue;
+                                    else
+                                    {
+                                        // no 也是抛出异常。因为继续下一批代价太大
+                                        throw new ChannelException(channel.ErrorCode, strError);
+                                    }
+                                }
+                                else
+                                    throw new ChannelException(channel.ErrorCode, strError);
+
+                            }
+
+                            string strOperation = DomUtil.GetElementText(dom.DocumentElement, "operation");
+                            if (strOperation == "setReaderInfo")
+                            {
+                                nRet = TraceSetReaderInfo(
+                                    dom,
+                                    info,
+                                    out strError);
+                            }
+                            else
+                                continue;
+
+                            if (nRet == -1)
+                            {
+                                strError = "同步 " + item.Date + " " + item.Index.ToString() + " 时出错: " + strError;
+
+                                if (this.HasLoaderPrompt())
+                                {
+                                    MessagePromptEventArgs e = new MessagePromptEventArgs
+                                    {
+                                        MessageText = strError + "\r\n\r\n是否跳过此条继续处理?\r\n\r\n(确定: 跳过;  取消: 停止全部操作)",
+                                        IncludeOperText = true,
+                                        // + "\r\n\r\n是否跳过此条继续处理?",
+                                        Actions = "yes,cancel"
+                                    };
+                                    Loader_Prompt(channel, e);
+                                    if (e.ResultAction == "cancel")
+                                        throw new Exception(strError);
+                                    else if (e.ResultAction == "yes")
+                                        continue;
+                                    else
+                                    {
+                                        // no 也是抛出异常。因为继续下一批代价太大
+                                        throw new Exception(strError);
+                                    }
+                                }
+                                else
+                                    throw new ChannelException(channel.ErrorCode, strError);
+                            }
+
+                        // lProcessCount++;
+                        CONTINUE:
+                            // 便于循环外获得这些值
+                            strLastItemDate = item.Date;
+                            lLastItemIndex = item.Index + 1;
+
+                            // index = 0;  // 第一个日志文件后面的，都从头开始了
+                        }
+                        // 记忆
+                        strLastDate = strLastItemDate;
+                        last_index = lLastItemIndex;
+                    }
+                    finally
+                    {
+                        loader.Prompt -= Loader_Prompt;
+                        channel.Timeout = old_timeout;
+                    }
+                }
+
+                return new ReplicationResult
+                {
+                    Value = last_index == -1 ? 0 : 1,
+                    LastDate = strLastDate,
+                    LastIndex = last_index,
+                    ProcessInfo = info
+                };
+            }
+            catch (ChannelException ex)
+            {
+                return new ReplicationResult
+                {
+                    Value = -1,
+                    ErrorInfo = ex.Message,
+                    ProcessInfo = info
+                };
+            }
+            catch (InterruptException ex)
+            {
+                // 2019/7/4
+                return new ReplicationResult
+                {
+                    Value = -1,
+                    ErrorInfo = ex.Message,
+                    ProcessInfo = info
+                };
+            }
+            catch (Exception ex)
+            {
+                string strError = "ReportForm DoReplication() exception: " + ExceptionUtil.GetDebugText(ex);
+                return new ReplicationResult
+                {
+                    Value = -1,
+                    ErrorInfo = strError,
+                    ProcessInfo = info
+                };
+            }
+        }
