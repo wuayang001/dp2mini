@@ -8,6 +8,7 @@ using System.Diagnostics;
 //using DigitalPlatform.LibraryClient.localhost;
 using DigitalPlatform.Core;
 using DigitalPlatform.Text;
+using DigitalPlatform.IO;
 using DigitalPlatform.LibraryRestClient;
 
 namespace DigitalPlatform.LibraryClient
@@ -17,11 +18,10 @@ namespace DigitalPlatform.LibraryClient
     /// </summary>
     public class OperLogItemLoader
     {
-        // del
         /// <summary>
         /// 提示框事件
         /// </summary>
-        public event MessagePromptEventHandler Prompt = null;
+        //public event MessagePromptEventHandler Prompt = null;
 
         LogType _logType = LogType.OperLog;
         /// <summary>
@@ -73,6 +73,14 @@ namespace DigitalPlatform.LibraryClient
             get;
             set;
         }
+
+#if NO
+        public IWin32Window owner
+        {
+            get;
+            set;
+        }
+#endif
 
         public ProgressEstimate Estimate
         {
@@ -134,7 +142,7 @@ namespace DigitalPlatform.LibraryClient
             set;
         }
 
-        public RestChannel Channel //LibraryChannel Channel
+        public RestChannel Channel
         {
             get;
             set;
@@ -575,7 +583,10 @@ FileShare.ReadWrite);
             byte[] attachment_data = null;
 
             long lFileSize = 0;
-            if (lServerFileSize == -1)
+            // 2021/3/17
+            // 如果是当天的日志文件，尺寸易变，要每次都探测一下
+            if (lServerFileSize == -1
+                || IsToday(this.Date))
             {
                 long _lServerFileSize = 0;
 
@@ -583,11 +594,10 @@ FileShare.ReadWrite);
                 if ((this.LogType & LogType.AccessLog) != 0)
                     strStyle += ",accessLog";
 
-                /* todo
                 // 获得服务器端日志文件尺寸
                 lRet = this.Channel.GetOperLog(
-                    this.Stop,
-                    this.Date,
+                    //this.Stop,
+                    this.Date + ".log", // 2021/3/18 增加 ".log"
                     -1,    // lIndex,
                     -1, // lHint,
                     strStyle,
@@ -601,9 +611,10 @@ FileShare.ReadWrite);
                     out strError);
                 // 2015/11/25
                 if (lRet == -1)
-                    throw new ChannelException(this.Channel.ErrorCode, strError);
-                */
-
+                {
+                    //throw new ChannelException(this.Channel.ErrorCode, strError);
+                    throw new Exception(strError);
+                }
 
                 this.lServerFileSize = _lServerFileSize;
 
@@ -751,6 +762,7 @@ FileShare.ReadWrite);
                                 //      1   succeed
                                 //      2   超过范围，本次调用无效
                                 lRet = this.Channel.GetOperLogs(
+                                    //this.Stop,
                                     this.Date + ".log",
                                     lIndex,
                                     lHint,
@@ -761,11 +773,29 @@ FileShare.ReadWrite);
                                     out strError);
                                 if (lRet == -1)
                                 {
-
+#if NO
+                                    DialogResult result = MessageBox.Show(owner,
+    "获取日志信息 ("+this.FileName + " " +lIndex.ToString() + ") 的操作发生错误： " + strError + "\r\n\r\n是否重试操作?\r\n\r\n(是: 重试;  否: 跳过本次操作，继续后面的操作; 放弃: 停止全部操作)",
+    "OperLogItemLoader",
+    MessageBoxButtons.YesNoCancel,
+    MessageBoxIcon.Question,
+    MessageBoxDefaultButton.Button1);
+                                    if (result == DialogResult.Yes)
+                                        goto REDO;
+                                    if (result == DialogResult.Cancel)
+                                        throw new Exception(strError);
+                                    else
+                                    {
+                                        // TODO: 是否要在listview中装入一条表示出错的行?
+                                        lHintNext = -1;
+                                        continue;
+                                    }
+#endif
                                     bool isStopped = (this.Stop != null && this.Stop.State != 0);
                                     if (isStopped)
                                         throw new InterruptException(strError);
 
+                                    /*
                                     if (this.Prompt != null)
                                     {
                                         MessagePromptEventArgs e = new MessagePromptEventArgs();
@@ -788,6 +818,8 @@ FileShare.ReadWrite);
                                     }
                                     else
                                         throw new ChannelException(this.Channel.ErrorCode, strError);
+                                    */
+                                    throw new Exception( strError);
                                 }
                                 if (lRet == 0)
                                     yield break;
@@ -798,7 +830,6 @@ FileShare.ReadWrite);
                                 // records数组表示的起点位置
                                 lStartRecords = lIndex /* - ri.lStart*/;
                             }
-
                             OperLogInfo info = records[lIndex - lStartRecords];
 
                             strXml = info.Xml;
@@ -910,18 +941,23 @@ FileShare.ReadWrite);
                     if (nRet == -1)
                     {
                         // MessageBox.Show(owner, strError1);
-                        if (this.Prompt != null)
-                        {
-                            MessagePromptEventArgs e = new MessagePromptEventArgs();
-                            e.MessageText = strError1;
-                            e.Actions = "ok";
-                            this.Prompt(this, e);
-                        }
+                        //if (this.Prompt != null)
+                        //{
+                        //    MessagePromptEventArgs e = new MessagePromptEventArgs();
+                        //    e.MessageText = strError1;
+                        //    e.Actions = "ok";
+                        //    this.Prompt(this, e);
+                        //}
                     }
                 }
             }
 
             lProgressValue += lFileSize;
+        }
+
+        static bool IsToday(string date)
+        {
+            return date == DateTimeUtil.DateTimeToString8(DateTime.Now);
         }
     }
 }

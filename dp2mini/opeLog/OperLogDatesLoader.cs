@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 using DigitalPlatform.Core;
+//using DigitalPlatform.LibraryClient.localhost;
 using DigitalPlatform.LibraryRestClient;
 
 namespace DigitalPlatform.LibraryClient
@@ -14,7 +15,7 @@ namespace DigitalPlatform.LibraryClient
         /// <summary>
         /// 提示框事件
         /// </summary>
-        public event MessagePromptEventHandler Prompt = null;
+        //public event MessagePromptEventHandler Prompt = null;
 
         List<string> m_filterdates = null;
 
@@ -67,7 +68,7 @@ namespace DigitalPlatform.LibraryClient
             string strError = "";
 
             if ((this.LogType & LogType.AccessLog) != 0
-                && (this.LogType & LogType.OperLog) != 0)
+&& (this.LogType & LogType.OperLog) != 0)
                 throw new ArgumentException("OperLogLoader 的 LogType 只能使用一种类型");
 
             List<string> filter_dates = null;
@@ -112,29 +113,31 @@ namespace DigitalPlatform.LibraryClient
 
                 if (lRet == -1)
                 {
-                    if (this.Prompt != null)
-                    {
-                        MessagePromptEventArgs e = new MessagePromptEventArgs();
-                        e.MessageText = "获取日志文件名的操作发生错误： " + strError;
-                        e.Actions = "yes,no,cancel";
-                        this.Prompt(this, e);
-                        if (e.ResultAction == "cancel")
-                            throw new InterruptException(strError);
-                        else if (e.ResultAction == "yes")
-                        {
-                            if (this.Stop != null)
-                                this.Stop.Continue();
-                            goto REDO;
-                        }
-                        else
-                        {
-                            // 还没有得到文件名，通讯就失败，所以操作无法进行了，只能抛出异常
-                            throw new ChannelException(this.Channel.ErrorCode, strError);
-                            // continue;
-                        }
-                    }
-                    else
-                        throw new ChannelException(this.Channel.ErrorCode, strError);
+                    //if (this.Prompt != null)
+                    //{
+                    //    MessagePromptEventArgs e = new MessagePromptEventArgs();
+                    //    e.MessageText = "获取日志文件名的操作发生错误： " + strError;
+                    //    e.Actions = "yes,no,cancel";
+                    //    this.Prompt(this, e);
+                    //    if (e.ResultAction == "cancel")
+                    //        throw new InterruptException(strError);
+                    //    else if (e.ResultAction == "yes")
+                    //    {
+                    //        if (this.Stop != null)
+                    //            this.Stop.Continue();
+                    //        goto REDO;
+                    //    }
+                    //    else
+                    //    {
+                    //        // 还没有得到文件名，通讯就失败，所以操作无法进行了，只能抛出异常
+                    //        throw new ChannelException(this.Channel.ErrorCode, strError);
+                    //        // continue;
+                    //    }
+                    //}
+                    //else
+                    //    throw new ChannelException(this.Channel.ErrorCode, strError);
+
+                    throw new Exception();
                 }
 
                 lHitCount = lRet;

@@ -173,7 +173,8 @@ namespace dp2mini
                             }
                             catch (Exception ex)
                             {
-                                throw new ChannelException(channel.ErrorCode, strError);
+                                //throw new ChannelException(channel.ErrorCode, strError);
+                                throw new Exception(strError);
                             }
 
                             string strOperation = DomUtil.GetElementText(dom.DocumentElement, "operation");
@@ -247,9 +248,14 @@ namespace dp2mini
         {
             error = "";
 
+            //"<operation>setEntity</operation><libraryCode></libraryCode><action>new</action>
+            //<style>outofrangeAsError</style><record recPath=\"中文图书实体/1\">&lt;root&gt;&lt;parent&gt;1&lt;/parent&gt;&lt;location&gt;流通库&lt;/location&gt;&lt;price&gt;CNY28.80&lt;/price&gt;&lt;bookType&gt;普通&lt;/bookType&gt;&lt;accessNo&gt;I563.85/H022&lt;/accessNo&gt;&lt;barcode&gt;B001&lt;/barcode&gt;&lt;refID&gt;b0067871-f39d-4c7e-aacf-750855ebfde0&lt;/refID&gt;&lt;operations&gt;&lt;operation name=\"create\" time=\"Wed, 07 Apr 2021 12:26:49 +0800\" operator=\"supervisor\" /&gt;&lt;/operations&gt;&lt;/root&gt;</record><operator>supervisor</operator><operTime>Wed, 07 Apr 2021 12:26:49 +0800</operTime><clientAddress via=\"net.pipe://localhost/dp2library/xe\">localhost</clientAddress>
+            //<version>1.08</version>"
+
+            string operation = DomUtil.GetElementText(dom.DocumentElement, "operation");
             string action = DomUtil.GetElementText(dom.DocumentElement, "action");
 
-            this.textBox1.Text += action+"\r\n";
+            this.textBox1.Text += operation+"/"+ action +"\r\n";
 
             return 0;
         }

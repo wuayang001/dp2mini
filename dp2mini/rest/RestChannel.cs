@@ -680,6 +680,12 @@ namespace DigitalPlatform.LibraryRestClient
                 return -1;
             }
 
+            // 给返回值赋值
+            strXml = response.strXml;
+            lHintNext = response.lHintNext;
+            attachment_data = response.attachment_data;
+            lAttachmentTotalLength = response.lAttachmentTotalLength;
+
             strError = response.GetOperLogResult.ErrorInfo;
             this.ErrorCode = response.GetOperLogResult.ErrorCode;
             this.ClearRedoCount();
@@ -762,25 +768,29 @@ namespace DigitalPlatform.LibraryRestClient
             request.lHint = lHint;
             request.strStyle = strStyle;
             request.strFilter = strFilter;
+            request.nCount = nCount;
 
             byte[] baData = Encoding.UTF8.GetBytes(Serialize(request));
             byte[] result = client.UploadData(this.GetRestfulApiUrl("GetOperLogs"),
                                                 "POST",
                                                 baData);
             string strResult = Encoding.UTF8.GetString(result);
-            GetOperLogsResult response = Deserialize<GetOperLogsResult>(strResult);
-            if (response.Value == -1
-                && response.ErrorCode == ErrorCode.NotLogin)
+            GetOperLogsResponse response = Deserialize<GetOperLogsResponse>(strResult);
+            if (response.GetOperLogsResult.Value == -1
+                && response.GetOperLogsResult.ErrorCode == ErrorCode.NotLogin)
             {
                 if (DoNotLogin(ref strError) == 1)
                     goto REDO;
                 return -1;
             }
 
-            strError = response.ErrorInfo;
-            this.ErrorCode = response.ErrorCode;
+            // 返回信息
+            records = response.records;
+            strError = response.GetOperLogsResult.ErrorInfo;
+
+            this.ErrorCode = response.GetOperLogsResult.ErrorCode;
             this.ClearRedoCount();
-            return response.Value;
+            return response.GetOperLogsResult.Value;
 
 
 

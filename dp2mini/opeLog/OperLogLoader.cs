@@ -17,11 +17,10 @@ namespace DigitalPlatform.LibraryClient
     /// </summary>
     public class OperLogLoader : IEnumerable
     {
-        // del
         /// <summary>
         /// 提示框事件
         /// </summary>
-        public event MessagePromptEventHandler Prompt = null;
+        //public event MessagePromptEventHandler Prompt = null;
 
 
         List<string> m_dates = new List<string>();
@@ -118,7 +117,7 @@ namespace DigitalPlatform.LibraryClient
             set;
         }
 
-        public RestChannel Channel //LibraryChannel Channel
+        public RestChannel Channel
         {
             get;
             set;
@@ -230,6 +229,7 @@ namespace DigitalPlatform.LibraryClient
         //      1   found
         static int GetFileSize(
             Stop stop,
+            //LibraryChannel channel,
             RestChannel channel,
             string strCacheDir,
             string strLogFileName,
@@ -398,7 +398,11 @@ namespace DigitalPlatform.LibraryClient
                     out long lCacheFileSize,
                     out strError);
                 if (nRet == -1)
-                    throw new ChannelException(this.Channel.ErrorCode, strError);
+                {
+                    throw new Exception(strError);
+                    //throw new ChannelException(this.Channel.ErrorCode, strError);
+                }
+
                 // 2015/11/25
                 if (nRet == -2)
                     yield break;    // 此类型的日志尚未启用
@@ -425,6 +429,7 @@ namespace DigitalPlatform.LibraryClient
                         out strError);
                     if (nRet == -1)
                     {
+                        /*
                         if (this.Prompt != null)
                         {
                             MessagePromptEventArgs e = new MessagePromptEventArgs();
@@ -441,6 +446,9 @@ namespace DigitalPlatform.LibraryClient
                         }
                         else
                             throw new Exception(strError);
+                        */
+
+                        throw new Exception(strError);
                     }
 #if NO
                     if (nRet == -1)
@@ -751,8 +759,8 @@ namespace DigitalPlatform.LibraryClient
                     }
                     finally
                     {
-                            //if (this.Prompt != null)
-                            //    loader.Prompt -= new MessagePromptEventHandler(loader_Prompt);
+                        //if (this.Prompt != null)
+                        //    loader.Prompt -= new MessagePromptEventHandler(loader_Prompt);
                     }
 
                     lDoneSize = loader.lProgressValue;
@@ -1053,24 +1061,25 @@ namespace DigitalPlatform.LibraryClient
         {
             long lHintNext = 0;
             strError = "";
+
             long lRet = 0;
 
-            /*
-            // return:
-            //      -1  出错
-            //      0   没有找到日志记录
-            //      >0  附件总长度
-            long lRet = this.Channel.DownloadOperlogAttachment(
-                this.Stop,   // stop,
-                item.Date + ".log",
-                item.Index,
-                -1, // lHint,
-                strCurrentFileName,
-                out lHintNext,
-                out strError);
-            if (lRet == -1)
-                return -1;
-            */
+            //todo 2021/4/2
+            //// return:
+            ////      -1  出错
+            ////      0   没有找到日志记录
+            ////      >0  附件总长度
+            //long lRet = this.Channel.DownloadOperlogAttachment(
+            //    this.Stop,   // stop,
+            //    item.Date + ".log",
+            //    item.Index,
+            //    -1, // lHint,
+            //    strCurrentFileName,
+            //    out lHintNext,
+            //    out strError);
+            //if (lRet == -1)
+            //    return -1;
+
             return lRet;
         }
 
@@ -1193,52 +1202,5 @@ namespace DigitalPlatform.LibraryClient
     {
         OperLog = 0x01,     // 操作日志
         AccessLog = 0x02,   // 只读日志
-    }
-
-
-    /// <summary>
-    /// 消息提示事件
-    /// </summary>
-    /// <param name="sender">发送者</param>
-    /// <param name="e">事件参数</param>
-    public delegate void MessagePromptEventHandler(object sender,
-        MessagePromptEventArgs e);
-
-    /// <summary>
-    /// 空闲事件的参数
-    /// </summary>
-    public class MessagePromptEventArgs : EventArgs
-    {
-        public string MessageText = ""; // [in] 提示文字
-
-        public bool IncludeOperText = false;   // [in] MessageText 提示文字中是否包含了操作说明部分？如果没有包含，则显示对话框时候要补上通用的操作说明语句
-
-        public string[] ButtonCaptions = null;  // 按钮上希望出现的文字。如果为 null，表示由相关模块自行决定该显示什么(默认的一些文字)
-
-        public string Actions = ""; // [in] 可选的动作。例如 "yes,no,cancel"
-        public string ResultAction = "";  // [out] 返回希望采取的动作
-    }
-
-    /// <summary>
-    /// dp2Library 通讯访问异常
-    /// </summary>
-    public class ChannelException : Exception
-    {
-        /// <summary>
-        /// 错误码
-        /// </summary>
-        public ErrorCode ErrorCode = ErrorCode.NoError;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="error"></param>
-        /// <param name="strText"></param>
-        public ChannelException(ErrorCode error,
-            string strText)
-            : base(strText)
-        {
-            this.ErrorCode = error;
-        }
     }
 }

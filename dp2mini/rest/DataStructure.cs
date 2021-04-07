@@ -906,20 +906,23 @@ namespace DigitalPlatform.LibraryRestClient
         public string strFilter { get; set; }
     }
 
-    [DataContract]
-    public class GetOperLogsResult
+
+
+        [DataContract]
+    public class GetOperLogsResponse
     {
-        [DataMember]
-        public long Value { get; set; }
-
-        [DataMember]
-        public string ErrorInfo { get; set; }
-
-        [DataMember]
-        public ErrorCode ErrorCode { get; set; }
+        //[DataMember]
+        //public long Value { get; set; }
 
         //[DataMember]
-        ////public LibraryServerResult Result { get; set; }
+        //public string ErrorInfo { get; set; }
+
+        //[DataMember]
+        //public ErrorCode ErrorCode { get; set; }
+
+        [DataMember]
+        public LibraryServerResult GetOperLogsResult { get; set; }
+
         [DataMember]
         public OperLogInfo[] records { get; set; }
     }
