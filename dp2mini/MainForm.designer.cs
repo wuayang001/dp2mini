@@ -202,7 +202,7 @@
             // 
             this.toolStripLabel_transferStatis.Name = "toolStripLabel_transferStatis";
             this.toolStripLabel_transferStatis.Size = new System.Drawing.Size(82, 28);
-            this.toolStripLabel_transferStatis.Text = "同步日志";
+            this.toolStripLabel_transferStatis.Text = "日志查询";
             this.toolStripLabel_transferStatis.Click += new System.EventHandler(this.toolStripLabel_transferStatis_Click);
             // 
             // MainForm

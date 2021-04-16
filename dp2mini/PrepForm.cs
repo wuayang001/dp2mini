@@ -223,7 +223,7 @@ namespace dp2mini
                                 // 增加一行到预约到书
                                 AppendNewLine(this.listView_results, item);
 
-                                // 为预约到书记录建议hashtable，方便后面保留到本地库。因为listviewitem的信息不全。
+                                // 为预约到书记录建立hashtable，方便后面保留到本地库。因为listviewitem的信息不全。
                                 // 未处理的预约记录一般量不太大，放在内存hashtable应该可以的。
                                 this.ItemHt[strPath] = item;
 

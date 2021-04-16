@@ -35,18 +35,99 @@
             this.dateTimePicker_end = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox_batchNo = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.listView_results = new System.Windows.Forms.ListView();
+            this.columnHeader_log_fileName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_log_index = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_log_libraryCode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_log_operType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_log_operator = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_log_operTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.comboBox_quickSetFilenames = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_index = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_libraryCode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_operType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_operator = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_operTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_seconds = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_attachment = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_comment = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader11 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader12 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader17 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader18 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader19 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader20 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader21 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader22 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader23 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader24 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader25 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader26 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader27 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader28 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader29 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader30 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader31 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader32 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader33 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader34 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader35 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader36 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.button_toExcel = new System.Windows.Forms.Button();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.textBox_xml = new System.Windows.Forms.TextBox();
+            this.tabControl_table = new System.Windows.Forms.TabControl();
+            this.tabPage_all = new System.Windows.Forms.TabPage();
+            this.tabPage_borrow = new System.Windows.Forms.TabPage();
+            this.listView_log_borrow = new System.Windows.Forms.ListView();
+            this.columnHeader_borrow_date = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_inex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_librarycode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_location = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_patronBarcode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_barcode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_opretor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_opretime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.tabPage_borrowStatic = new System.Windows.Forms.TabPage();
+            this.listView_borrowStatis = new System.Windows.Forms.ListView();
+            this.columnHeader37 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader38 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader46 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader47 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            this.tabControl_table.SuspendLayout();
+            this.tabPage_all.SuspendLayout();
+            this.tabPage_borrow.SuspendLayout();
+            this.tabPage_borrowStatic.SuspendLayout();
             this.SuspendLayout();
             // 
             // button_search
             // 
             this.button_search.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_search.Location = new System.Drawing.Point(913, 11);
-            this.button_search.Margin = new System.Windows.Forms.Padding(5);
+            this.button_search.Location = new System.Drawing.Point(541, 6);
+            this.button_search.Margin = new System.Windows.Forms.Padding(4);
             this.button_search.Name = "button_search";
-            this.button_search.Size = new System.Drawing.Size(102, 40);
+            this.button_search.Size = new System.Drawing.Size(83, 34);
             this.button_search.TabIndex = 2;
             this.button_search.Text = "查询";
             this.button_search.UseVisualStyleBackColor = true;
@@ -56,20 +137,20 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(17, 19);
-            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label1.Location = new System.Drawing.Point(11, 13);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(137, 25);
+            this.label1.Size = new System.Drawing.Size(115, 21);
             this.label1.TabIndex = 0;
             this.label1.Text = "日期范围：";
             // 
             // button_stop
             // 
             this.button_stop.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_stop.Location = new System.Drawing.Point(1025, 12);
-            this.button_stop.Margin = new System.Windows.Forms.Padding(5);
+            this.button_stop.Location = new System.Drawing.Point(628, 6);
+            this.button_stop.Margin = new System.Windows.Forms.Padding(4);
             this.button_stop.Name = "button_stop";
-            this.button_stop.Size = new System.Drawing.Size(89, 40);
+            this.button_stop.Size = new System.Drawing.Size(73, 34);
             this.button_stop.TabIndex = 3;
             this.button_stop.Text = "停止";
             this.button_stop.UseVisualStyleBackColor = true;
@@ -77,26 +158,28 @@
             // 
             // dateTimePicker_start
             // 
-            this.dateTimePicker_start.Location = new System.Drawing.Point(178, 16);
+            this.dateTimePicker_start.Location = new System.Drawing.Point(143, 9);
+            this.dateTimePicker_start.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.dateTimePicker_start.Name = "dateTimePicker_start";
-            this.dateTimePicker_start.Size = new System.Drawing.Size(200, 31);
+            this.dateTimePicker_start.Size = new System.Drawing.Size(178, 28);
             this.dateTimePicker_start.TabIndex = 4;
             // 
             // dateTimePicker_end
             // 
-            this.dateTimePicker_end.Location = new System.Drawing.Point(431, 16);
+            this.dateTimePicker_end.Location = new System.Drawing.Point(360, 9);
+            this.dateTimePicker_end.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.dateTimePicker_end.Name = "dateTimePicker_end";
-            this.dateTimePicker_end.Size = new System.Drawing.Size(200, 31);
+            this.dateTimePicker_end.Size = new System.Drawing.Size(175, 28);
             this.dateTimePicker_end.TabIndex = 6;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(386, 19);
-            this.label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label2.Location = new System.Drawing.Point(327, 13);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(37, 25);
+            this.label2.Size = new System.Drawing.Size(31, 21);
             this.label2.TabIndex = 7;
             this.label2.Text = "至";
             // 
@@ -104,62 +187,557 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(133, 19);
-            this.label3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label3.Location = new System.Drawing.Point(106, 13);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(37, 25);
+            this.label3.Size = new System.Drawing.Size(31, 21);
             this.label3.TabIndex = 8;
             this.label3.Text = "从";
             // 
-            // textBox_batchNo
+            // listView_results
             // 
-            this.textBox_batchNo.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_batchNo.Location = new System.Drawing.Point(744, 14);
-            this.textBox_batchNo.Margin = new System.Windows.Forms.Padding(5);
-            this.textBox_batchNo.Name = "textBox_batchNo";
-            this.textBox_batchNo.Size = new System.Drawing.Size(143, 35);
-            this.textBox_batchNo.TabIndex = 10;
+            this.listView_results.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView_results.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader_log_fileName,
+            this.columnHeader_log_index,
+            this.columnHeader_log_libraryCode,
+            this.columnHeader_log_operType,
+            this.columnHeader_log_operator,
+            this.columnHeader_log_operTime});
+            this.listView_results.FullRowSelect = true;
+            this.listView_results.GridLines = true;
+            this.listView_results.HideSelection = false;
+            this.listView_results.Location = new System.Drawing.Point(4, 4);
+            this.listView_results.Margin = new System.Windows.Forms.Padding(4);
+            this.listView_results.Name = "listView_results";
+            this.listView_results.Size = new System.Drawing.Size(774, 389);
+            this.listView_results.TabIndex = 12;
+            this.listView_results.UseCompatibleStateImageBehavior = false;
+            this.listView_results.View = System.Windows.Forms.View.Details;
+            this.listView_results.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_results_ColumnClick);
+            this.listView_results.SelectedIndexChanged += new System.EventHandler(this.listView_results_SelectedIndexChanged);
             // 
-            // label4
+            // columnHeader_log_fileName
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(647, 19);
-            this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(112, 25);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "批次号：";
+            this.columnHeader_log_fileName.Text = "日期";
+            this.columnHeader_log_fileName.Width = 97;
             // 
-            // textBox1
+            // columnHeader_log_index
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBox1.Location = new System.Drawing.Point(22, 72);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(1070, 534);
-            this.textBox1.TabIndex = 11;
+            this.columnHeader_log_index.Text = "序号";
+            // 
+            // columnHeader_log_libraryCode
+            // 
+            this.columnHeader_log_libraryCode.Text = "馆代码";
+            this.columnHeader_log_libraryCode.Width = 81;
+            // 
+            // columnHeader_log_operType
+            // 
+            this.columnHeader_log_operType.Text = "操作类型";
+            this.columnHeader_log_operType.Width = 119;
+            // 
+            // columnHeader_log_operator
+            // 
+            this.columnHeader_log_operator.Text = "操作者";
+            this.columnHeader_log_operator.Width = 82;
+            // 
+            // columnHeader_log_operTime
+            // 
+            this.columnHeader_log_operTime.Text = "操作时间";
+            this.columnHeader_log_operTime.Width = 150;
+            // 
+            // comboBox_quickSetFilenames
+            // 
+            this.comboBox_quickSetFilenames.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.comboBox_quickSetFilenames.FormattingEnabled = true;
+            this.comboBox_quickSetFilenames.Items.AddRange(new object[] {
+            "今天",
+            "本周",
+            "本月",
+            "本年",
+            "最近 7 天",
+            "最近 30 天",
+            "最近 31 天",
+            "最近 365 天",
+            "最近 10 年"});
+            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(200, 46);
+            this.comboBox_quickSetFilenames.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.comboBox_quickSetFilenames.Name = "comboBox_quickSetFilenames";
+            this.comboBox_quickSetFilenames.Size = new System.Drawing.Size(122, 29);
+            this.comboBox_quickSetFilenames.TabIndex = 14;
+            this.comboBox_quickSetFilenames.SelectedIndexChanged += new System.EventHandler(this.comboBox_quickSetFilenames_SelectedIndexChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(14, 50);
+            this.label6.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(189, 21);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "快速设定时间范围:";
+            // 
+            // columnHeader_filename
+            // 
+            this.columnHeader_filename.Text = "文件名";
+            this.columnHeader_filename.Width = 150;
+            // 
+            // columnHeader_index
+            // 
+            this.columnHeader_index.Text = "序号";
+            this.columnHeader_index.Width = 100;
+            // 
+            // columnHeader_libraryCode
+            // 
+            this.columnHeader_libraryCode.Text = "馆代码";
+            this.columnHeader_libraryCode.Width = 127;
+            // 
+            // columnHeader_operType
+            // 
+            this.columnHeader_operType.Text = "操作类型";
+            this.columnHeader_operType.Width = 200;
+            // 
+            // columnHeader_operator
+            // 
+            this.columnHeader_operator.Text = "操作者";
+            this.columnHeader_operator.Width = 200;
+            // 
+            // columnHeader_operTime
+            // 
+            this.columnHeader_operTime.Text = "操作时间";
+            this.columnHeader_operTime.Width = 200;
+            // 
+            // columnHeader_seconds
+            // 
+            this.columnHeader_seconds.Text = "耗时(秒)";
+            this.columnHeader_seconds.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader_attachment
+            // 
+            this.columnHeader_attachment.Text = "附件";
+            this.columnHeader_attachment.Width = 87;
+            // 
+            // columnHeader_comment
+            // 
+            this.columnHeader_comment.Text = "附注";
+            this.columnHeader_comment.Width = 160;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "文件名";
+            this.columnHeader1.Width = 150;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "序号";
+            this.columnHeader2.Width = 100;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "馆代码";
+            this.columnHeader3.Width = 127;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "操作类型";
+            this.columnHeader4.Width = 200;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "操作者";
+            this.columnHeader5.Width = 200;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "操作时间";
+            this.columnHeader6.Width = 200;
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "耗时(秒)";
+            this.columnHeader7.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "附件";
+            this.columnHeader8.Width = 87;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "附注";
+            this.columnHeader9.Width = 160;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "文件名";
+            this.columnHeader10.Width = 150;
+            // 
+            // columnHeader11
+            // 
+            this.columnHeader11.Text = "序号";
+            this.columnHeader11.Width = 100;
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Text = "馆代码";
+            this.columnHeader12.Width = 127;
+            // 
+            // columnHeader13
+            // 
+            this.columnHeader13.Text = "操作类型";
+            this.columnHeader13.Width = 200;
+            // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "操作者";
+            this.columnHeader14.Width = 200;
+            // 
+            // columnHeader15
+            // 
+            this.columnHeader15.Text = "操作时间";
+            this.columnHeader15.Width = 200;
+            // 
+            // columnHeader16
+            // 
+            this.columnHeader16.Text = "耗时(秒)";
+            this.columnHeader16.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader17
+            // 
+            this.columnHeader17.Text = "附件";
+            this.columnHeader17.Width = 87;
+            // 
+            // columnHeader18
+            // 
+            this.columnHeader18.Text = "附注";
+            this.columnHeader18.Width = 160;
+            // 
+            // columnHeader19
+            // 
+            this.columnHeader19.Text = "文件名";
+            this.columnHeader19.Width = 150;
+            // 
+            // columnHeader20
+            // 
+            this.columnHeader20.Text = "序号";
+            this.columnHeader20.Width = 100;
+            // 
+            // columnHeader21
+            // 
+            this.columnHeader21.Text = "馆代码";
+            this.columnHeader21.Width = 127;
+            // 
+            // columnHeader22
+            // 
+            this.columnHeader22.Text = "操作类型";
+            this.columnHeader22.Width = 200;
+            // 
+            // columnHeader23
+            // 
+            this.columnHeader23.Text = "操作者";
+            this.columnHeader23.Width = 200;
+            // 
+            // columnHeader24
+            // 
+            this.columnHeader24.Text = "操作时间";
+            this.columnHeader24.Width = 200;
+            // 
+            // columnHeader25
+            // 
+            this.columnHeader25.Text = "耗时(秒)";
+            this.columnHeader25.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader26
+            // 
+            this.columnHeader26.Text = "附件";
+            this.columnHeader26.Width = 87;
+            // 
+            // columnHeader27
+            // 
+            this.columnHeader27.Text = "附注";
+            this.columnHeader27.Width = 160;
+            // 
+            // columnHeader28
+            // 
+            this.columnHeader28.Text = "文件名";
+            this.columnHeader28.Width = 150;
+            // 
+            // columnHeader29
+            // 
+            this.columnHeader29.Text = "序号";
+            this.columnHeader29.Width = 100;
+            // 
+            // columnHeader30
+            // 
+            this.columnHeader30.Text = "馆代码";
+            this.columnHeader30.Width = 127;
+            // 
+            // columnHeader31
+            // 
+            this.columnHeader31.Text = "操作类型";
+            this.columnHeader31.Width = 200;
+            // 
+            // columnHeader32
+            // 
+            this.columnHeader32.Text = "操作者";
+            this.columnHeader32.Width = 200;
+            // 
+            // columnHeader33
+            // 
+            this.columnHeader33.Text = "操作时间";
+            this.columnHeader33.Width = 200;
+            // 
+            // columnHeader34
+            // 
+            this.columnHeader34.Text = "耗时(秒)";
+            this.columnHeader34.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader35
+            // 
+            this.columnHeader35.Text = "附件";
+            this.columnHeader35.Width = 87;
+            // 
+            // columnHeader36
+            // 
+            this.columnHeader36.Text = "附注";
+            this.columnHeader36.Width = 160;
+            // 
+            // button_toExcel
+            // 
+            this.button_toExcel.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_toExcel.Location = new System.Drawing.Point(541, 46);
+            this.button_toExcel.Margin = new System.Windows.Forms.Padding(4);
+            this.button_toExcel.Name = "button_toExcel";
+            this.button_toExcel.Size = new System.Drawing.Size(160, 34);
+            this.button_toExcel.TabIndex = 15;
+            this.button_toExcel.Text = "导出Excel";
+            this.button_toExcel.UseVisualStyleBackColor = true;
+            this.button_toExcel.Click += new System.EventHandler(this.button_toExcel_Click);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(6, 6);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.listView_results);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.textBox_xml);
+            this.splitContainer1.Size = new System.Drawing.Size(1178, 397);
+            this.splitContainer1.SplitterDistance = 782;
+            this.splitContainer1.TabIndex = 16;
+            // 
+            // textBox_xml
+            // 
+            this.textBox_xml.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_xml.Location = new System.Drawing.Point(3, 5);
+            this.textBox_xml.Multiline = true;
+            this.textBox_xml.Name = "textBox_xml";
+            this.textBox_xml.ReadOnly = true;
+            this.textBox_xml.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox_xml.Size = new System.Drawing.Size(386, 388);
+            this.textBox_xml.TabIndex = 0;
+            // 
+            // tabControl_table
+            // 
+            this.tabControl_table.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tabControl_table.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl_table.Controls.Add(this.tabPage_all);
+            this.tabControl_table.Controls.Add(this.tabPage_borrow);
+            this.tabControl_table.Controls.Add(this.tabPage_borrowStatic);
+            this.tabControl_table.Location = new System.Drawing.Point(18, 87);
+            this.tabControl_table.Name = "tabControl_table";
+            this.tabControl_table.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.tabControl_table.SelectedIndex = 0;
+            this.tabControl_table.Size = new System.Drawing.Size(1198, 441);
+            this.tabControl_table.TabIndex = 17;
+            // 
+            // tabPage_all
+            // 
+            this.tabPage_all.Controls.Add(this.splitContainer1);
+            this.tabPage_all.Location = new System.Drawing.Point(4, 4);
+            this.tabPage_all.Name = "tabPage_all";
+            this.tabPage_all.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_all.Size = new System.Drawing.Size(1190, 409);
+            this.tabPage_all.TabIndex = 0;
+            this.tabPage_all.Text = "日志总表";
+            this.tabPage_all.UseVisualStyleBackColor = true;
+            // 
+            // tabPage_borrow
+            // 
+            this.tabPage_borrow.Controls.Add(this.listView_log_borrow);
+            this.tabPage_borrow.Location = new System.Drawing.Point(4, 4);
+            this.tabPage_borrow.Name = "tabPage_borrow";
+            this.tabPage_borrow.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_borrow.Size = new System.Drawing.Size(1190, 409);
+            this.tabPage_borrow.TabIndex = 1;
+            this.tabPage_borrow.Text = "借书日志";
+            this.tabPage_borrow.UseVisualStyleBackColor = true;
+            // 
+            // listView_log_borrow
+            // 
+            this.listView_log_borrow.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView_log_borrow.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader_borrow_date,
+            this.columnHeader_borrow_inex,
+            this.columnHeader_borrow_librarycode,
+            this.columnHeader_borrow_location,
+            this.columnHeader_borrow_patronBarcode,
+            this.columnHeader_borrow_name,
+            this.columnHeader_borrow_barcode,
+            this.columnHeader_borrow_opretor,
+            this.columnHeader_borrow_opretime});
+            this.listView_log_borrow.FullRowSelect = true;
+            this.listView_log_borrow.GridLines = true;
+            this.listView_log_borrow.HideSelection = false;
+            this.listView_log_borrow.Location = new System.Drawing.Point(7, 10);
+            this.listView_log_borrow.Margin = new System.Windows.Forms.Padding(4);
+            this.listView_log_borrow.Name = "listView_log_borrow";
+            this.listView_log_borrow.Size = new System.Drawing.Size(1176, 389);
+            this.listView_log_borrow.TabIndex = 13;
+            this.listView_log_borrow.UseCompatibleStateImageBehavior = false;
+            this.listView_log_borrow.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader_borrow_date
+            // 
+            this.columnHeader_borrow_date.Text = "日期";
+            this.columnHeader_borrow_date.Width = 97;
+            // 
+            // columnHeader_borrow_inex
+            // 
+            this.columnHeader_borrow_inex.Text = "序号";
+            this.columnHeader_borrow_inex.Width = 56;
+            // 
+            // columnHeader_borrow_librarycode
+            // 
+            this.columnHeader_borrow_librarycode.Text = "馆代码";
+            this.columnHeader_borrow_librarycode.Width = 89;
+            // 
+            // columnHeader_borrow_location
+            // 
+            this.columnHeader_borrow_location.Text = "馆藏地";
+            this.columnHeader_borrow_location.Width = 81;
+            // 
+            // columnHeader_borrow_patronBarcode
+            // 
+            this.columnHeader_borrow_patronBarcode.Text = "读者证条码";
+            this.columnHeader_borrow_patronBarcode.Width = 119;
+            // 
+            // columnHeader_borrow_name
+            // 
+            this.columnHeader_borrow_name.Text = "读者姓名";
+            this.columnHeader_borrow_name.Width = 129;
+            // 
+            // columnHeader_borrow_barcode
+            // 
+            this.columnHeader_borrow_barcode.Text = "图书册条码";
+            this.columnHeader_borrow_barcode.Width = 150;
+            // 
+            // columnHeader_borrow_opretor
+            // 
+            this.columnHeader_borrow_opretor.Text = "操作者";
+            this.columnHeader_borrow_opretor.Width = 135;
+            // 
+            // columnHeader_borrow_opretime
+            // 
+            this.columnHeader_borrow_opretime.Text = "操作时间";
+            this.columnHeader_borrow_opretime.Width = 122;
+            // 
+            // tabPage_borrowStatic
+            // 
+            this.tabPage_borrowStatic.Controls.Add(this.listView_borrowStatis);
+            this.tabPage_borrowStatic.Location = new System.Drawing.Point(4, 4);
+            this.tabPage_borrowStatic.Name = "tabPage_borrowStatic";
+            this.tabPage_borrowStatic.Size = new System.Drawing.Size(1190, 409);
+            this.tabPage_borrowStatic.TabIndex = 2;
+            this.tabPage_borrowStatic.Text = "借书统计";
+            this.tabPage_borrowStatic.UseVisualStyleBackColor = true;
+            // 
+            // listView_borrowStatis
+            // 
+            this.listView_borrowStatis.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView_borrowStatis.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader37,
+            this.columnHeader38,
+            this.columnHeader46,
+            this.columnHeader47});
+            this.listView_borrowStatis.FullRowSelect = true;
+            this.listView_borrowStatis.GridLines = true;
+            this.listView_borrowStatis.HideSelection = false;
+            this.listView_borrowStatis.Location = new System.Drawing.Point(4, 4);
+            this.listView_borrowStatis.Margin = new System.Windows.Forms.Padding(4);
+            this.listView_borrowStatis.Name = "listView_borrowStatis";
+            this.listView_borrowStatis.Size = new System.Drawing.Size(1182, 401);
+            this.listView_borrowStatis.TabIndex = 14;
+            this.listView_borrowStatis.UseCompatibleStateImageBehavior = false;
+            this.listView_borrowStatis.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader37
+            // 
+            this.columnHeader37.Text = "馆藏地";
+            this.columnHeader37.Width = 97;
+            // 
+            // columnHeader38
+            // 
+            this.columnHeader38.Text = "读者证条码";
+            this.columnHeader38.Width = 148;
+            // 
+            // columnHeader46
+            // 
+            this.columnHeader46.Text = "读者姓名";
+            this.columnHeader46.Width = 200;
+            // 
+            // columnHeader47
+            // 
+            this.columnHeader47.Text = "借书数量";
+            this.columnHeader47.Width = 210;
             // 
             // TransferStatisForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1136, 630);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.textBox_batchNo);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(1228, 540);
+            this.Controls.Add(this.tabControl_table);
+            this.Controls.Add(this.button_toExcel);
+            this.Controls.Add(this.comboBox_quickSetFilenames);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.dateTimePicker_end);
             this.Controls.Add(this.dateTimePicker_start);
             this.Controls.Add(this.button_stop);
             this.Controls.Add(this.button_search);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(5);
+            this.Controls.Add(this.label2);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TransferStatisForm";
             this.Text = "调拨统计";
             this.Load += new System.EventHandler(this.PrepForm_Load);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            this.tabControl_table.ResumeLayout(false);
+            this.tabPage_all.ResumeLayout(false);
+            this.tabPage_borrow.ResumeLayout(false);
+            this.tabPage_borrowStatic.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -173,8 +751,81 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker_end;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox_batchNo;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ListView listView_results;
+        private System.Windows.Forms.ComboBox comboBox_quickSetFilenames;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ColumnHeader columnHeader_filename;
+        private System.Windows.Forms.ColumnHeader columnHeader_index;
+        private System.Windows.Forms.ColumnHeader columnHeader_libraryCode;
+        private System.Windows.Forms.ColumnHeader columnHeader_operType;
+        private System.Windows.Forms.ColumnHeader columnHeader_operator;
+        private System.Windows.Forms.ColumnHeader columnHeader_operTime;
+        private System.Windows.Forms.ColumnHeader columnHeader_seconds;
+        private System.Windows.Forms.ColumnHeader columnHeader_attachment;
+        private System.Windows.Forms.ColumnHeader columnHeader_comment;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
+        private System.Windows.Forms.ColumnHeader columnHeader9;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
+        private System.Windows.Forms.ColumnHeader columnHeader11;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
+        private System.Windows.Forms.ColumnHeader columnHeader14;
+        private System.Windows.Forms.ColumnHeader columnHeader15;
+        private System.Windows.Forms.ColumnHeader columnHeader16;
+        private System.Windows.Forms.ColumnHeader columnHeader17;
+        private System.Windows.Forms.ColumnHeader columnHeader18;
+        private System.Windows.Forms.ColumnHeader columnHeader19;
+        private System.Windows.Forms.ColumnHeader columnHeader20;
+        private System.Windows.Forms.ColumnHeader columnHeader21;
+        private System.Windows.Forms.ColumnHeader columnHeader22;
+        private System.Windows.Forms.ColumnHeader columnHeader23;
+        private System.Windows.Forms.ColumnHeader columnHeader24;
+        private System.Windows.Forms.ColumnHeader columnHeader25;
+        private System.Windows.Forms.ColumnHeader columnHeader26;
+        private System.Windows.Forms.ColumnHeader columnHeader27;
+        private System.Windows.Forms.ColumnHeader columnHeader28;
+        private System.Windows.Forms.ColumnHeader columnHeader29;
+        private System.Windows.Forms.ColumnHeader columnHeader30;
+        private System.Windows.Forms.ColumnHeader columnHeader31;
+        private System.Windows.Forms.ColumnHeader columnHeader32;
+        private System.Windows.Forms.ColumnHeader columnHeader33;
+        private System.Windows.Forms.ColumnHeader columnHeader34;
+        private System.Windows.Forms.ColumnHeader columnHeader35;
+        private System.Windows.Forms.ColumnHeader columnHeader36;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_fileName;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_index;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_libraryCode;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_operType;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_operator;
+        private System.Windows.Forms.ColumnHeader columnHeader_log_operTime;
+        private System.Windows.Forms.Button button_toExcel;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.TextBox textBox_xml;
+        public System.Windows.Forms.TabControl tabControl_table;
+        private System.Windows.Forms.TabPage tabPage_all;
+        private System.Windows.Forms.TabPage tabPage_borrow;
+        private System.Windows.Forms.TabPage tabPage_borrowStatic;
+        private System.Windows.Forms.ListView listView_log_borrow;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_date;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_inex;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_location;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_patronBarcode;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_name;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_barcode;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_opretor;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_opretime;
+        private System.Windows.Forms.ColumnHeader columnHeader_borrow_librarycode;
+        private System.Windows.Forms.ListView listView_borrowStatis;
+        private System.Windows.Forms.ColumnHeader columnHeader37;
+        private System.Windows.Forms.ColumnHeader columnHeader38;
+        private System.Windows.Forms.ColumnHeader columnHeader46;
+        private System.Windows.Forms.ColumnHeader columnHeader47;
     }
 }
