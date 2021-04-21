@@ -140,56 +140,41 @@ namespace dp2mini
                         ServerVersion = ""//serverVersion
                     };
 
-                    //TimeSpan old_timeout = channel.Timeout;
-                    //channel.Timeout = new TimeSpan(0, 2, 0);   // 二分钟
-
                     //loader.Prompt += Loader_Prompt;
                     try
                     {
-                        // int nRecCount = 0;
 
-                        string strLastItemDate = "";
-                        long lLastItemIndex = -1;
-                        // TODO: 计算遍历耗费的时间。如果太短了，要想办法让调主知道这一点，放缓重新调用的节奏，以避免 CPU 和网络资源太高
+                        int nIndex = 0;
+
                         foreach (OperLogItem item in loader)
                         {
                             token.ThrowIfCancellationRequested();
 
-                            //if (stop != null)
-                            //    stop.SetMessage("正在同步 " + item.Date + " " + item.Index.ToString() + " " + estimate.Text + "...");
-
-                            //if (string.IsNullOrEmpty(item.Xml) == true)
-                            //    goto CONTINUE;
-
-                                this.Invoke((Action)(() =>
-                                {
-                                   nRet= this.LoadLog(item, out strError);
-                                    if (nRet == -1)
-                                        throw new Exception(strError);
-                                }
-                                ));
-                            
-
-
-                            if (nRet == -1)
+                            this.Invoke((Action)(() =>
                             {
-                                strError = "同步 " + item.Date + " " + item.Index.ToString() + " 时出错: " + strError;
-                                throw new Exception(strError);
+                                nRet = this.LoadLog(item, out strError);
+                                if (nRet == -1)
+                                    throw new Exception(strError);
 
-                                //throw new ChannelException(channel.ErrorCode, strError);
+                                    // 通过外面显示一下进度
+                                    this._mainForm.SetStatusMessage("正在装载 " + item.Date + "-" + item.Index.ToString());
                             }
+                            ));
 
-                        // lProcessCount++;
-                        CONTINUE:
-                            // 便于循环外获得这些值
-                            strLastItemDate = item.Date;
-                            lLastItemIndex = item.Index + 1;
-
-                            // index = 0;  // 第一个日志文件后面的，都从头开始了
+                            nIndex++;
                         }
-                        //// 记忆
-                        //strLastDate = strLastItemDate;
-                        //last_index = lLastItemIndex;
+
+
+                        this.Invoke((Action)(() =>
+                        {
+                            //if (todoCount > 0)
+                            //{
+                            //    // 按证条码号排序
+                            //    this.SortCol(1);
+                            //}
+                            // 任务栏显示信息
+                            this._mainForm.SetStatusMessage("装载完成，共装入"+nIndex.ToString()+"条日志。");
+                        }));
                     }
                     finally
                     {
@@ -201,7 +186,12 @@ namespace dp2mini
                 // 进行取合，放在借书报表中
                 this.Invoke((Action)(() =>
                 {
-                    this.StaticBorrow();
+                    // 借书统计
+                    this.StatisBorrow();
+
+                    // 还书统计
+                    this.StatisReturn();
+
                 }
 ));
 
@@ -233,36 +223,79 @@ namespace dp2mini
             ));
         }
 
-        public void StaticBorrow()
+        // 对借书日志进行聚合
+        public void StatisBorrow()
         {
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = this._borrowItems.GroupBy(
-                x => new { x.location,x.readerBarcode,x.readerName },
+                x => new { x.location, x.readerBarcode, x.readerName,x.dept },
                 (key, item_list) => new BorrowGroup
                 {
-                    Location = key.location,
+                    location = key.location,
                     readerBarcode = key.readerBarcode,
-                    readerName=key.readerName,
+                    readerName = key.readerName,
+                    dept = key.dept,
                     Items = new List<BorrowLogItem>(item_list)
-                }).ToList();
+                }).OrderByDescending(o=>o.Items.Count).OrderBy(o => o.location).ToList();
 
 
             foreach (BorrowGroup group in list)
             {
-                ListViewItem viewItem = new ListViewItem(group.Location, 0);
+                ListViewItem viewItem = new ListViewItem(group.location, 0);
                 this.listView_borrowStatis.Items.Add(viewItem);
 
                 viewItem.SubItems.Add(group.readerBarcode);
                 viewItem.SubItems.Add(group.readerName);
+                viewItem.SubItems.Add(group.dept);
+                viewItem.SubItems.Add(group.Items.Count.ToString());
+            }
+
+            //if (this._borrowItems.Count > 0)
+            //{
+            //    // 按证条码号排序
+            //    SortCol(this.listView_borrowStatis, this.SortColumns_borrowStatis, 3);
+
+            //    SortCol(this.listView_borrowStatis, this.SortColumns_borrowStatis, 0);
+            //}
+        }
+
+        // 对还书日志进行聚合
+        public void StatisReturn()
+        {
+            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
+            var list = this._returnItems.GroupBy(
+                x => new { x.location, x.readerBarcode, x.readerName,x.dept },
+                (key, item_list) => new BorrowGroup
+                {
+                    location = key.location,
+                    readerBarcode = key.readerBarcode,
+                    readerName = key.readerName,
+                    dept=key.dept,
+                    Items = new List<BorrowLogItem>(item_list)
+                }).OrderByDescending(o => o.Items.Count).OrderBy(o => o.location).ToList();
+
+
+            foreach (BorrowGroup group in list)
+            {
+                ListViewItem viewItem = new ListViewItem(group.location, 0);
+                this.listView_returnStatis.Items.Add(viewItem);
+
+                viewItem.SubItems.Add(group.readerBarcode);
+                viewItem.SubItems.Add(group.readerName);
+                viewItem.SubItems.Add(group.dept);
                 viewItem.SubItems.Add(group.Items.Count.ToString());
             }
         }
 
+
         // 日志记录hastable,方便点一条，在右侧看到详细信息
         public Hashtable _logItems = new Hashtable();
 
-        // 用于做读者聚会的类
+        // 用于做借书聚合的类
         List<BorrowLogItem> _borrowItems = new List<BorrowLogItem>();
+
+        // 用于做还书聚合的类
+        List<BorrowLogItem> _returnItems = new List<BorrowLogItem>();
 
         public int LoadLog(OperLogItem logItem,out string error)
         {
@@ -318,11 +351,18 @@ namespace dp2mini
             _logItems[key] = logItem;
 
 
-            // 如果是borrow加到借书表中
-            if (operation == "borrow")
+            // 如果是borrow加到借书表中，发现borrow和return的格式一致
+            if (operation == "borrow" || operation=="return")
             {
                 ListViewItem viewItem = new ListViewItem(logItem.Date, 0);
-                this.listView_log_borrow.Items.Add(viewItem);
+
+                // 根据操作类型，加到不同的表格
+                if (operation == "borrow")
+                    this.listView_log_borrow.Items.Add(viewItem);
+                else
+                    this.listView_return.Items.Add(viewItem);
+                
+                
                 viewItem.SubItems.Add(logItem.Index.ToString());
                 viewItem.SubItems.Add(libraryCode);
 
@@ -331,6 +371,7 @@ namespace dp2mini
                 {
                     string info = "获取借书详细信息出错" + strError;
                     viewItem.SubItems.Add(info);
+                    viewItem.SubItems.Add("");
                     viewItem.SubItems.Add("");
                     viewItem.SubItems.Add("");
                     viewItem.SubItems.Add("");
@@ -344,10 +385,14 @@ namespace dp2mini
                     viewItem.SubItems.Add(borrowLog.location);
                     viewItem.SubItems.Add(borrowLog.readerBarcode);
                     viewItem.SubItems.Add(borrowLog.readerName);
+                    viewItem.SubItems.Add(borrowLog.dept);
                     viewItem.SubItems.Add(borrowLog.itemBarcode);
 
-                    // 加到内存集中
-                    _borrowItems.Add(borrowLog);
+                    // 根据类型判断，加到对应的内存集中
+                    if (operation == "borrow")
+                        this._borrowItems.Add(borrowLog);
+                    else
+                        this._returnItems.Add(borrowLog);
                 }
 
 
@@ -397,14 +442,17 @@ namespace dp2mini
 
             // 清空借书列表
             this.listView_log_borrow.Items.Clear();
-
             this.listView_borrowStatis.Items.Clear();
-
             // 清空借书记录内存表
             _borrowItems.Clear();
 
-            ////设置父窗口状态栏参数
-            //this._mainForm.SetStatusMessage("");
+            // 清空借书列表
+            this.listView_return.Items.Clear();
+            this.listView_returnStatis.Items.Clear();
+            this._returnItems.Clear();
+
+            //设置父窗口状态栏参数
+            this._mainForm.SetStatusMessage("");
         }
 
         /// <summary>
@@ -415,6 +463,8 @@ namespace dp2mini
         {
             this.button_search.Enabled = bEnable;
             this.button_stop.Enabled = !(bEnable);
+
+            this.button_toExcel.Enabled = bEnable;
         }
 
         /// <summary>
@@ -520,33 +570,7 @@ namespace dp2mini
             this.BeginInvoke(d, new object[] { sender });
         }
 
-        // 点击列头排序
-        private void listView_results_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            int nClickColumn = e.Column;
-
-            this.SortCol(nClickColumn);
-        }
-        SortColumns SortColumns1 = new SortColumns();
-
-        public void SortCol(int nClickColumn)
-        {
-            ColumnSortStyle sortStyle = ColumnSortStyle.LeftAlign;
-
-            // 第一列为记录路径，排序风格特殊
-            if (nClickColumn == 0)
-                sortStyle = ColumnSortStyle.RecPath;
-
-            this.SortColumns1.SetFirstColumn(nClickColumn,
-                sortStyle,
-                this.listView_results.Columns,
-                true);
-
-            // 排序
-            this.listView_results.ListViewItemSorter = new SortColumnsComparer(this.SortColumns1);
-
-            this.listView_results.ListViewItemSorter = null;
-        }
+ 
 
         // 把列表中的全部记录导出excel
         private void button_toExcel_Click(object sender, EventArgs e)
@@ -584,6 +608,10 @@ namespace dp2mini
                         temp = this.listView_log_borrow;
                     else if (tabName == "借书统计")
                         temp = this.listView_borrowStatis;
+                    else if (tabName == "还书日志")
+                        temp = this.listView_return;
+                    else if (tabName == "还书统计")
+                        temp = this.listView_returnStatis;
                     else
                         continue;  // 不认识的表
 
@@ -725,6 +753,10 @@ namespace dp2mini
                 //string strCreateDate = GetRfc1123DisplayString(DomUtil.GetElementInnerText(reader_dom.DocumentElement, "createDate"));
                 //string strExpireDate = GetRfc1123DisplayString(DomUtil.GetElementInnerText(reader_dom.DocumentElement, "expireDate"));
                 borrowLog.readerName = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "name");
+
+                //><department>单位</department>
+                borrowLog.dept = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "department");
+
             }
 
             // 获取图书信息
@@ -756,8 +788,152 @@ namespace dp2mini
             return 0;
         }
 
+        #region 关于点列头排序
 
+        // 借书日志 点列头排序
+        private void listView_log_borrow_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_log_borrow, SortColumns_borrow, nClickColumn);
+        }
 
+        // 借书统计 点列头排序
+        private void listView_borrowStatis_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_borrowStatis, SortColumns_borrowStatis, nClickColumn);
+        }
+
+        // 还书日志 点列头排序
+        private void listView_return_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_return, SortColumns_return, nClickColumn);
+        }
+
+        // 还书统计 点列头排序
+        private void listView_returnStatis_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_returnStatis, SortColumns_borrowStatis, nClickColumn);
+        }
+
+        // 点击列头排序
+        private void listView_results_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_results, SortColumns_all, nClickColumn);
+        }
+        SortColumns SortColumns_all = new SortColumns();
+        SortColumns SortColumns_borrow = new SortColumns();
+        SortColumns SortColumns_borrowStatis = new SortColumns();
+        SortColumns SortColumns_return = new SortColumns();
+        SortColumns SortColumns_returnStatis = new SortColumns();
+        public static void SortCol(ListView myListView, SortColumns sortCol, int nClickColumn)
+        {
+            ColumnSortStyle sortStyle = ColumnSortStyle.LeftAlign;
+
+            // 第一列为记录路径，排序风格特殊
+            if (nClickColumn == 0)
+                sortStyle = ColumnSortStyle.RecPath;
+
+            sortCol.SetFirstColumn(nClickColumn,
+                sortStyle,
+                myListView.Columns,
+                true);
+
+            // 排序
+            myListView.ListViewItemSorter = new SortColumnsComparer(sortCol);
+
+            myListView.ListViewItemSorter = null;
+        }
+
+        #endregion
+
+        private void ToolStripMenuItem_huizong_Click(object sender, EventArgs e)
+        {
+            string totalCountText = "";
+            ListView mylistview = null;
+            if (this.tabControl_table.SelectedTab.Text == "借书统计")
+            {
+                mylistview = listView_borrowStatis;
+                totalCountText = "借书";
+            }
+            else if (this.tabControl_table.SelectedTab.Text == "还书统计")
+            {
+                mylistview = this.listView_returnStatis;
+                totalCountText = "还书";
+            }
+
+            if (mylistview == null)
+                return;
+
+            if (mylistview.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "请先选中要汇总的行。");
+                return;
+            }
+
+            List<BorrowGroup> list = new List<BorrowGroup>();
+            foreach (ListViewItem item in mylistview.SelectedItems)
+            {
+                BorrowGroup group = new BorrowGroup();
+                group.location = item.SubItems[0].Text;
+                group.readerBarcode = item.SubItems[1].Text;
+                group.readerName = item.SubItems[2].Text;
+                group.count = Convert.ToInt32(item.SubItems[4].Text);
+                list.Add(group);
+            }
+
+            string text = "";
+
+            var groups = list.GroupBy(p => p.location);
+            foreach (var group in groups)
+            {
+                //Console.WriteLine(group.Key);
+
+                string location = group.Key;
+
+                int readerCount = 0;
+                int totalCount = 0;
+                foreach (var one in group)
+                {
+                    readerCount++;
+
+                    totalCount += one.count;
+
+                    //Console.WriteLine($"\t{person.Name},{person.Age}");
+                }
+
+                string line = location + "  读者数量:" + readerCount + "  "+totalCountText+"总量:" + totalCount;
+
+                if (text != "")
+                    text += "\r\n";
+                text += line;
+            }
+
+            MessageBox.Show(this, text);
+        }
+
+        private void 全选ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.tabControl_table.SelectedTab.Text == "借书统计")
+            {
+                foreach (ListViewItem item in this.listView_borrowStatis.Items)
+                {
+                    item.Selected = true;
+                }
+            }
+            else
+            {
+                foreach (ListViewItem item in this.listView_returnStatis.Items)
+                {
+                    item.Selected = true;
+                }
+
+            }
+
+        }
     }
 
     public class BorrowLogItem
@@ -780,6 +956,9 @@ namespace dp2mini
         // 读者姓名
         public string readerName { get; set; }
 
+        // 读者单位
+        public string dept { get; set; }
+
         // 图书类型
         public string bookType { get; set; }
 
@@ -795,12 +974,24 @@ namespace dp2mini
     // 借书统计
     public class BorrowGroup
     {
-        public string Location { get; set; }
+        public string location { get; set; }
         public string readerBarcode { get; set; }
 
         public string readerName { get; set; }
 
+        public string dept { get; set; }
+
         public List<BorrowLogItem> Items { get; set; }
+
+
+        public int count{ get; set; }
+    }
+
+    public class LocationGroup
+    {
+        public string location { get; set; }
+        public int readerCount { get; set; }
+        public int totalCount { get; set; }
     }
 
 }
