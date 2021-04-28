@@ -46,6 +46,7 @@
             this.toolStripButton_prep = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton_note = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel_transferStatis = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripLabel_marc = new System.Windows.Forms.ToolStripLabel();
             this.menuStrip_main.SuspendLayout();
             this.statusStrip_main.SuspendLayout();
             this.toolStrip_main.SuspendLayout();
@@ -170,7 +171,8 @@
             this.toolStrip_main.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton_prep,
             this.toolStripButton_note,
-            this.toolStripLabel_transferStatis});
+            this.toolStripLabel_transferStatis,
+            this.toolStripLabel_marc});
             this.toolStrip_main.Location = new System.Drawing.Point(0, 34);
             this.toolStrip_main.Name = "toolStrip_main";
             this.toolStrip_main.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
@@ -201,9 +203,16 @@
             // toolStripLabel_transferStatis
             // 
             this.toolStripLabel_transferStatis.Name = "toolStripLabel_transferStatis";
-            this.toolStripLabel_transferStatis.Size = new System.Drawing.Size(82, 28);
-            this.toolStripLabel_transferStatis.Text = "日志查询";
+            this.toolStripLabel_transferStatis.Size = new System.Drawing.Size(136, 28);
+            this.toolStripLabel_transferStatis.Text = "日志查询与统计";
             this.toolStripLabel_transferStatis.Click += new System.EventHandler(this.toolStripLabel_transferStatis_Click);
+            // 
+            // toolStripLabel_marc
+            // 
+            this.toolStripLabel_marc.Name = "toolStripLabel_marc";
+            this.toolStripLabel_marc.Size = new System.Drawing.Size(137, 28);
+            this.toolStripLabel_marc.Text = "MARC文件处理";
+            this.toolStripLabel_marc.Click += new System.EventHandler(this.toolStripLabel_marc_Click);
             // 
             // MainForm
             // 
@@ -252,6 +261,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton_note;
         private System.Windows.Forms.ToolStripLabel toolStripLabel_transferStatis;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_version;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel_marc;
     }
 }
 

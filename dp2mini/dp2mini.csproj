@@ -32,7 +32,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>23</ApplicationRevision>
+    <ApplicationRevision>24</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -224,6 +224,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api.cs" />
+    <Compile Include="core\PriceUtil.cs" />
+    <Compile Include="core\StringUtil.cs" />
+    <Compile Include="MarcForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MarcForm.designer.cs">
+      <DependentUpon>MarcForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MarcKernel\FieldNameList.cs" />
+    <Compile Include="MarcKernel\MarcDiff.cs" />
     <Compile Include="SelectSheetForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -279,7 +289,6 @@
     <Compile Include="opeLog\OperLogLoader.cs" />
     <Compile Include="opeLog\ProgressEstimate.cs" />
     <Compile Include="opeLog\Stop.cs" />
-    <Compile Include="text\StringUtil.cs" />
     <Compile Include="io\DateTimeUtil.cs" />
     <Compile Include="io\PathUtil.cs" />
     <Compile Include="LoginForm.cs">
@@ -343,6 +352,9 @@
       <DependentUpon>TransferStatisForm.cs</DependentUpon>
     </Compile>
     <Compile Include="xml\DomUtil.cs" />
+    <EmbeddedResource Include="MarcForm.resx">
+      <DependentUpon>MarcForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelectSheetForm.resx">
       <DependentUpon>SelectSheetForm.cs</DependentUpon>
     </EmbeddedResource>

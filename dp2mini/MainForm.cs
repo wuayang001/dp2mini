@@ -786,6 +786,11 @@ namespace dp2mini
         {
             EnsureChildForm<TransferStatisForm>(true);
         }
+
+        private void toolStripLabel_marc_Click(object sender, EventArgs e)
+        {
+            EnsureChildForm<MarcForm>(true);
+        }
     }
 
 }

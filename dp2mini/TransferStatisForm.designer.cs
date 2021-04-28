@@ -103,6 +103,7 @@
             this.columnHeader_borrow_location = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_borrow_patronBarcode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_borrow_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_borrow_dept = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_borrow_barcode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_borrow_opretor = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_borrow_opretime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -111,7 +112,11 @@
             this.columnHeader37 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader38 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader46 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader54 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader47 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.contextMenuStrip_statis = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.全选ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuItem_huizong = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage_return = new System.Windows.Forms.TabPage();
             this.listView_return = new System.Windows.Forms.ListView();
             this.columnHeader39 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -120,6 +125,7 @@
             this.columnHeader42 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader43 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader44 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader55 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader45 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader48 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader49 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -128,14 +134,8 @@
             this.columnHeader50 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader51 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader52 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader53 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ToolStripMenuItem_huizong = new System.Windows.Forms.ToolStripMenuItem();
-            this.全选ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip_statis = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.columnHeader_borrow_dept = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader54 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader55 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader56 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader53 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -144,9 +144,9 @@
             this.tabPage_all.SuspendLayout();
             this.tabPage_borrow.SuspendLayout();
             this.tabPage_borrowStatis.SuspendLayout();
+            this.contextMenuStrip_statis.SuspendLayout();
             this.tabPage_return.SuspendLayout();
             this.tabPage_returnStatis.SuspendLayout();
-            this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
             // 
             // button_search
@@ -673,6 +673,10 @@
             this.columnHeader_borrow_name.Text = "读者姓名";
             this.columnHeader_borrow_name.Width = 129;
             // 
+            // columnHeader_borrow_dept
+            // 
+            this.columnHeader_borrow_dept.Text = "读者单位";
+            // 
             // columnHeader_borrow_barcode
             // 
             this.columnHeader_borrow_barcode.Text = "图书册条码";
@@ -737,10 +741,38 @@
             this.columnHeader46.Text = "读者姓名";
             this.columnHeader46.Width = 166;
             // 
+            // columnHeader54
+            // 
+            this.columnHeader54.Text = "读者单位";
+            this.columnHeader54.Width = 96;
+            // 
             // columnHeader47
             // 
             this.columnHeader47.Text = "借书数量";
             this.columnHeader47.Width = 210;
+            // 
+            // contextMenuStrip_statis
+            // 
+            this.contextMenuStrip_statis.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.contextMenuStrip_statis.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.全选ToolStripMenuItem,
+            this.ToolStripMenuItem_huizong});
+            this.contextMenuStrip_statis.Name = "contextMenuStrip_statis";
+            this.contextMenuStrip_statis.Size = new System.Drawing.Size(171, 64);
+            // 
+            // 全选ToolStripMenuItem
+            // 
+            this.全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
+            this.全选ToolStripMenuItem.Size = new System.Drawing.Size(170, 30);
+            this.全选ToolStripMenuItem.Text = "全选";
+            this.全选ToolStripMenuItem.Click += new System.EventHandler(this.全选ToolStripMenuItem_Click);
+            // 
+            // ToolStripMenuItem_huizong
+            // 
+            this.ToolStripMenuItem_huizong.Name = "ToolStripMenuItem_huizong";
+            this.ToolStripMenuItem_huizong.Size = new System.Drawing.Size(170, 30);
+            this.ToolStripMenuItem_huizong.Text = "汇总选中项";
+            this.ToolStripMenuItem_huizong.Click += new System.EventHandler(this.ToolStripMenuItem_huizong_Click);
             // 
             // tabPage_return
             // 
@@ -810,6 +842,10 @@
             this.columnHeader44.Text = "读者姓名";
             this.columnHeader44.Width = 129;
             // 
+            // columnHeader55
+            // 
+            this.columnHeader55.Text = "读者单位";
+            // 
             // columnHeader45
             // 
             this.columnHeader45.Text = "图书册条码";
@@ -874,50 +910,14 @@
             this.columnHeader52.Text = "读者姓名";
             this.columnHeader52.Width = 200;
             // 
+            // columnHeader56
+            // 
+            this.columnHeader56.Text = "读者单位";
+            // 
             // columnHeader53
             // 
             this.columnHeader53.Text = "还书数量";
             this.columnHeader53.Width = 210;
-            // 
-            // ToolStripMenuItem_huizong
-            // 
-            this.ToolStripMenuItem_huizong.Name = "ToolStripMenuItem_huizong";
-            this.ToolStripMenuItem_huizong.Size = new System.Drawing.Size(170, 30);
-            this.ToolStripMenuItem_huizong.Text = "汇总选中项";
-            this.ToolStripMenuItem_huizong.Click += new System.EventHandler(this.ToolStripMenuItem_huizong_Click);
-            // 
-            // 全选ToolStripMenuItem
-            // 
-            this.全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
-            this.全选ToolStripMenuItem.Size = new System.Drawing.Size(170, 30);
-            this.全选ToolStripMenuItem.Text = "全选";
-            this.全选ToolStripMenuItem.Click += new System.EventHandler(this.全选ToolStripMenuItem_Click);
-            // 
-            // contextMenuStrip_statis
-            // 
-            this.contextMenuStrip_statis.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.contextMenuStrip_statis.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.全选ToolStripMenuItem,
-            this.ToolStripMenuItem_huizong});
-            this.contextMenuStrip_statis.Name = "contextMenuStrip_statis";
-            this.contextMenuStrip_statis.Size = new System.Drawing.Size(171, 64);
-            // 
-            // columnHeader_borrow_dept
-            // 
-            this.columnHeader_borrow_dept.Text = "读者单位";
-            // 
-            // columnHeader54
-            // 
-            this.columnHeader54.Text = "读者单位";
-            this.columnHeader54.Width = 96;
-            // 
-            // columnHeader55
-            // 
-            this.columnHeader55.Text = "读者单位";
-            // 
-            // columnHeader56
-            // 
-            this.columnHeader56.Text = "读者单位";
             // 
             // TransferStatisForm
             // 
@@ -937,7 +937,7 @@
             this.Controls.Add(this.label2);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TransferStatisForm";
-            this.Text = "调拨统计";
+            this.Text = "日志查询与统计";
             this.Load += new System.EventHandler(this.PrepForm_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -948,9 +948,9 @@
             this.tabPage_all.ResumeLayout(false);
             this.tabPage_borrow.ResumeLayout(false);
             this.tabPage_borrowStatis.ResumeLayout(false);
+            this.contextMenuStrip_statis.ResumeLayout(false);
             this.tabPage_return.ResumeLayout(false);
             this.tabPage_returnStatis.ResumeLayout(false);
-            this.contextMenuStrip_statis.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
