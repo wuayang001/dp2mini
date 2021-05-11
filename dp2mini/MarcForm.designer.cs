@@ -40,10 +40,10 @@
             this.button_tobdf = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.textBox_location = new System.Windows.Forms.TextBox();
             this.textBox_bookType = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.textBox_location = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -183,23 +183,6 @@
             this.groupBox1.TabIndex = 18;
             this.groupBox1.TabStop = false;
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 78);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(71, 18);
-            this.label5.TabIndex = 15;
-            this.label5.Text = "馆藏地:";
-            // 
-            // textBox_location
-            // 
-            this.textBox_location.Location = new System.Drawing.Point(121, 75);
-            this.textBox_location.Name = "textBox_location";
-            this.textBox_location.Size = new System.Drawing.Size(250, 28);
-            this.textBox_location.TabIndex = 19;
-            // 
             // textBox_bookType
             // 
             this.textBox_bookType.Location = new System.Drawing.Point(121, 121);
@@ -216,6 +199,23 @@
             this.label6.Size = new System.Drawing.Size(89, 18);
             this.label6.TabIndex = 20;
             this.label6.Text = "图书类型:";
+            // 
+            // textBox_location
+            // 
+            this.textBox_location.Location = new System.Drawing.Point(121, 75);
+            this.textBox_location.Name = "textBox_location";
+            this.textBox_location.Size = new System.Drawing.Size(250, 28);
+            this.textBox_location.TabIndex = 19;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 78);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(71, 18);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "馆藏地:";
             // 
             // MarcForm
             // 
@@ -234,7 +234,7 @@
             this.Controls.Add(this.comboBox_marcSyntax);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MarcForm";
-            this.Text = "预约到书查询";
+            this.Text = "MARC转BDF";
             this.Load += new System.EventHandler(this.PrepForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
