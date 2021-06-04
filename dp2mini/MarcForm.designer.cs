@@ -149,9 +149,9 @@
             // 
             // button_tobdf
             // 
-            this.button_tobdf.Location = new System.Drawing.Point(16, 368);
+            this.button_tobdf.Location = new System.Drawing.Point(16, 415);
             this.button_tobdf.Name = "button_tobdf";
-            this.button_tobdf.Size = new System.Drawing.Size(380, 86);
+            this.button_tobdf.Size = new System.Drawing.Size(164, 39);
             this.button_tobdf.TabIndex = 16;
             this.button_tobdf.Text = "转换为BDF文件";
             this.button_tobdf.UseVisualStyleBackColor = true;

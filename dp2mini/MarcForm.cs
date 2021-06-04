@@ -368,34 +368,6 @@ TABLE.marc SPAN.fieldend
                     return;
                 }
             }
-            if (this.comboBox_source.Text.ToUpper() == "金盘")
-            {
-                if (this.Location == "")
-                {
-                    MessageBox.Show(this, "请输入馆藏地");
-                    return;
-                }
-
-                if (this.BookType == "")
-                {
-                    MessageBox.Show(this, "请输入图书类型");
-                    return;
-                }
-            }
-           else
-            {
-                if (this.Location == "")
-                {
-                    MessageBox.Show(this, "请输入馆藏地");
-                    return;
-                }
-
-                if (this.BookType == "")
-                {
-                    MessageBox.Show(this, "请输入图书类型");
-                    return;
-                }
-            }
 
 
 
