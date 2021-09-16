@@ -296,10 +296,10 @@ namespace dp2mini
         {
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = this._borrowAndReturnItems.GroupBy(
-                x => new { x.location, x.readerBarcode, x.readerName, x.dept },
+                x => new {  x.readerBarcode, x.readerName, x.dept },
                 (key, item_list) => new BorrowGroup
                 {
-                    location = key.location,
+                    //location = key.location,
 
                     readerBarcode = key.readerBarcode,
                     readerName = key.readerName,
@@ -310,10 +310,10 @@ namespace dp2mini
 
             foreach (BorrowGroup group in list)
             {
-                ListViewItem viewItem = new ListViewItem(group.location, 0);
+                ListViewItem viewItem = new ListViewItem(group.readerBarcode, 0);
                 this.listView_borrowAndReurn_statis.Items.Add(viewItem);
 
-                viewItem.SubItems.Add(group.readerBarcode);
+                //viewItem.SubItems.Add(group.readerBarcode);
                 viewItem.SubItems.Add(group.readerName);
                 viewItem.SubItems.Add(group.dept);
                 viewItem.SubItems.Add(group.Items.Count.ToString());

@@ -138,7 +138,6 @@
             this.columnHeader53 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabPage_borrowAndReturn = new System.Windows.Forms.TabPage();
             this.listView_borrowAndReurn_statis = new System.Windows.Forms.ListView();
-            this.columnHeader57 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader58 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader59 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader60 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -944,7 +943,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView_borrowAndReurn_statis.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader57,
             this.columnHeader58,
             this.columnHeader59,
             this.columnHeader60,
@@ -962,11 +960,6 @@
             this.listView_borrowAndReurn_statis.View = System.Windows.Forms.View.Details;
             this.listView_borrowAndReurn_statis.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_borrowAndReurn_statis_ColumnClick);
             // 
-            // columnHeader57
-            // 
-            this.columnHeader57.Text = "馆藏地";
-            this.columnHeader57.Width = 97;
-            // 
             // columnHeader58
             // 
             this.columnHeader58.Text = "读者证条码";
@@ -980,6 +973,7 @@
             // columnHeader60
             // 
             this.columnHeader60.Text = "读者单位";
+            this.columnHeader60.Width = 144;
             // 
             // columnHeader61
             // 
@@ -1134,7 +1128,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader56;
         private System.Windows.Forms.TabPage tabPage_borrowAndReturn;
         private System.Windows.Forms.ListView listView_borrowAndReurn_statis;
-        private System.Windows.Forms.ColumnHeader columnHeader57;
         private System.Windows.Forms.ColumnHeader columnHeader58;
         private System.Windows.Forms.ColumnHeader columnHeader59;
         private System.Windows.Forms.ColumnHeader columnHeader60;
