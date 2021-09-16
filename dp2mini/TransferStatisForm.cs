@@ -192,6 +192,9 @@ namespace dp2mini
                     // 还书统计
                     this.StatisReturn();
 
+                    // 借还统计
+                    this.StatisBorrowAndReturn();
+
                 }
 ));
 
@@ -288,6 +291,37 @@ namespace dp2mini
         }
 
 
+        // 对借书和还书日志进行聚合
+        public void StatisBorrowAndReturn()
+        {
+            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
+            var list = this._borrowAndReturnItems.GroupBy(
+                x => new { x.location, x.readerBarcode, x.readerName, x.dept },
+                (key, item_list) => new BorrowGroup
+                {
+                    location = key.location,
+
+                    readerBarcode = key.readerBarcode,
+                    readerName = key.readerName,
+                    dept = key.dept,
+                    Items = new List<BorrowLogItem>(item_list)
+                }).OrderByDescending(o => o.Items.Count).OrderBy(o => o.location).ToList();
+
+
+            foreach (BorrowGroup group in list)
+            {
+                ListViewItem viewItem = new ListViewItem(group.location, 0);
+                this.listView_borrowAndReurn_statis.Items.Add(viewItem);
+
+                viewItem.SubItems.Add(group.readerBarcode);
+                viewItem.SubItems.Add(group.readerName);
+                viewItem.SubItems.Add(group.dept);
+                viewItem.SubItems.Add(group.Items.Count.ToString());
+            }
+        }
+
+
+
         // 日志记录hastable,方便点一条，在右侧看到详细信息
         public Hashtable _logItems = new Hashtable();
 
@@ -296,6 +330,9 @@ namespace dp2mini
 
         // 用于做还书聚合的类
         List<BorrowLogItem> _returnItems = new List<BorrowLogItem>();
+
+        // 用于做借还聚合的类
+        List<BorrowLogItem> _borrowAndReturnItems = new List<BorrowLogItem>();
 
         public int LoadLog(OperLogItem logItem,out string error)
         {
@@ -393,6 +430,9 @@ namespace dp2mini
                         this._borrowItems.Add(borrowLog);
                     else
                         this._returnItems.Add(borrowLog);
+
+                    // 借还都算
+                    _borrowAndReturnItems.Add(borrowLog);
                 }
 
 
@@ -450,6 +490,10 @@ namespace dp2mini
             this.listView_return.Items.Clear();
             this.listView_returnStatis.Items.Clear();
             this._returnItems.Clear();
+
+            // 借还统计信息
+            this.listView_borrowAndReurn_statis.Items.Clear();
+            this._borrowAndReturnItems.Clear();
 
             //设置父窗口状态栏参数
             this._mainForm.SetStatusMessage("");
@@ -612,6 +656,8 @@ namespace dp2mini
                         temp = this.listView_return;
                     else if (tabName == "还书统计")
                         temp = this.listView_returnStatis;
+                    else if (tabName == "借还统计")
+                        temp = this.listView_borrowAndReurn_statis;
                     else
                         continue;  // 不认识的表
 
@@ -824,11 +870,21 @@ namespace dp2mini
             int nClickColumn = e.Column;
             SortCol(this.listView_results, SortColumns_all, nClickColumn);
         }
+
+        private void listView_borrowAndReurn_statis_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            SortCol(this.listView_borrowAndReurn_statis, SortColumns_borrowAndReturnStatis, nClickColumn);
+        }
+
         SortColumns SortColumns_all = new SortColumns();
         SortColumns SortColumns_borrow = new SortColumns();
         SortColumns SortColumns_borrowStatis = new SortColumns();
         SortColumns SortColumns_return = new SortColumns();
         SortColumns SortColumns_returnStatis = new SortColumns();
+
+        SortColumns SortColumns_borrowAndReturnStatis = new SortColumns();
+
         public static void SortCol(ListView myListView, SortColumns sortCol, int nClickColumn)
         {
             ColumnSortStyle sortStyle = ColumnSortStyle.LeftAlign;
@@ -934,6 +990,8 @@ namespace dp2mini
             }
 
         }
+
+
     }
 
     public class BorrowLogItem

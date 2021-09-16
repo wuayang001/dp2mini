@@ -32,7 +32,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>24</ApplicationRevision>
+    <ApplicationRevision>25</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -59,10 +59,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6AF85AEF3D710EA412E3251FB895A45EE1B11018</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>3EC46D6B99520A1DCDAD027B726C38528625A83D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>代码签名证书-2020.p12</ManifestKeyFile>
+    <ManifestKeyFile>数字平台（北京）软件有限责任公司.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -412,6 +412,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="代码签名证书-2020.p12" />
+    <None Include="数字平台（北京）软件有限责任公司.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
