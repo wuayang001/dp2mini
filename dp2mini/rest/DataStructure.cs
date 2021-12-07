@@ -83,7 +83,7 @@ namespace DigitalPlatform.LibraryRestClient
 
     #region Reservation
 
-    // SearchBiblioRequest
+    // ReservationRequest
     [DataContract]
     public class ReservationRequest
     {
@@ -177,6 +177,73 @@ namespace DigitalPlatform.LibraryRestClient
 
     #endregion
 
+    /*
+        LibraryServerResult SearchItem(
+            string strItemDbName,
+            string strQueryWord,
+            int nPerMax,
+
+            string strFrom,
+            string strMatchStyle,
+            string strLang,
+
+            string strResultSetName,
+            string strSearchStyle,
+            string strOutputStyle);
+
+     */
+
+    #region SearchItem
+
+    // SearchBiblioRequest
+    [DataContract]
+    public class SearchItemRequest
+    {
+        [DataMember]
+        public string strItemDbName { get; set; }
+        [DataMember]
+        public string strQueryWord { get; set; }
+        [DataMember]
+        public int nPerMax { get; set; }
+        [DataMember]
+
+        public string strFrom{ get; set; }
+        [DataMember]
+        public string strMatchStyle { get; set; }
+        [DataMember]
+        public string strLang { get; set; }
+        [DataMember]
+
+        public string strResultSetName { get; set; }
+        [DataMember]
+        public string strSearchStyle { get; set; }
+        [DataMember]
+        public string strOutputStyle { get; set; }
+    }
+
+    /*
+成员	返回值	说明
+LibraryServerResult.Value		
+	-1	错误
+	0	没有命中
+	>=1	命中。返回值为命中的记录条数
+LibraryServerResult.ErrorInfo		出错信息
+
+     */
+
+    //SearchItemResult
+    [DataContract]
+    public class SearchItemResponse
+    {
+        [DataMember]
+        public LibraryServerResult SearchItemResult { get; set; }
+
+        //// strQueryXml
+        //[DataMember]
+        //public string strQueryXml { get; set; }
+    }
+
+    #endregion
 
     #region SearchBiblio
 

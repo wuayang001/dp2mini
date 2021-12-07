@@ -1023,8 +1023,6 @@ namespace dp2mini
         // 馆藏地
         public string location { get; set; }
 
-        // 索取号
-        public string shelftNo { get; set; }
 
     }
 

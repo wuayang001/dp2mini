@@ -258,6 +258,7 @@ namespace DigitalPlatform.LibraryRestClient
 
         #endregion
 
+        #region 预约相关
 
         // 2021/2/20
         // 发送通知
@@ -394,6 +395,8 @@ namespace DigitalPlatform.LibraryRestClient
 
             return response;
         }
+
+        #endregion
 
         /// <summary>
         /// 获取书目信息
@@ -1592,6 +1595,87 @@ namespace DigitalPlatform.LibraryRestClient
                     return -1;
                 goto REDO;
             }
+        }
+
+        /*
+        LibraryServerResult SearchItem(
+            string strItemDbName,
+            string strQueryWord,
+            int nPerMax,
+            string strFrom,
+            string strMatchStyle,
+            string strLang,
+            string strResultSetName,
+            string strSearchStyle,
+            string strOutputStyle);
+
+         */
+        public long SearchItem(
+    string strItemDbName,
+    string strQueryWord,
+    int nPerMax,
+    string strFrom,
+    string strMatchStyle,
+    string strResultSetName,
+     string strOutputStyle,
+    out string strError)
+        {
+            strError = "";
+        REDO:
+            try
+            {
+
+                //CookieAwareWebClient client = new CookieAwareWebClient(this.Cookies);
+                //client.Headers["Content-type"] = "application/json; charset=utf-8";
+                //client.Headers["User-Agent"] = "dp2LibraryClient";
+                CookieAwareWebClient client = this.GetClient();
+
+                SearchItemRequest request = new SearchItemRequest();
+                request.strItemDbName = strItemDbName;
+                request.strQueryWord = strQueryWord;
+                request.nPerMax = nPerMax;
+                request.strFrom = strFrom;
+                request.strMatchStyle = strMatchStyle;
+
+                request.strLang = "zh";
+                request.strResultSetName = strResultSetName;
+                request.strSearchStyle = "";// "desc";
+                request.strOutputStyle = strOutputStyle;
+
+
+
+                byte[] baData = Encoding.UTF8.GetBytes(Serialize(request));
+
+                string strRequest = Encoding.UTF8.GetString(baData);
+
+                byte[] result = client.UploadData(this.GetRestfulApiUrl("SearchItem"),
+                                "POST",
+                                 baData);
+
+                string strResult = Encoding.UTF8.GetString(result);
+
+                SearchItemResponse response = Deserialize<SearchItemResponse>(strResult);
+
+                // 未登录的情况
+                if (response.SearchItemResult.Value == -1 && response.SearchItemResult.ErrorCode == ErrorCode.NotLogin)
+                {
+                    if (DoNotLogin(ref strError) == 1)
+                        goto REDO;
+                    return -1;
+                }
+                strError = response.SearchItemResult.ErrorInfo;
+                // this.ErrorCode = response.SearchBiblioResult.ErrorCode;
+                this.ClearRedoCount();
+                return response.SearchItemResult.Value;
+            }
+            catch (Exception ex)
+            {
+                int nRet = ConvertWebError(ex, out strError);
+                if (nRet == 0)
+                    return -1;
+                goto REDO;
+            }
+
         }
 
         // 获得册信息

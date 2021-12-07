@@ -15,7 +15,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>C:\publish\dp2mini\v1_dev\</PublishUrl>
+    <PublishUrl>d:\publish\dp2mini\v1_dev\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -32,7 +32,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>25</ApplicationRevision>
+    <ApplicationRevision>27</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -226,6 +226,8 @@
     <Compile Include="api.cs" />
     <Compile Include="core\PriceUtil.cs" />
     <Compile Include="core\StringUtil.cs" />
+    <Compile Include="Database\EntityDbManager.cs" />
+    <Compile Include="Database\EntityDb.cs" />
     <Compile Include="MarcForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -234,6 +236,12 @@
     </Compile>
     <Compile Include="MarcKernel\FieldNameList.cs" />
     <Compile Include="MarcKernel\MarcDiff.cs" />
+    <Compile Include="toolForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="toolForm.designer.cs">
+      <DependentUpon>toolForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SelectSheetForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -355,6 +363,9 @@
     <EmbeddedResource Include="MarcForm.resx">
       <DependentUpon>MarcForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="toolForm.resx">
+      <DependentUpon>toolForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SelectSheetForm.resx">
       <DependentUpon>SelectSheetForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -411,7 +422,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="代码签名证书-2020.p12" />
     <None Include="数字平台（北京）软件有限责任公司.pfx" />
   </ItemGroup>
   <ItemGroup>
