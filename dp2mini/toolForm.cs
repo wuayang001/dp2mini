@@ -153,7 +153,17 @@ namespace dp2mini
         // 检查权限
         private void button_right_Click(object sender, EventArgs e)
         {
-
+            EnableControls(false);
+            try
+            {
+                this.OutputInfo("===\r\n开始获取流通权限:\r\n");
+                this.GetCirculationRight();
+                this.OutputInfo("结束获取流通权限");
+            }
+            finally
+            {
+                EnableControls(true);
+            }
         }
 
         #endregion
@@ -221,7 +231,7 @@ namespace dp2mini
         // 获取数据库信息
         public void GetDbInfos()
         {
-            this.OutputInfo("序号\t书目库名\t 数据量\t是否流通\t数据格式\t文献类型\t角色\t下级子库" + "\r\n");
+            this.OutputInfo("序号\t书目库名\t 数据量\t是否流通\t数据格式\t文献类型\t角色\t下级子库");
 
             RestChannel channel = this._mainForm.GetChannel();
             try
@@ -299,8 +309,7 @@ namespace dp2mini
                         + one.syntax + "\t"
                         + type + "\t"
                         + one.role + "\t"
-                        + one.itemDbName + "," + one.orderDbName + "," + one.commentDbName + "," + one.issueDbName
-                        + "\r\n";
+                        + one.itemDbName + "," + one.orderDbName + "," + one.commentDbName + "," + one.issueDbName;
 
                     this.OutputInfo(info);
 
@@ -721,6 +730,18 @@ namespace dp2mini
 
         }
 
+        private LocGroup GetLocGroup(List<LocGroup> list, string name)
+        {
+            foreach (LocGroup group in list)
+            {
+                if (group.location == name)
+                {
+                    group.Existed=true;
+                    return group;
+                }
+            }
+            return null;
+        }
 
         // 对馆藏地进行聚合
         public void GroupLocation(List<Entity> items, CancellationToken token)
@@ -735,11 +756,96 @@ namespace dp2mini
                     count = item_list.Count()
                 }).OrderByDescending(o => o.Items.Count);
 
-
+            List<LocGroup> locs = new List<LocGroup>();
             foreach (LocGroup group in list)
             {
-                this.OutputInfo(group.Dump());
+                locs.Add(group);
+                //this.OutputInfo(group.Dump());
             }
+
+            RestChannel channel = this._mainForm.GetChannel();
+            try
+            {
+
+                GetSystemParameterResponse response = channel.GetSystemParameter("circulation",
+                    "locationTypes");
+                long lRet = response.GetSystemParameterResult.Value;
+                string strError = response.GetSystemParameterResult.ErrorInfo;
+                if (lRet == -1)
+                {
+                    MessageBox.Show(this, "针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
+                    return;
+                }
+
+                this.OutputInfo("馆藏地" + "\t" + "允许流通");
+
+
+                /*
+                <root><item canborrow="yes" canreturn="" itemBarcodeNullable="yes">流通库</item>
+                <item canborrow="yes" canreturn="" itemBarcodeNullable="yes">走廊</item>
+                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">共享书柜</item>
+                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">一楼阅览室</item>
+                <item canborrow="no" canreturn="" itemBarcodeNullable="yes">二楼阅览室</item>
+                <library code="第三中学">
+                <item canborrow="no" canreturn="" itemBarcodeNullable="no">大阅读室</item>
+                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">图书馆</item>
+                <item canborrow="no" canreturn="" itemBarcodeNullable="yes">一年级</item>
+                </library>
+                */
+                string xml = "<root>" + response.strValue + "</root>";
+                XmlDocument dom = new XmlDocument();
+                dom.LoadXml(xml);
+                XmlNodeList nodelist = dom.DocumentElement.SelectNodes("item");
+                foreach (XmlNode node in nodelist)
+                {
+                    string location = DomUtil.GetNodeText(node);
+                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
+
+                    LocGroup group = this.GetLocGroup(locs, location);
+                    int count = 0;
+                    if (group != null)  
+                        count=group.count;
+
+                    this.OutputInfo(location + "\t" + canBorrow+"\t"+count);
+                }
+
+                // 分馆的馆藏地
+                nodelist = dom.DocumentElement.SelectNodes("library/item");
+                foreach (XmlNode node in nodelist)
+                {
+                    string location = DomUtil.GetAttr(node.ParentNode, "code") +"/"+ DomUtil.GetNodeText(node);
+                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
+
+
+                    LocGroup group = this.GetLocGroup(locs, location);
+                    int count = 0;
+                    if (group != null)
+                        count = group.count;
+
+                    this.OutputInfo(location + "\t" + canBorrow + "\t" + count);
+                }
+
+                //this.OutputInfo(xml);
+
+
+
+            }
+            finally
+            {
+                this._mainForm.ReturnChannel(channel);
+            }
+
+
+            // 把没有数据的馆藏地显示在下方
+            foreach (LocGroup loc in locs)
+            {
+                if (loc.Existed == false)
+                {
+                    this.OutputInfo(loc.location + "\t" + "未定义" + "\t" + loc.count);
+                }
+            }
+
+            return;
         }
 
 
@@ -1272,11 +1378,11 @@ namespace dp2mini
             this._cancel.Dispose();
             this._cancel = new CancellationTokenSource();
 
-            //// 开一个新线程
-            //Task.Run(() =>
-            //{
+            // 开一个新线程
+            Task.Run(() =>
+            {
                 SearchItem(this._cancel.Token);
-            //});
+            });
         }
 
         // 检查馆藏地
@@ -1395,6 +1501,59 @@ namespace dp2mini
         }
 
         #endregion
+
+        // 获取馆藏地
+        private void button_getLocation_Click(object sender, EventArgs e)
+        {
+            EnableControls(false);
+
+            RestChannel channel = this._mainForm.GetChannel();
+
+            try
+            {
+                this.OutputInfo("===\r\n开始获取流通权限:\r\n");
+
+
+
+                GetSystemParameterResponse response = channel.GetSystemParameter("circulation",
+                    "locationTypes");
+                long lRet = response.GetSystemParameterResult.Value;
+                string strError = response.GetSystemParameterResult.ErrorInfo;
+                if (lRet == -1)
+                {
+                    MessageBox.Show(this, "针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
+                    return;
+                }
+
+                this.OutputInfo("馆藏地" + "\t" + "允许流通");
+
+
+                // <item canborrow="yes" canreturn="" itemBarcodeNullable="no">外借库</item>
+                string xml = "<root>"+ response.strValue + "</root>";
+                XmlDocument dom = new XmlDocument();
+                dom.LoadXml(xml);
+                XmlNodeList list = dom.DocumentElement.SelectNodes("item");
+                foreach (XmlNode node in list)
+                {
+                    string location = DomUtil.GetNodeText(node);
+                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
+                    this.OutputInfo(location+"\t"+canBorrow);
+                }
+                //this.OutputInfo(xml);
+
+                this.OutputInfo("结束获取流通权限");
+
+                return;
+
+            }
+            finally
+            {
+                this._mainForm.ReturnChannel(channel);
+
+
+                EnableControls(true);
+            }
+        }
     }
 
     public class TypeGroup
@@ -1428,6 +1587,9 @@ namespace dp2mini
             return location + "\t"
                 + count;
         }
+
+        public bool Existed { get; set; }
+
     }
 
     // 册记录

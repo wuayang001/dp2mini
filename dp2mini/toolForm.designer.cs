@@ -70,6 +70,7 @@
             this.textBox_info.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_info.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.textBox_info.Location = new System.Drawing.Point(3, 3);
             this.textBox_info.Multiline = true;
             this.textBox_info.Name = "textBox_info";
@@ -80,7 +81,7 @@
             // button_circulationRight
             // 
             this.button_circulationRight.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_circulationRight.Location = new System.Drawing.Point(200, 85);
+            this.button_circulationRight.Location = new System.Drawing.Point(219, 83);
             this.button_circulationRight.Margin = new System.Windows.Forms.Padding(7);
             this.button_circulationRight.Name = "button_circulationRight";
             this.button_circulationRight.Size = new System.Drawing.Size(179, 57);
@@ -134,7 +135,7 @@
             // button_right
             // 
             this.button_right.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_right.Location = new System.Drawing.Point(586, 85);
+            this.button_right.Location = new System.Drawing.Point(1145, 83);
             this.button_right.Margin = new System.Windows.Forms.Padding(7);
             this.button_right.Name = "button_right";
             this.button_right.Size = new System.Drawing.Size(188, 57);
@@ -146,7 +147,7 @@
             // button_patron
             // 
             this.button_patron.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_patron.Location = new System.Drawing.Point(393, 85);
+            this.button_patron.Location = new System.Drawing.Point(952, 83);
             this.button_patron.Margin = new System.Windows.Forms.Padding(7);
             this.button_patron.Name = "button_patron";
             this.button_patron.Size = new System.Drawing.Size(179, 57);
