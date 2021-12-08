@@ -23,6 +23,7 @@ using DigitalPlatform.Marc;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DigitalPlatform.Text;
+using ClosedXML.Excel;
 
 namespace dp2mini
 {
@@ -44,6 +45,8 @@ namespace dp2mini
             InitializeComponent();
         }
 
+        // excel
+        XLWorkbook _workbook= new XLWorkbook();
 
         /// <summary>
         /// 窗体装载
@@ -53,6 +56,7 @@ namespace dp2mini
         private void toolForm_Load(object sender, EventArgs e)
         {
             this._mainForm = this.MdiParent as MainForm;
+
         }
 
 
@@ -61,46 +65,98 @@ namespace dp2mini
 
         #region 界面操作按钮
 
+        public string Dir
+        {
+            get
+            {
+                string dir= this.textBox_dir.Text.Trim();
+                if (string.IsNullOrEmpty(dir) == true)
+                {
+                    //先选择输出目录
+                    button_selectDir_Click(null, null);
+                    dir = this.textBox_dir.Text.Trim();
+
+
+                }
+                return dir;
+            }
+        }
+
+        StreamWriter _sw = null;
+        public StreamWriter Sw
+        {
+            get
+            {
+                if (this._sw == null)
+                {
+                    string fileName = this.Dir + "/"+this._mainForm.LibraryName+"-巡检结果.txt";
+                    if (File.Exists(fileName) == true)
+                        File.Delete(fileName);
+                    _sw = new StreamWriter(fileName, false, Encoding.UTF8);
+                }
+
+                return this._sw;
+            }
+        }
+
         // 一键巡检
         private void button_oneKey_Click(object sender, EventArgs e)
         {
             EnableControls(false);
             try
             {
+                // 先清一下文件
+                if (this._sw != null)
+                {
+                    _sw.Close();
+                    _sw = null;
+                }
+                this.textBox_info.Text = "";
+
+
                 // 获取数据库信息
                 this.button_listdb_Click(sender, e);
 
-                // 获取流通权限
-                this.button_circulationRight_Click(sender, e);
-                //this.GetCirculationRight();
-
-                // 册统计
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
-                //// 开一个新线程
-                //Task.Run(() =>
-                //{
+                // 获取册
                 SearchItem(this._cancel.Token);
-                //});
 
-                // 校验册记录各种信息
-                this.button_checkBookType_Click(sender, e);
+                // 馆藏地
                 this.button_checkLocation_Click(sender, e);
-                this.button_verifyBarcode_Click(sender, e);
-                this.button_checkPrice_Click(sender, e);
+
+                // 图书类型
+                this.button_checkBookType_Click(sender, e);
+
+                // 排架体系
+                this.button_paijia_Click(sender, e);
+                // 索取号
                 this.button_checkAccessNo_Click(sender, e);
 
+
+
+                // 册价格
+                this.button_checkPrice_Click(sender, e);
+
+
+                // 获取流通权限
+                this.button_circulationRight_Click(sender, e);
 
                 // 统计读者
                 this.checkDepartment();
 
                 // 检查权限
                 this.CheckRights();
+
+                // 需放在最后，获取校验函数
+                this.button_script_Click(sender, e);
+                this.button_verifyBarcode_Click(sender, e);
             }
             finally
-            { 
+            {
                 EnableControls(true);
+
+
             }
+
         }
 
         // 停止
@@ -116,9 +172,9 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                this.OutputInfo("===\r\n开始获取书目信息:\r\n");
+                this.OutputInfo("==开始获取书目信息==");
                 this.GetDbInfos();
-                this.OutputInfo("结束获取书目信息");
+                this.OutputInfo("==结束获取书目信息，详见excel==");
             }
             finally
             {
@@ -132,9 +188,11 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                this.OutputInfo("===\r\n开始获取流通权限:\r\n");
+                // 空2行
+                this.OutputEmprty(2);
+                this.OutputInfo("==开始获取流通权限==");
                 this.GetCirculationRight();
-                this.OutputInfo("结束获取流通权限");
+                this.OutputInfo("==结束获取流通权限，详见右侧==");
             }
             finally
             {
@@ -156,9 +214,7 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                this.OutputInfo("===\r\n开始获取流通权限:\r\n");
-                this.GetCirculationRight();
-                this.OutputInfo("结束获取流通权限");
+
             }
             finally
             {
@@ -177,23 +233,38 @@ namespace dp2mini
             this.textBox_info.Text = "";
         }
 
-        public void OutputInfo(string info)
+        public void OutputInfo(string info,bool isTextBox=true,bool isState=true)
         {
             this.Invoke((Action)(() =>
             {
-                this.textBox_info.Text += info + "\r\n";
+                if (isTextBox == true)
+                {
+                    this.textBox_info.Text += info + "\r\n";
+
+
+                    this.textBox_info.Focus();//获取焦点
+                    this.textBox_info.Select(this.textBox_info.TextLength, 0);//光标定位到文本最后
+                    this.textBox_info.ScrollToCaret();//滚动到光标处
+
+                    // 写到文件
+                    this.Sw.WriteLine(info);
+                    this.Sw.Flush();
+                }
+
+                if (isState == true)
+                {
+                    //设置父窗口状态栏参数
+                    this._mainForm.SetStatusMessage(info);
+                }
             }
             ));
         }
 
-        public void SetStateInfo(string info)
+        public void OnlyOutput2File(string info)
         {
-            this.Invoke((Action)(() =>
-            {
-                //设置父窗口状态栏参数
-                this._mainForm.SetStatusMessage(info);
-            }
-            ));
+            // 写到文件
+            this.Sw.WriteLine(info);
+            this.Sw.Flush();
         }
 
         /// <summary>
@@ -205,21 +276,23 @@ namespace dp2mini
             this.button_oneKey.Enabled = bEnable;
             this.button_stop.Enabled = bEnable?false:true;
 
-            this.button_listdb.Enabled = bEnable;
-            this.button_circulationRight.Enabled = bEnable;
-            this.button_entity.Enabled = bEnable;
-            this.button_patron.Enabled = bEnable;
-            this.button_right.Enabled = bEnable;
+            this.button_listdb.Enabled = bEnable;  // 书目
+            this.button_entity.Enabled = bEnable; //获取册
+            this.button_checkLocation.Enabled = bEnable; // 馆藏地
+            this.button_checkBookType.Enabled = bEnable; //图书类型
+            this.button_paijia.Enabled = bEnable;  //排架
+            this.button_checkAccessNo.Enabled = bEnable;  //索取号
+            this.button_script.Enabled = bEnable; //校验函数
+            this.button_verifyBarcode.Enabled = bEnable;  //校验册条码
+            this.button_checkPrice.Enabled = bEnable;  //册价格
 
-            this.button_checkAccessNo.Enabled = bEnable;
-            this.button_checkPrice.Enabled = bEnable;
-            this.button_verifyBarcode.Enabled = bEnable;
-            this.button_checkBookType.Enabled = bEnable;
-            this.button_checkLocation.Enabled = bEnable;
+            this.button_circulationRight.Enabled = bEnable;  //流通权限
 
+            this.button_patron.Enabled = bEnable;  //校验读者
+            this.button_right.Enabled = bEnable;  //权限
+            this.button_loc.Enabled = bEnable; //单馆藏地
 
-            this.button_clear.Enabled = bEnable;   
-
+            this.button_clear.Enabled = bEnable;     //清信息
         }
 
 
@@ -231,48 +304,68 @@ namespace dp2mini
         // 获取数据库信息
         public void GetDbInfos()
         {
-            this.OutputInfo("序号\t书目库名\t 数据量\t是否流通\t数据格式\t文献类型\t角色\t下级子库");
+            string strError = "";
+
+            // sheet名：书目库
+            IXLWorksheet ws = null;
+            bool bExist=this._workbook.Worksheets.TryGetWorksheet("书目库",out ws);
+            if (bExist == true)
+                this._workbook.Worksheets.Delete("书目库");
+
+           ws = this._workbook.Worksheets.Add("书目库");
+            // 设置标题
+            string[] titles = {
+            "序号",
+            "书目库名",
+            "数据量",
+            "是否流通",
+            "数据格式",
+            "文献类型",
+            "角色",
+            "下级子库"
+            };
+            int i = 1;
+            foreach (string s in titles)
+            {
+                ws.Cell(1, i++).Value = s;
+            }
+
+
+            // 已输出excel，则不输出的文本了
+            //this.OutputInfo("序号\t书目库名\t 数据量\t是否流通\t数据格式\t文献类型\t角色\t下级子库",
+            //    true,false);
+
+
+            // 获取书目库
+            string strValue = this.GetSystemParameter("system", "biblioDbGroup");
+            //<database biblioDbName="中文图书" syntax="unimarc"
+            // orderDbName="中文图书订购" commentDbName="中文图书评注"
+            // inCirculation="true" role="catalogWork" itemDbName="中文图书实体"  issueDbName="中文期刊期" >
+            string xml = strValue;
+            xml = "<root>" + xml + "</root>";
+            XmlDocument dom = new XmlDocument();
+            dom.LoadXml(xml);
+            XmlNodeList list = dom.DocumentElement.SelectNodes("database");
+            List<db> dbs = new List<db>();
+            foreach (XmlNode node in list)
+            {
+                Application.DoEvents();
+
+                db one = new db();
+                one.biblioDbName = DomUtil.GetAttr(node, "biblioDbName");
+                one.itemDbName = DomUtil.GetAttr(node, "itemDbName");
+                one.orderDbName = DomUtil.GetAttr(node, "orderDbName");
+                one.commentDbName = DomUtil.GetAttr(node, "commentDbName");
+                one.issueDbName = DomUtil.GetAttr(node, "issueDbName");
+                one.syntax = DomUtil.GetAttr(node, "syntax");
+                one.inCirculation = DomUtil.GetAttr(node, "inCirculation");
+                one.role = DomUtil.GetAttr(node, "role");
+                dbs.Add(one);
+            }
 
             RestChannel channel = this._mainForm.GetChannel();
             try
             {
-                GetSystemParameterResponse response = channel.GetSystemParameter("system",
-                    "biblioDbGroup");
-                long lRet = response.GetSystemParameterResult.Value;
-                string strError = response.GetSystemParameterResult.ErrorInfo;
-                if (lRet == -1)
-                {
-                    this.OutputInfo("针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
-                    return;
-                }
-
-                List<db> dbs = new List<db>();
-
-                //<database biblioDbName="中文图书" syntax="unimarc"
-                // orderDbName="中文图书订购" commentDbName="中文图书评注"
-                // inCirculation="true" role="catalogWork" itemDbName="中文图书实体"  issueDbName="中文期刊期" >
-                string xml = response.strValue;
-                xml = "<root>" + xml + "</root>";
-                XmlDocument dom = new XmlDocument();
-                dom.LoadXml(xml);
-                XmlNodeList list = dom.DocumentElement.SelectNodes("database");
-                foreach (XmlNode node in list)
-                {
-                    Application.DoEvents();
-
-                    db one = new db();
-                    one.biblioDbName = DomUtil.GetAttr(node, "biblioDbName");
-                    one.itemDbName = DomUtil.GetAttr(node, "itemDbName");
-                    one.orderDbName = DomUtil.GetAttr(node, "orderDbName");
-                    one.commentDbName = DomUtil.GetAttr(node, "commentDbName");
-                    one.issueDbName = DomUtil.GetAttr(node, "issueDbName");
-                    one.syntax = DomUtil.GetAttr(node, "syntax");
-                    one.inCirculation = DomUtil.GetAttr(node, "inCirculation");
-                    one.role = DomUtil.GetAttr(node, "role");
-                    dbs.Add(one);
-                }
-
-                //string info = "";
                 int index = 0;
                 long lTotalCount = 0;  //总数量
                 long lCirCount = 0; //流通库数据总量
@@ -280,14 +373,13 @@ namespace dp2mini
                 foreach (db one in dbs)
                 {
                     Application.DoEvents();
-
                     index++;
 
                     string type = "Book-图书";
                     if (string.IsNullOrEmpty(one.issueDbName) == false)
                         type = "Series-期刊";
                     string output = "";
-                    lRet = channel.SearchBiblio(one.biblioDbName,
+                    long lRet = channel.SearchBiblio(one.biblioDbName,
                        "",
                        -1,
                        "recid",
@@ -298,20 +390,46 @@ namespace dp2mini
                        out strError);
                     if (lRet == -1)
                     {
-                        this.OutputInfo("获取数据库[" + one.biblioDbName + "]的书目记录数量进出错：" + strError);
+                        this.OutputInfo("获取数据库[" + one.biblioDbName + "]的书目记录数量出错：" + strError,
+                            true,false);
                         continue;
                     }
 
-                    string info = index + "\t"
-                        + one.biblioDbName + "\t"
-                        + lRet + "\t"
-                        + one.inCirculation + "\t"
-                        + one.syntax + "\t"
-                        + type + "\t"
-                        + one.role + "\t"
-                        + one.itemDbName + "," + one.orderDbName + "," + one.commentDbName + "," + one.issueDbName;
+                    List<string> children = new List<string>();
+                    if (string.IsNullOrEmpty(one.itemDbName) == false)
+                        children.Add(one.itemDbName);
+                    if (string.IsNullOrEmpty(one.orderDbName) == false)
+                        children.Add(one.orderDbName);
+                    if (string.IsNullOrEmpty(one.commentDbName) == false)
+                        children.Add(one.commentDbName);
+                    if (string.IsNullOrEmpty(one.issueDbName) == false)
+                        children.Add(one.issueDbName);
+                    
 
-                    this.OutputInfo(info);
+
+                    string[] row = {
+            index.ToString(),
+             one.biblioDbName,
+            lRet.ToString(),
+           one.inCirculation.ToString(),
+            one.syntax,
+           type,
+            one.role,
+           string.Join("\r\n",children) //one.itemDbName + "\r\n" + one.orderDbName + "\r\n" + one.commentDbName + "\r\n" + one.issueDbName
+                    };
+
+
+                    // 已输出excel，则不输出的文本了
+                    //string info = string.Join("\t", row).Replace("\r\n", ",");
+                    //this.OutputInfo(info,true,false);
+
+                    // 写excel
+                    i = 1;
+                    foreach (string s in row)
+                    {
+                        ws.Cell(index+1, i++).Value = s;
+                    }
+
 
                     //流通库数量和记录数
                     if (one.inCirculation == "true")
@@ -325,8 +443,15 @@ namespace dp2mini
                 }
 
                 this.OutputInfo("\r\n图书馆系统中总共有" + index + "个书目库，书目记录总数量为" + lTotalCount
-                    + "，其中有" + cirDbCount + "个库可流通，流通的书目种数为" + lCirCount + "。" + "\r\n");
+                    + "，其中有" + cirDbCount + "个库可流通，流通的书目种数为" + lCirCount + "。" + "\r\n",
+                    true,false);
 
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index + 1,titles.Length);
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
 
                 return;
             }
@@ -346,6 +471,12 @@ namespace dp2mini
 
         public void SearchItem(CancellationToken token)
         {
+            // 空2行
+            this.OutputEmprty(2);
+
+            this.OutputInfo("==开始获取册信息==");
+            Application.DoEvents();
+
             string strError = "";
             long lRet = 0;
 
@@ -390,13 +521,14 @@ namespace dp2mini
                        out strError);
                     if (lRet == -1)
                     {
-                        this.OutputInfo("检索册记录出错：" + strError);
+                        this.OutputInfo("检索册记录出错：" + strError,true,false);
                         return;
                     }
 
                     // 输出命中信息
-                    this.OutputInfo("共命中" + lRet.ToString() + "册");
-                    this.SetStateInfo("共命中" + lRet.ToString() + "册");
+                    this.OutputInfo("系统中册数量总计" + this._items.Count.ToString() + "册。", true, false);
+
+                    //this.OutputInfo("共命中" + lRet.ToString() + "册");
 
 
                     long lHitCount = lRet;
@@ -423,7 +555,8 @@ namespace dp2mini
                             out strError);
                         if (lRet == -1)
                         {
-                            this.OutputInfo("已获取" + lStart.ToString() + "条，获取结果集出错：" + strError);
+                            this.OutputInfo("已获取" + lStart.ToString() + "条，获取结果集出错：" + strError,
+                                true,false);
                             return;
                         }
 
@@ -433,7 +566,6 @@ namespace dp2mini
                             break;
                         }
 
-                        this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条");
 
                         // 处理本批取到的册记录
                         for (int i = 0; i < searchresults.Length; i++)
@@ -463,8 +595,12 @@ namespace dp2mini
 
 
                             // info
-                            this.SetStateInfo("正在获取第" + (lStart + i).ToString());
+                            this.OutputInfo("获取第" + (lStart + i).ToString(),false,true);
                         }
+
+                        this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条",
+                            true,false);
+
 
                         lStart += searchresults.Length;
                         lCount -= searchresults.Length;
@@ -477,13 +613,6 @@ namespace dp2mini
                 {
                     this._mainForm.ReturnChannel(channel);
                 }
-
-
-
-                //完成提示
-                this.SetStateInfo("获取数据完成");
-                this.OutputInfo("获取数据完成");
-
             }
             finally
             {
@@ -494,10 +623,11 @@ namespace dp2mini
                 {
                     EnableControls(true);
                     this.Cursor = oldCursor;
-
-
                 }
                 ));
+
+                //完成提示
+                this.OutputInfo("==结束获取册信息==");
             }
         }
 
@@ -505,77 +635,109 @@ namespace dp2mini
 
         public void VerifyBarcode(List<Entity> items, CancellationToken token)
         {
-            string strError = "";
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                EnableControls(false);
+            }
+            ));
 
-            List<Entity> barcodeErrorItems = new List<Entity>();
-            RestChannel channel = this._mainForm.GetChannel();
+            // 空2行
+            this.OutputEmprty(2);
+
+            this.OutputInfo("==开始校验册条码==");
+
             try
             {
-                int index = 0;
-                foreach (Entity item in items)
+
+                string strError = "";
+
+                long errorCount = 0;
+                RestChannel channel = this._mainForm.GetChannel();
+                try
                 {
-                    // 当外部让停止时，停止循环
-                    token.ThrowIfCancellationRequested();
-
-                    index++;
-                    this.SetStateInfo("正在校验册价格" + index.ToString());
-
-                    /// <param name="strLibraryCode">馆代码</param>
-                    /// <param name="strBarcode">条码号</param>
-                    /// <param name="strError">返回出错信息</param>
-                    /// <returns>
-                    /// <para>-1:   出错</para>
-                    /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
-                    // 校验册条码
-                    long lRet = channel.VerifyBarcode("",
-                        item.barcode,
-                        out strError);
-                    if (lRet == -1)
+                    int index = 0;
+                    foreach (Entity item in items)
                     {
-                        this.OutputInfo("校验册条码出错:" + strError);
-                        return;
-                    }
-                    // 不合法
-                    if (lRet == 0)
-                    {
-                        item.errorInfo = strError;
-                        barcodeErrorItems.Add(item);
-                    }
-                    if (lRet == 1)
-                    {
-                        item.errorInfo = "与读者证规则冲突";
-                        barcodeErrorItems.Add(item);
+                        // 当外部让停止时，停止循环
+                        token.ThrowIfCancellationRequested();
+                        //Application.DoEvents();
+
+                        index++;
+                        this.OutputInfo("校验册条码第" + index.ToString(),false,true);
+
+                        /// <param name="strLibraryCode">馆代码</param>
+                        /// <param name="strBarcode">条码号</param>
+                        /// <param name="strError">返回出错信息</param>
+                        /// <returns>
+                        /// <para>-1:   出错</para>
+                        /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
+                        // 校验册条码
+                        long lRet = channel.VerifyBarcode("",
+                            item.barcode,
+                            out strError);
+                        if (lRet == -1)
+                        {
+                            this.OutputInfo("校验册条码出错:" + strError,true,false);
+                            return;
+                        }
+                        // 不合法
+                        if (lRet == 0 || lRet == 1)
+                        {
+                            errorCount++;
+                            if (errorCount == 1)
+                            {
+                                // this.OutputInfo("以下册条码不符合规则");
+                                // 仅输出到文件
+                                this.OnlyOutput2File("以下册条码不符合规则");
+                            }
+
+                            if (lRet == 0)
+                            {
+                                //仅输出到文件
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + strError);
+                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + strError, true, false);
+                            }
+                            else if (lRet == 1)
+                            {
+                                //仅输出到文件
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + "与读者证规则冲突");
+                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + "与读者证规则冲突", true, false);
+                            }
+                        }
+
+                        token.ThrowIfCancellationRequested();
+
                     }
 
+                    if (errorCount > 0)
+                    {
+                        this.OutputEmprty();
+                        this.OutputInfo("不符合规则的册条码共有" + errorCount + "条。");
+                    }
                 }
-
+                finally
+                {
+                    this._mainForm.ReturnChannel(channel);
+                }
             }
             finally
             {
-                this._mainForm.ReturnChannel(channel);
-            }
-
-            // 输入册条码不合格的记录
-            if (barcodeErrorItems.Count > 0)
-            {
-                this.OutputInfo("共有" + barcodeErrorItems.Count.ToString() + "条记录不符合册条码规则");
-
-                foreach (Entity item in barcodeErrorItems)
+                this.Invoke((Action)(() =>
                 {
-                    this.OutputInfo(item.path + "\t" + item.barcode + "\t" + item.errorInfo);
+                    EnableControls(true);
                 }
+                ));
+
+
             }
 
+            this.OutputInfo("==结束校验册条码，详见txt文件==");
         }
 
         // 校验价格
         private void CheckPrice(List<Entity> items, CancellationToken token)
         {
-            //this.toolStripStatusLabel_info.Text = "开始";
-
-            //string[] lines = this.GetLines();
-            string result = "";
-
             string match = "^[0-9]*([.][0-9]*)$";// this.txtMatch.Text.Trim();
 
             //空价格的
@@ -594,21 +756,14 @@ namespace dp2mini
                 token.ThrowIfCancellationRequested();
 
                 index++;
-                this.SetStateInfo("正在校验册价格" + index.ToString());
-
-
-
-                //if (line == "")
-                //    continue;
+                this.OutputInfo("校验册价格第" + index.ToString(),false,true);
 
                 string path = item.path;
                 string price = item.price;
                 if (price == null)
                     price = "";
 
-                //this.toolStripStatusLabel_info.Text = "处理 " + line;
                 Application.DoEvents();
-
 
                 string retLine = path + "\t" + price;
 
@@ -637,11 +792,11 @@ namespace dp2mini
                         continue;
                     }
 
-                    //大于500
+                    //大于200
                     try
                     {
                         double dPrice = Convert.ToDouble(right);
-                        if (dPrice > 100)
+                        if (dPrice > 200)
                         {
                             largeList.Add(retLine);
                         }
@@ -665,9 +820,7 @@ namespace dp2mini
                             {
 
                             }
-
                         }
-
                     }
 
                     // 正常的
@@ -680,9 +833,7 @@ namespace dp2mini
                     {
                         bracketList.Add(retLine);
                         continue;
-
                     }
-
                 }
 
                 otherList.Add(retLine);
@@ -691,62 +842,135 @@ namespace dp2mini
 
 
             //输出
-            result += "==价格为空" + emptyList.Count + "条==";
-            foreach (string li in emptyList)
+            StringBuilder result = new StringBuilder();
+
+            if (emptyList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
-            }
-            //
-            result += "\r\n\r\n==价格超过500的" + largeList.Count + "条==";
-            foreach (string li in largeList)
-            {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
-            }
-            //
-            result += "\r\n\r\n==价格带括号的" + bracketList.Count + "条==";
-            foreach (string li in bracketList)
-            {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
-            }
-            //
-            result += "\r\n\r\n==其它不合规则的" + otherList.Count + "条==";
-            foreach (string li in otherList)
-            {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是册价格为空的，有" + emptyList.Count + "条。");
+                foreach (string li in emptyList)
+                {
+                    result.AppendLine(li);
+                }
             }
 
-            this.OutputInfo(result);
+            //
+            if (largeList.Count > 0)
+            {
+                result.AppendLine("\r\n下面是册价格很高超过CNY200异常的，有" + largeList.Count + "条。");
+                foreach (string li in largeList)
+                {
+                    result.AppendLine(li);
+                }
+            }
+            //
 
-            //MessageBox.Show("ok");
-            //this.toolStripStatusLabel_info.Text = "结束";
+            if (bracketList.Count > 0)
+            {
+                result.AppendLine("\r\n下面是册价格带括号异常的，有" + bracketList.Count + "条。");
+                foreach (string li in bracketList)
+                {
+                    result.AppendLine(li);
+                }
+            }
+
+            //
+            if (otherList.Count > 0)
+            {
+                result.AppendLine("\r\n下面是其它册价格不合规则的，有" + otherList.Count + "条。");
+                foreach (string li in otherList)
+                {
+                    result.AppendLine(li);
+                }
+            }
+
+            // 输出到界面上
+            //this.OutputInfo(result.ToString(),true,false);
+
+            // 仅输出到文件
+            this.OnlyOutput2File(result.ToString());
+
 
         }
 
+        // 获取聚合的location
         private LocGroup GetLocGroup(List<LocGroup> list, string name)
         {
             foreach (LocGroup group in list)
             {
                 if (group.location == name)
                 {
-                    group.Existed=true;
                     return group;
                 }
             }
             return null;
         }
 
+        // 获取聚合的类型
+        private TypeGroup GetTypeGroup(List<TypeGroup> list, string name)
+        {
+            foreach (TypeGroup group in list)
+            {
+                if (group.bookType == name)
+                {
+                    return group;
+                }
+            }
+            return null;
+        }
+
+        // 获取馆藏地
+        public List<simpleLoc> GetLocation()
+        {
+            List<simpleLoc> locList = new List<simpleLoc>();
+
+            string strValue = this.GetSystemParameter("circulation", "locationTypes");
+            /*
+            <root><item canborrow="yes" canreturn="" itemBarcodeNullable="yes">流通库</item>
+            <item canborrow="yes" canreturn="" itemBarcodeNullable="yes">走廊</item>
+            <item canborrow="yes" canreturn="" itemBarcodeNullable="no">共享书柜</item>
+            <item canborrow="yes" canreturn="" itemBarcodeNullable="no">一楼阅览室</item>
+            <item canborrow="no" canreturn="" itemBarcodeNullable="yes">二楼阅览室</item>
+            <library code="第三中学">
+            <item canborrow="no" canreturn="" itemBarcodeNullable="no">大阅读室</item>
+            <item canborrow="yes" canreturn="" itemBarcodeNullable="no">图书馆</item>
+            <item canborrow="no" canreturn="" itemBarcodeNullable="yes">一年级</item>
+            </library>
+            */
+            string xml = "<root>" + strValue + "</root>";
+            XmlDocument dom = new XmlDocument();
+            dom.LoadXml(xml);
+            XmlNodeList nodelist = dom.DocumentElement.SelectNodes("item");
+            foreach (XmlNode node in nodelist)
+            {
+                string location = DomUtil.GetNodeText(node);
+                string canBorrow = DomUtil.GetAttr(node, "canborrow");
+                simpleLoc simpleLoc = new simpleLoc();
+                simpleLoc.name = location;
+                simpleLoc.canBorrow = canBorrow;
+                locList.Add(simpleLoc);
+            }
+
+            // 分馆的馆藏地
+            nodelist = dom.DocumentElement.SelectNodes("library/item");
+            foreach (XmlNode node in nodelist)
+            {
+                string location = DomUtil.GetAttr(node.ParentNode, "code") + "/" + DomUtil.GetNodeText(node);
+                string canBorrow = DomUtil.GetAttr(node, "canborrow");
+                simpleLoc simpleLoc = new simpleLoc();
+                simpleLoc.name = location;
+                simpleLoc.canBorrow = canBorrow;
+                locList.Add(simpleLoc);
+            }
+
+            return locList;
+        }
+
+
         // 对馆藏地进行聚合
         public void GroupLocation(List<Entity> items, CancellationToken token)
         {
-            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
+
+            // 按馆藏地统计册数
             var list = items.GroupBy(
                 x => new { x.location },
                 (key, item_list) => new LocGroup
@@ -760,92 +984,117 @@ namespace dp2mini
             foreach (LocGroup group in list)
             {
                 locs.Add(group);
-                //this.OutputInfo(group.Dump());
             }
 
-            RestChannel channel = this._mainForm.GetChannel();
-            try
+
+            // sheet名：馆藏地
+            IXLWorksheet ws = this.CreateSheet("馆藏地");
+
+            // 设置标题
+            string[] titles = {
+            "馆藏地名称",
+            "允许外借",
+            "册数量"
+            };
+            int i = 1;
+            foreach (string s in titles)
             {
-
-                GetSystemParameterResponse response = channel.GetSystemParameter("circulation",
-                    "locationTypes");
-                long lRet = response.GetSystemParameterResult.Value;
-                string strError = response.GetSystemParameterResult.ErrorInfo;
-                if (lRet == -1)
-                {
-                    MessageBox.Show(this, "针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
-                    return;
-                }
-
-                this.OutputInfo("馆藏地" + "\t" + "允许流通");
-
-
-                /*
-                <root><item canborrow="yes" canreturn="" itemBarcodeNullable="yes">流通库</item>
-                <item canborrow="yes" canreturn="" itemBarcodeNullable="yes">走廊</item>
-                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">共享书柜</item>
-                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">一楼阅览室</item>
-                <item canborrow="no" canreturn="" itemBarcodeNullable="yes">二楼阅览室</item>
-                <library code="第三中学">
-                <item canborrow="no" canreturn="" itemBarcodeNullable="no">大阅读室</item>
-                <item canborrow="yes" canreturn="" itemBarcodeNullable="no">图书馆</item>
-                <item canborrow="no" canreturn="" itemBarcodeNullable="yes">一年级</item>
-                </library>
-                */
-                string xml = "<root>" + response.strValue + "</root>";
-                XmlDocument dom = new XmlDocument();
-                dom.LoadXml(xml);
-                XmlNodeList nodelist = dom.DocumentElement.SelectNodes("item");
-                foreach (XmlNode node in nodelist)
-                {
-                    string location = DomUtil.GetNodeText(node);
-                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
-
-                    LocGroup group = this.GetLocGroup(locs, location);
-                    int count = 0;
-                    if (group != null)  
-                        count=group.count;
-
-                    this.OutputInfo(location + "\t" + canBorrow+"\t"+count);
-                }
-
-                // 分馆的馆藏地
-                nodelist = dom.DocumentElement.SelectNodes("library/item");
-                foreach (XmlNode node in nodelist)
-                {
-                    string location = DomUtil.GetAttr(node.ParentNode, "code") +"/"+ DomUtil.GetNodeText(node);
-                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
-
-
-                    LocGroup group = this.GetLocGroup(locs, location);
-                    int count = 0;
-                    if (group != null)
-                        count = group.count;
-
-                    this.OutputInfo(location + "\t" + canBorrow + "\t" + count);
-                }
-
-                //this.OutputInfo(xml);
-
-
-
+                ws.Cell(1, i++).Value = s;
             }
-            finally
+
+            // 已输出excel，则不输出的文本了
+            // 输出表头
+            //this.OutputInfo("馆藏地名称\t允许外借\t册数量",true,false);
+
+            // 系统里配置的馆藏地
+            int index = 0;
+            List<simpleLoc> locList = this.GetLocation();
+            foreach (simpleLoc one in locList)
             {
-                this._mainForm.ReturnChannel(channel);
+                index++;
+
+                LocGroup group = this.GetLocGroup(locs, one.name);
+                int count = 0;
+                if (group != null)
+                {
+                    count = group.count;
+                    group.isConfig = true; //表示在系统已定义过
+                }
+
+                // 已输出excel，则不输出的文本了
+                //this.OutputInfo(one.name + "\t" + one.canBorrow + "\t" + count,true,false);
+                
+                // 写excel
+                ws.Cell(index+1, 1).Value = one.name;
+                ws.Cell(index + 1,2).Value = one.canBorrow;
+                ws.Cell(index + 1, 3).Value = count.ToString();
             }
+
 
 
             // 把没有数据的馆藏地显示在下方
             foreach (LocGroup loc in locs)
             {
-                if (loc.Existed == false)
+                if (loc.isConfig == false)
                 {
-                    this.OutputInfo(loc.location + "\t" + "未定义" + "\t" + loc.count);
+                    index++;
+                    
+                    // 输出excel
+                    //this.OutputInfo(loc.location + "\t" + "未定义" + "\t" + loc.count,true,false);
+
+                    // 写excel
+                    ws.Cell(index + 1, 1).Value = loc.location;
+                    ws.Cell(index + 1, 2).Value = "未定义";
+                    ws.Cell(index + 1, 3).Value = loc.count;
                 }
             }
 
+            // 设置excel格式
+            this.SetExcelStyle(ws,  index + 1,titles.Length);
+
+            //保存excel
+            this._workbook.SaveAs(this.ExcelFileName);
+
             return;
+        }
+
+        public string ExcelFileName
+        {
+            get
+            {
+                return this.Dir + "/" + this._mainForm.LibraryName + "-巡检结果.xlsx";
+                //return this.Dir + "/巡检结果.xlsx"; 
+            }
+        }
+
+        private IXLWorksheet CreateSheet(string sheetName)
+        {
+            IXLWorksheet ws = null;
+            bool bExist = this._workbook.Worksheets.TryGetWorksheet("馆藏地", out ws);
+            if (bExist == true)
+                this._workbook.Worksheets.Delete("馆藏地");
+            ws = this._workbook.Worksheets.Add("馆藏地");
+
+            return ws;
+        }
+
+        public void SetExcelStyle(IXLWorksheet ws,int rowCount, int colCount)
+        {
+            // 第一行加粗，背景发灰
+            var range = ws.Range(1, 1, 1, colCount);
+            range.Style.Font.Bold = true;
+            range.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+            //第三列为文本格式
+            //ws.Column(3).Style.NumberFormat.Format = "@";
+
+            range = ws.Range(1, 1, rowCount, colCount);
+            range.Style.Font.SetFontName("微软雅黑");
+            range.Style.Font.SetFontSize(8);
+            ws.Columns().AdjustToContents();  // Adjust column width
+            ws.Rows().AdjustToContents();     // Adjust row heights
+            range.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            range.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
         }
 
 
@@ -863,10 +1112,146 @@ namespace dp2mini
                 }).OrderByDescending(o => o.Items.Count);
 
 
+
+            List<TypeGroup> types = new List<TypeGroup>();
+
             foreach (TypeGroup group in list)
             {
-                this.OutputInfo(group.Dump());
+                if (String.IsNullOrEmpty(group.bookType) == true)
+                    group.bookType = "[空]";
+
+                types.Add(group);
             }
+
+
+            // sheet名：馆藏地
+            IXLWorksheet ws = this.CreateSheet("图书类型");
+
+            // 设置标题
+            string[] titles = {
+            "图书类型",
+            "册数量",
+            "备注"
+            };
+            int i = 1;
+            foreach (string s in titles)
+            {
+                ws.Cell(1, i++).Value = s;
+            }
+
+            // 已输出excel，则不输出的文本了
+            // 输出表头
+            //this.OutputInfo("图书类型	\t册数量\t备注",true,false);
+
+            // 获取配置的图书类型
+            int index = 0;
+            List<string> bookTypes = this.GetCirTypes("bookTypes");
+            foreach (string one in bookTypes)
+            {
+                index++; 
+
+                TypeGroup group = this.GetTypeGroup(types, one);
+                int count = 0;
+                if (group != null)
+                {
+                    count = group.count;
+                    group.isConfig = true; //表示在系统已定义过
+                }
+
+                // 已输出excel，则不输出的文本了
+                //this.OutputInfo(one +  "\t" + count, true, false);
+
+                // 写excel
+                ws.Cell(index + 1, 1).Value = one;
+                ws.Cell(index + 1, 2).Value = count.ToString();
+                ws.Cell(index + 1, 3).Value = "";
+            }
+
+            // 把没有数据的馆藏地显示在下方
+            foreach (TypeGroup one in types)
+            {
+                if (one.isConfig == false)
+                {
+                    index++;
+
+                    // 已输出excel，则不输出的文本了
+                    //this.OutputInfo(one.bookType+  "\t" +one.count+"\t" + "未定义", true, false);
+
+                    // 写excel
+                    ws.Cell(index + 1, 1).Value = one.bookType;
+                    ws.Cell(index + 1, 2).Value = one.count.ToString();
+                    ws.Cell(index + 1, 3).Value = "未定义";
+                }
+            }
+
+            // 设置excel格式
+            this.SetExcelStyle(ws, index + 1, titles.Length);
+
+            //保存excel
+            this._workbook.SaveAs(this.ExcelFileName);
+        }
+
+        public List<string> GetCirTypes(string type)
+        {
+            List<string> types = new List<string>();
+
+            /*
+<rightsTable>  
+    <readerTypes>
+        <item>读者</item>
+        <item>test</item>
+    </readerTypes>
+    <bookTypes>
+        <item>普通</item>
+    </bookTypes>
+    <library code="星洲学校">
+        <readerTypes>
+            <item>教师</item>
+            <item>志愿者</item>
+        </readerTypes>
+        <bookTypes>
+            <item>普通</item>
+            <item>教材</item>
+            <item>[空]</item>
+        </bookTypes>
+    </library>
+</rightsTable>
+             */
+
+            // 流通权限定义的图书类型
+            string strValue = this.GetSystemParameter("circulation", "rightsTable");
+            if (string.IsNullOrEmpty(strValue) == false)
+            {
+                strValue = "<root>" + strValue + "</root>";
+                XmlDocument dom = new XmlDocument();
+                dom.LoadXml(strValue);
+                XmlNodeList nodeList = dom.DocumentElement.SelectNodes(type+"/item");
+                foreach (XmlNode node in nodeList)
+                {
+                    string value = node.InnerText.Trim();
+                    if (string.IsNullOrEmpty(value)==false)
+                    {
+                        types.Add(value);
+                    }
+                }
+
+                nodeList = dom.DocumentElement.SelectNodes("library");
+                foreach (XmlNode node in nodeList)
+                {
+                    string library = DomUtil.GetAttr(node, "code").Trim();
+                    XmlNodeList list1 = node.SelectNodes(type + "/item");
+                    foreach (XmlNode one in list1)
+                    {
+                        string value = one.InnerText.Trim();
+                        if (string.IsNullOrEmpty(value) == false)
+                        {
+                            types.Add(library+"/"+value);
+                        }
+                    }
+                }
+            }
+
+            return types;
         }
 
         #region 检查索取号
@@ -874,11 +1259,6 @@ namespace dp2mini
         // 检查索取号
         private void CheckAccessNo(List<Entity> items, CancellationToken token)
         {
-            //this.toolStripStatusLabel_info.Text = "开始";
-
-            //string[] lines = this.GetLines();
-            string result = "";
-
 
             //空索取号的
             List<string> emptyList = new List<string>();
@@ -892,9 +1272,6 @@ namespace dp2mini
             //左右有空格的
             List<string> hasKgList = new List<string>();
 
-
-
-
             List<string> leftWrongList = new List<string>();
             List<string> rightWrongList = new List<string>();
 
@@ -907,7 +1284,7 @@ namespace dp2mini
                 token.ThrowIfCancellationRequested();
 
                 index++;
-                this.SetStateInfo("正在校验索取号" + index.ToString());
+                this.OutputInfo("校验索取号第" + index.ToString(),false,true);
 
                 //if (line == "")
                 //    continue;
@@ -916,12 +1293,6 @@ namespace dp2mini
                 string accessNo = item.accessNo;
                 if (accessNo == null)
                     accessNo = "";
-
-
-
-                ////this.toolStripStatusLabel_info.Text = "处理 " + line;
-                Application.DoEvents();
-
 
                 string retLine = path + "\t" + accessNo;
 
@@ -975,6 +1346,9 @@ namespace dp2mini
                 catch
                 {
                     string firstRight = right.Substring(0, 1);
+                    if (StringUtil.Between(firstRight, "A", "Z") == true)
+                        continue;
+
                     if (StringUtil.Between(firstRight, "A", "Z") == false)
                     {
                         nTemp = right.IndexOf(":");
@@ -986,7 +1360,6 @@ namespace dp2mini
                             nTemp = right.IndexOf(";");
                         if (nTemp == -1)
                             nTemp = right.IndexOf("；");
-
 
                         if (nTemp > 0)
                         {
@@ -1004,12 +1377,6 @@ namespace dp2mini
                         rightWrongList.Add(retLine);
                         continue;
                     }
-                    else
-                    {
-
-                        continue;
-                    }
-
                 }
 
                 //
@@ -1017,65 +1384,82 @@ namespace dp2mini
 
             }
 
+            StringBuilder result = new StringBuilder ();
 
 
             //空索取号的
-            result += "##索取号为空的" + emptyList.Count + "条";
-            foreach (string li in emptyList)
+            if (emptyList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是索取号为空的册记录，有" + emptyList.Count + "条。");
+                foreach (string li in emptyList)
+                {
+                    result.AppendLine(li);
+                }
             }
             //没有斜
-            result += "\r\n##没有斜的" + noXpList.Count + "条";
-            foreach (string li in noXpList)
+            if (noXpList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是索取号中没有区分号/，有" + noXpList.Count + "条。");
+                foreach (string li in noXpList)
+                {
+                    result.AppendLine(li);
+                }
             }
+
             //有斜，但左或右没值
-            result += "\r\n##有斜，但左或右没值的" + hasXpNoValueList.Count + "条";
-            foreach (string li in hasXpNoValueList)
+            if (hasXpNoValueList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是分类号或区分号没值的，有" + hasXpNoValueList.Count + "条。");
+                foreach (string li in hasXpNoValueList)
+                {
+                    result.AppendLine(li);
+                }
+            }
+
+            if (hasKgList.Count > 0)
+            {
+                result.AppendLine("\r\n下面分类号或区分号中有空格的，有" + hasXpNoValueList.Count + "条。");
+                foreach (string li in hasXpNoValueList)
+                {
+                    result.AppendLine(li);
+                }
             }
 
             //左边错误
-            result += "\r\n##左边错误的" + leftWrongList.Count + "条";
-            foreach (string li in leftWrongList)
+            if (leftWrongList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是索取号中分类号错误的，有" + leftWrongList.Count + "条。");
+                foreach (string li in leftWrongList)
+                {
+                    result.AppendLine(li);
+                }
             }
 
 
             //右边错误
-            result += "\r\n##右边错误" + rightWrongList.Count + "条";
-            foreach (string li in rightWrongList)
+            if (rightWrongList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是索取号中区分号错误的，有" + rightWrongList.Count + "条。");
+
+                foreach (string li in rightWrongList)
+                {
+                    result.AppendLine(li);
+                }
             }
 
             //其它
-            result += "\r\n##其它" + otherList.Count + "条";
-            foreach (string li in otherList)
+            if (otherList.Count > 0)
             {
-                if (result != "")
-                    result += "\r\n";
-                result += li;
+                result.AppendLine("\r\n下面是其它索取号错误的，有" + otherList.Count + "条。");
+                foreach (string li in otherList)
+                {
+                    result.AppendLine(li);
+                }
             }
 
-            this.OutputInfo(result);
-
-            //MessageBox.Show("ok");
-            //this.toolStripStatusLabel_info.Text = "结束";
+            // 整体输出，仅输出到文件
+            this.OnlyOutput2File(result.ToString());    
+            //this.OutputInfo(result.ToString(),true,false);
 
         }
 
@@ -1171,7 +1555,8 @@ namespace dp2mini
         // 统计读者单位
         private void checkDepartment()
         {
-            this.OutputInfo("读者统计功能尚未实现");
+            this.OutputEmprty(2);
+            this.OutputInfo("读者统计功能尚未实现",true,false);
             return;
 
             Hashtable keyvalues = new Hashtable();
@@ -1253,7 +1638,8 @@ namespace dp2mini
         // 检查帐号权限
         private void CheckRights()
         {
-            this.OutputInfo("检查权限功能尚未实现");
+            this.OutputEmprty(2);
+            this.OutputInfo("检查权限功能尚未实现",true,false);
             return;
 
             string result = "";
@@ -1304,31 +1690,10 @@ namespace dp2mini
         #region 获取流通权限
         public void GetCirculationRight()
         {
+            string strValue = this.GetSystemParameter("circulation", "rightsTableHtml");
 
-            RestChannel channel = this._mainForm.GetChannel();
-            try
-            {
-                GetSystemParameterResponse response = channel.GetSystemParameter("circulation",
-                    "rightsTableHtml");
-                long lRet = response.GetSystemParameterResult.Value;
-                string strError = response.GetSystemParameterResult.ErrorInfo;
-                if (lRet == -1)
-                {
-                    MessageBox.Show(this, "针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
-                    return;
-                }
-
-                // 显示在浏览器控件中
-                string xml = response.strValue;
-                WriteHtml(this.webBrowser1,xml);
-
-                return;
-            }
-            finally
-            {
-                this._mainForm.ReturnChannel(channel);
-
-            }
+            // 显示在浏览器控件中
+            WriteHtml(this.webBrowser1, strValue);
         }
 
         static void WriteHtml(WebBrowser webBrowser,
@@ -1395,12 +1760,12 @@ namespace dp2mini
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
 
-                // 聚合馆藏地
-                this.SetStateInfo("开始统计馆藏地");
+                // 空2行
+                this.OutputEmprty(2);
 
-                this.OutputInfo("===\r\n开始统计册记录的馆藏地:\r\n");
+                this.OutputInfo("==开始统计馆藏地==");
                 this.GroupLocation(this._items, this._cancel.Token);
-                this.OutputInfo("结束统计馆藏地");
+                this.OutputInfo("==结束统计馆藏地，详见excel==");
             }
             finally
             {
@@ -1418,12 +1783,12 @@ namespace dp2mini
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
 
-                // 聚合图书类型
-                this.SetStateInfo("开始统计图书类型");
+                // 空2行
+                this.OutputEmprty(2);
 
-                this.OutputInfo("\r\n***\r\n开始统计图书类型:\r\n");
+                this.OutputInfo("==开始统计图书类型==");
                 this.GroupType(this._items, this._cancel.Token);
-                this.OutputInfo("结束统计图书类型");
+                this.OutputInfo("==结束统计图书类型，详见excel==");
             }
             finally
             {
@@ -1441,12 +1806,14 @@ namespace dp2mini
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
 
-                // 校验索取号
-                this.SetStateInfo("开始校验索取号");
+                // 空2行
+                this.OutputEmprty(2);
 
-                this.OutputInfo("\r\n***\r\n开始校验索取号:\r\n");
+                // 校验索取号
+                this.OutputInfo("==开始校验索取号==");
+                Application.DoEvents();
                 this.CheckAccessNo(this._items, this._cancel.Token);
-                this.OutputInfo("结束校验索取号");
+                this.OutputInfo("==结束校验索取号，详见txt文件==");
             }
             finally
             {
@@ -1464,12 +1831,14 @@ namespace dp2mini
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
 
-                // 校验册价格
-                this.SetStateInfo("正在校验册价格");
+                // 空2行
+                this.OutputEmprty(2);
 
-                this.OutputInfo("\r\n***\r\n开始校验册价格:\r\n");
+                // 校验册价格
+                this.OutputInfo("==开始校验册价格==");
+
                 this.CheckPrice(this._items, this._cancel.Token);
-                this.OutputInfo("结束校验册价格");
+                this.OutputInfo("==结束校验册价格，详见txt文件==");
             }
             finally
             {
@@ -1480,24 +1849,16 @@ namespace dp2mini
         // 校验册条码
         private void button_verifyBarcode_Click(object sender, EventArgs e)
         {
-            EnableControls(false);
-            try
-            {
-                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
 
-                // 校验册条码
-                this.SetStateInfo("正在校验索取号");
+            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+            this._cancel.Dispose();
+            this._cancel = new CancellationTokenSource();
 
-                this.OutputInfo("\r\n***\r\n开始校验索取号:");
-                this.VerifyBarcode(this._items,this._cancel.Token);
-                this.OutputInfo("结束校验索取号");
-            }
-            finally
+            // 开一个新线程
+            Task.Run(() =>
             {
-                EnableControls(true);
-            }
+                this.VerifyBarcode(this._items, this._cancel.Token);
+            });
         }
 
         #endregion
@@ -1506,52 +1867,218 @@ namespace dp2mini
         private void button_getLocation_Click(object sender, EventArgs e)
         {
             EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
 
+                this.OutputInfo("==开始获取流通权限==");
+
+                List<simpleLoc> locs = this.GetLocation();
+
+                foreach (simpleLoc one in locs)
+                {
+                    this.OutputInfo(one.name+"\t"+one.canBorrow,true,false);
+                }
+
+                this.OutputInfo("==结束获取流通权限==");
+
+                return;
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        // 检查排架体系
+        private void button_paijia_Click(object sender, EventArgs e)
+        {
+            EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
+
+                this.OutputInfo("==开始检查排架体系==");
+
+                // 调服务器接口
+                string strValue = this.GetSystemParameter("circulation","callNumber");
+
+                // 已配置了排系体系的馆藏地
+                List<string> paijiaLocs = new List<string>();
+                /*
+                <group name="著者号排架" classType="中图法" qufenhaoType="GCAT" zhongcihaodb="" callNumberStyle="索取类号+区分号">
+                <location name="星洲学校/图书馆" />
+                <location name="星洲学校/阅览室" />
+                <location name="星洲学校/班级书架" /><location name="星洲学校/走廊" /><location name="流通库" /></group><group name="种" classType="中图法" qufenhaoType="种次号" zhongcihaodb="" callNumberStyle=""><location name="第三中学/一年级" /><location name="第三中学/大阅读室" /><location name="第三中学/图书馆" />
+                </group>
+                 */
+                string xml = "<root>" + strValue + "</root>";
+                XmlDocument dom = new XmlDocument();
+                dom.LoadXml(xml);
+                XmlNodeList list = dom.DocumentElement.SelectNodes("group");
+                foreach (XmlNode node in list)
+                {
+                    string name = DomUtil.GetAttr(node, "name");
+                    string classType = DomUtil.GetAttr(node, "classType");
+                    string qufenhaoType = DomUtil.GetAttr(node, "qufenhaoType");
+
+                    this.OutputInfo("\r\n排架体系:"+ qufenhaoType + "  类号=" + classType+"  区分号="+qufenhaoType,
+                        true,false);
+
+                    XmlNodeList locs = node.SelectNodes("location");
+                    foreach (XmlNode loc in locs)
+                    { 
+                        string locName=DomUtil.GetAttr(loc, "name");
+                        this.OutputInfo(locName,true,false);
+                        paijiaLocs.Add(locName);
+                    }
+                }
+
+
+                // 把配置的馆藏地列出来，看看哪些没有定义排架
+                bool bFirst = true;
+                List<simpleLoc> simpleLocs = this.GetLocation();
+                foreach(simpleLoc one in simpleLocs)
+                {
+                    if (paijiaLocs.IndexOf(one.name) == -1)
+                    {
+                        if (bFirst == true)
+                        {
+                            this.OutputInfo("\r\n以下馆藏地未配置排架方式，请图书馆老师确认是否需要配置。",
+                                true,false);
+                            bFirst = false;
+                        }
+                        this.OutputInfo(one.name,true,false);
+                    }
+                }
+
+                this.OutputEmprty();
+                this.OutputInfo("==结束检查排架体系==");
+
+                return;
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        // 输出空行
+        private void OutputEmprty(int count=1)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                // 输出空格
+                this.OutputInfo("", true, false);
+            }
+        }
+
+        // 获取脚本
+        private void button_script_Click(object sender, EventArgs e)
+        {
+            EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
+
+                this.OutputInfo("==开始获取条码校验规则==");
+
+                //barcodeValidation
+                string strValue = this.GetSystemParameter("circulation", "barcodeValidation");
+                strValue = DomUtil.GetIndentXml("<barcodeValidation>"+strValue+ "</barcodeValidation>");
+
+                if (string.IsNullOrEmpty(strValue) == false)
+                {
+                    this.OutputInfo("已配置新版本条码校验规则，如下:");
+                    this.OutputInfo(strValue, true, false);
+                }
+                else
+                {
+                    this.OutputInfo("已配置新版本条码校验规则，如下:");
+                }
+
+
+
+                //script
+                strValue = this.GetSystemParameter("circulation", "script");
+
+                bool bHasFun = false;
+                if (strValue.IndexOf("VerifyBarcode") != -1)
+                {
+                    this.OutputInfo("存在C#条码格式校验函数");
+                    bHasFun = true;
+                }
+
+                if (strValue.IndexOf("ItemCanBorrow") != -1)
+                {
+                    this.OutputInfo("存在ItemCanBorrow函数");
+                    bHasFun = true;
+                }
+
+                if (strValue.IndexOf("ItemCanReturn") != -1)
+                {
+                    this.OutputInfo("存在ItemCanReturn函数");
+                    bHasFun = true;
+                }
+
+                /*
+VerifyBarcode
+ItemCanBorrow
+ItemCanReturn
+                 */
+                if (bHasFun)
+                {
+                    // 输出空格
+                    this.OutputEmprty();
+
+                    this.OutputInfo(strValue, true, false);
+                }
+
+                this.OutputInfo("==结束获取条码校验规则==");
+
+                return;
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+
+        // 获取系统参数
+        public string GetSystemParameter(string strCategory,string strName)
+        {
             RestChannel channel = this._mainForm.GetChannel();
 
             try
             {
-                this.OutputInfo("===\r\n开始获取流通权限:\r\n");
-
-
-
-                GetSystemParameterResponse response = channel.GetSystemParameter("circulation",
-                    "locationTypes");
+                GetSystemParameterResponse response = channel.GetSystemParameter(strCategory,
+                    strName);
                 long lRet = response.GetSystemParameterResult.Value;
                 string strError = response.GetSystemParameterResult.ErrorInfo;
                 if (lRet == -1)
                 {
-                    MessageBox.Show(this, "针对服务器 " + channel.Url + " 获得图书馆名称发生错误：" + strError);
-                    return;
+                    throw new Exception("针对服务器 " + channel.Url + " 获得系统参数Category=["+strCategory+"]Name=["+strName+"]发生错误：" + strError);
                 }
 
-                this.OutputInfo("馆藏地" + "\t" + "允许流通");
-
-
-                // <item canborrow="yes" canreturn="" itemBarcodeNullable="no">外借库</item>
-                string xml = "<root>"+ response.strValue + "</root>";
-                XmlDocument dom = new XmlDocument();
-                dom.LoadXml(xml);
-                XmlNodeList list = dom.DocumentElement.SelectNodes("item");
-                foreach (XmlNode node in list)
-                {
-                    string location = DomUtil.GetNodeText(node);
-                    string canBorrow = DomUtil.GetAttr(node, "canborrow");
-                    this.OutputInfo(location+"\t"+canBorrow);
-                }
-                //this.OutputInfo(xml);
-
-                this.OutputInfo("结束获取流通权限");
-
-                return;
+                return response.strValue;
 
             }
             finally
             {
                 this._mainForm.ReturnChannel(channel);
+            }
+        }
 
-
-                EnableControls(true);
+        private void toolForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this._sw != null)
+            {
+                _sw.Close();
+                _sw = null;
             }
         }
     }
@@ -1570,6 +2097,9 @@ namespace dp2mini
             return bookType + "\t"
                 + count;
         }
+
+        // 是否在系统里定义过
+        public bool isConfig { get; set; }
     }
 
     public class LocGroup
@@ -1588,7 +2118,8 @@ namespace dp2mini
                 + count;
         }
 
-        public bool Existed { get; set; }
+        // 是否在系统里定义过
+        public bool isConfig { get; set; }
 
     }
 
@@ -1636,6 +2167,11 @@ namespace dp2mini
         public string role { get; set; }
     }
 
+    public class simpleLoc
+    {
+        public string name { get; set; }
 
+        public string canBorrow { get; set; }
+    }
 
-}
+    }
