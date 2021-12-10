@@ -59,7 +59,14 @@ namespace dp2mini
 
         }
 
-
+        private void toolForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (this._sw != null)
+            {
+                _sw.Close();
+                _sw = null;
+            }
+        }
 
 
 
@@ -113,11 +120,15 @@ namespace dp2mini
                 }
                 this.textBox_info.Text = "";
 
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
+
 
                 // 获取数据库信息
                 this.button_listdb_Click(sender, e);
 
-                // 获取册
+                // 获取册,注意是直接调了函数
                 SearchItem(this._cancel.Token);
 
                 // 馆藏地
@@ -131,24 +142,45 @@ namespace dp2mini
                 // 索取号
                 this.button_checkAccessNo_Click(sender, e);
 
-
-
                 // 册价格
                 this.button_checkPrice_Click(sender, e);
+
+                // 获取校验函数
+                this.button_script_Click(sender, e);
+
+                // 校验册条码，注意是直接调了函数
+                this.VerifyBarcode(this._items, this._cancel.Token);
 
 
                 // 获取流通权限
                 this.button_circulationRight_Click(sender, e);
 
-                // 统计读者
-                this.checkDepartment();
 
+                //==以下是读者相关
+
+                // 读者库
+                button_patron_Click(sender, e);
+
+                // 获取读者，注意是直接调函数
+                SearchReader(this._cancel.Token);
+
+                // 读者类型
+                button_readerType_Click(sender, e);
+
+                // 读者单位
+                button_department_Click(sender, e);
+
+
+                // ==其它====
+
+                // 查配置
+                this.button_checkConfig_Click(sender, e);
+
+               
                 // 检查权限
-                this.CheckRights();
+                this.button_right_Click(sender, e);
 
-                // 需放在最后，获取校验函数
-                this.button_script_Click(sender, e);
-                this.button_verifyBarcode_Click(sender, e);
+
             }
             finally
             {
@@ -166,20 +198,45 @@ namespace dp2mini
             this._cancel.Cancel();
         }
 
+        private string GetTimeString(DateTime time)
+        {
+            return time.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        public string GetInfoAddTime(string info,DateTime time)
+        {
+            return this.GetTimeString(time) + info;
+        }
+
         // 列出书目库信息
         private void button_listdb_Click(object sender, EventArgs e)
         {
             EnableControls(false);
             try
             {
-                this.OutputInfo("==开始获取书目信息==");
-                this.GetDbInfos();
-                this.OutputInfo("==结束获取书目信息，详见excel==");
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始获取书目信息==",start));
+
+                // 干活
+                this.GetBiblioDbInfos();
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束获取书目信息,详见excel,用时"+this.GetSeconds(start,end)+"秒==",end));
             }
             finally
             {
                 EnableControls(true);
             }
+        }
+
+        public string GetSeconds(DateTime start, DateTime end)
+        {
+            double m = (end - start).TotalSeconds;
+            return m.ToString("f2");
         }
 
         // 获取流通权限
@@ -190,9 +247,16 @@ namespace dp2mini
             {
                 // 空2行
                 this.OutputEmprty(2);
-                this.OutputInfo("==开始获取流通权限==");
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始获取流通权限==", start));
+
                 this.GetCirculationRight();
-                this.OutputInfo("==结束获取流通权限，详见右侧==");
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束获取流通权限,详见右侧,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -205,7 +269,27 @@ namespace dp2mini
         // 统计读者
         private void button_patron_Click(object sender, EventArgs e)
         {
+            EnableControls(false);
+            try
+            {
 
+                // 空2行
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始获取读者库信息==", start));
+
+                this.GetReaderDbInfos();
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束获取读者库信息,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
         }
 
         // 检查权限
@@ -241,7 +325,6 @@ namespace dp2mini
                 {
                     this.textBox_info.Text += info + "\r\n";
 
-
                     this.textBox_info.Focus();//获取焦点
                     this.textBox_info.Select(this.textBox_info.TextLength, 0);//光标定位到文本最后
                     this.textBox_info.ScrollToCaret();//滚动到光标处
@@ -273,27 +356,75 @@ namespace dp2mini
         /// <param name="bEnable"></param>
         void EnableControls(bool bEnable)
         {
-            this.button_oneKey.Enabled = bEnable;
-            this.button_stop.Enabled = bEnable?false:true;
+            this.Invoke((Action)(() =>
+            {
+                this.button_oneKey.Enabled = bEnable;
+                this.button_stop.Enabled = bEnable ? false : true;
 
-            this.button_listdb.Enabled = bEnable;  // 书目
-            this.button_entity.Enabled = bEnable; //获取册
-            this.button_checkLocation.Enabled = bEnable; // 馆藏地
-            this.button_checkBookType.Enabled = bEnable; //图书类型
-            this.button_paijia.Enabled = bEnable;  //排架
-            this.button_checkAccessNo.Enabled = bEnable;  //索取号
-            this.button_script.Enabled = bEnable; //校验函数
-            this.button_verifyBarcode.Enabled = bEnable;  //校验册条码
-            this.button_checkPrice.Enabled = bEnable;  //册价格
+                this.button_listdb.Enabled = bEnable;  // 书目
+                this.button_entity.Enabled = bEnable; //获取册
+                this.button_checkLocation.Enabled = bEnable; // 馆藏地
+                this.button_checkBookType.Enabled = bEnable; //图书类型
+                this.button_paijia.Enabled = bEnable;  //排架
+                this.button_checkAccessNo.Enabled = bEnable;  //索取号
+                this.button_script.Enabled = bEnable; //校验函数
+                this.button_verifyBarcode.Enabled = bEnable;  //校验册条码
+                this.button_checkPrice.Enabled = bEnable;  //册价格
 
-            this.button_circulationRight.Enabled = bEnable;  //流通权限
+                this.button_circulationRight.Enabled = bEnable;  //流通权限
 
-            this.button_patron.Enabled = bEnable;  //校验读者
-            this.button_right.Enabled = bEnable;  //权限
-            this.button_loc.Enabled = bEnable; //单馆藏地
+                this.button_patron.Enabled = bEnable;  //读者库
+                this.button_getReader.Enabled = bEnable;//获取读者
+                this.button_readerType.Enabled=bEnable;//读者类型
+                this.button_department.Enabled = bEnable;//读者部门
 
-            this.button_clear.Enabled = bEnable;     //清信息
+
+
+                this.button_checkConfig.Enabled = bEnable;  //查配置
+                this.button_right.Enabled = bEnable;  //权限
+                this.button_loc.Enabled = bEnable; //单馆藏地
+
+
+                this.button_clear.Enabled = bEnable;     //清信息
+            }
+            ));
         }
+
+        // 输出空行
+        private void OutputEmprty(int count = 1)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                // 输出空格
+                this.OutputInfo("", true, false);
+            }
+        }
+
+        // 获取系统参数
+        public string GetSystemParameter(string strCategory, string strName)
+        {
+            RestChannel channel = this._mainForm.GetChannel();
+            try
+            {
+                GetSystemParameterResponse response = channel.GetSystemParameter(strCategory,
+                    strName);
+                long lRet = response.GetSystemParameterResult.Value;
+                string strError = response.GetSystemParameterResult.ErrorInfo;
+                if (lRet == -1)
+                {
+                    throw new Exception("针对服务器 " + channel.Url + " 获得系统参数Category=[" + strCategory + "]Name=[" + strName + "]发生错误：" + strError);
+                }
+
+                return response.strValue;
+
+            }
+            finally
+            {
+                this._mainForm.ReturnChannel(channel);
+            }
+        }
+
+
 
 
         #endregion
@@ -302,17 +433,12 @@ namespace dp2mini
         #region 获取数据库信息
 
         // 获取数据库信息
-        public void GetDbInfos()
+        public void GetBiblioDbInfos()
         {
             string strError = "";
 
             // sheet名：书目库
-            IXLWorksheet ws = null;
-            bool bExist=this._workbook.Worksheets.TryGetWorksheet("书目库",out ws);
-            if (bExist == true)
-                this._workbook.Worksheets.Delete("书目库");
-
-           ws = this._workbook.Worksheets.Add("书目库");
+            IXLWorksheet ws = this.CreateSheet("书目库");
             // 设置标题
             string[] titles = {
             "序号",
@@ -471,10 +597,15 @@ namespace dp2mini
 
         public void SearchItem(CancellationToken token)
         {
+            this._items.Clear(); // 先清空本地缓存的册记录
+
+
             // 空2行
             this.OutputEmprty(2);
 
-            this.OutputInfo("==开始获取册信息==");
+            // 开始时间
+            DateTime start = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==开始获取册信息==", start));
             Application.DoEvents();
 
             string strError = "";
@@ -526,8 +657,8 @@ namespace dp2mini
                     }
 
                     // 输出命中信息
-                    this.OutputInfo("系统中册数量总计" + this._items.Count.ToString() + "册。", true, false);
-
+                    this.OutputInfo("系统中册数量总计" + lRet.ToString() + "册。", true, false);
+                    Application.DoEvents();
                     //this.OutputInfo("共命中" + lRet.ToString() + "册");
 
 
@@ -538,7 +669,7 @@ namespace dp2mini
                     // 从结果集中取出册记录
                     for (; ; )
                     {
-                        //Application.DoEvents(); // 出让界面控制权
+                        Application.DoEvents(); // 出让界面控制权
 
                         token.ThrowIfCancellationRequested();
 
@@ -570,6 +701,10 @@ namespace dp2mini
                         // 处理本批取到的册记录
                         for (int i = 0; i < searchresults.Length; i++)
                         {
+                            Application.DoEvents(); // 出让界面控制权
+                            token.ThrowIfCancellationRequested();
+
+
                             Record record = searchresults[i];
 
                             Entity item = new Entity();
@@ -595,11 +730,10 @@ namespace dp2mini
 
 
                             // info
-                            this.OutputInfo("获取第" + (lStart + i).ToString(),false,true);
+                            this.OutputInfo("获取册记录第" + (lStart + i).ToString(),false,true);
                         }
 
-                        this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条",
-                            true,false);
+                        this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条");
 
 
                         lStart += searchresults.Length;
@@ -626,9 +760,13 @@ namespace dp2mini
                 }
                 ));
 
-                //完成提示
-                this.OutputInfo("==结束获取册信息==");
+
             }
+
+
+            // 结束时间
+            DateTime end = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==结束获取册信息,用时" + this.GetSeconds(start, end) + "秒==", end));
         }
 
         // 校验册条码
@@ -645,8 +783,10 @@ namespace dp2mini
             // 空2行
             this.OutputEmprty(2);
 
-            this.OutputInfo("==开始校验册条码==");
 
+            // 开始时间
+            DateTime start = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==开始校验册条码==", start));
             try
             {
 
@@ -661,7 +801,7 @@ namespace dp2mini
                     {
                         // 当外部让停止时，停止循环
                         token.ThrowIfCancellationRequested();
-                        //Application.DoEvents();
+                        Application.DoEvents();
 
                         index++;
                         this.OutputInfo("校验册条码第" + index.ToString(),false,true);
@@ -728,11 +868,11 @@ namespace dp2mini
                     EnableControls(true);
                 }
                 ));
-
-
             }
 
-            this.OutputInfo("==结束校验册条码，详见txt文件==");
+            // 结束时间
+            DateTime end = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==结束校验册条码,详见txt文件,用时" + this.GetSeconds(start, end) + "秒==", end));
         }
 
         // 校验价格
@@ -906,11 +1046,23 @@ namespace dp2mini
         }
 
         // 获取聚合的类型
-        private TypeGroup GetTypeGroup(List<TypeGroup> list, string name)
+        private BookTypeGroup GetTypeGroup(List<BookTypeGroup> list, string name)
         {
-            foreach (TypeGroup group in list)
+            foreach (BookTypeGroup group in list)
             {
                 if (group.bookType == name)
+                {
+                    return group;
+                }
+            }
+            return null;
+        }
+
+        private PatronGroup GetPatronGroup(List<PatronGroup> list, string name)
+        {
+            foreach (PatronGroup group in list)
+            {
+                if (group.name == name)
                 {
                     return group;
                 }
@@ -1070,10 +1222,10 @@ namespace dp2mini
         private IXLWorksheet CreateSheet(string sheetName)
         {
             IXLWorksheet ws = null;
-            bool bExist = this._workbook.Worksheets.TryGetWorksheet("馆藏地", out ws);
+            bool bExist = this._workbook.Worksheets.TryGetWorksheet(sheetName, out ws);
             if (bExist == true)
-                this._workbook.Worksheets.Delete("馆藏地");
-            ws = this._workbook.Worksheets.Add("馆藏地");
+                this._workbook.Worksheets.Delete(sheetName);
+            ws = this._workbook.Worksheets.Add(sheetName);
 
             return ws;
         }
@@ -1104,7 +1256,7 @@ namespace dp2mini
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = items.GroupBy(
                 x => new { x.bookType },
-                (key, item_list) => new TypeGroup
+                (key, item_list) => new BookTypeGroup
                 {
                     bookType = key.bookType,
                     Items = new List<Entity>(item_list),
@@ -1113,9 +1265,8 @@ namespace dp2mini
 
 
 
-            List<TypeGroup> types = new List<TypeGroup>();
-
-            foreach (TypeGroup group in list)
+            List<BookTypeGroup> types = new List<BookTypeGroup>();
+            foreach (BookTypeGroup group in list)
             {
                 if (String.IsNullOrEmpty(group.bookType) == true)
                     group.bookType = "[空]";
@@ -1148,9 +1299,9 @@ namespace dp2mini
             List<string> bookTypes = this.GetCirTypes("bookTypes");
             foreach (string one in bookTypes)
             {
-                index++; 
+                index++;
 
-                TypeGroup group = this.GetTypeGroup(types, one);
+                BookTypeGroup group = this.GetTypeGroup(types, one);
                 int count = 0;
                 if (group != null)
                 {
@@ -1168,7 +1319,7 @@ namespace dp2mini
             }
 
             // 把没有数据的馆藏地显示在下方
-            foreach (TypeGroup one in types)
+            foreach (BookTypeGroup one in types)
             {
                 if (one.isConfig == false)
                 {
@@ -1552,6 +1703,621 @@ namespace dp2mini
 
         #region 统计读者
 
+        public List<db> GetReaderDbs()
+        {
+            this._cirReaderDbs = "";
+
+            // 获取读者库
+            string strValue = this.GetSystemParameter("system", "readerDbGroup");
+            //<database name="读者" inCirculation="true" libraryCode="" />
+
+            string xml = strValue;
+            xml = "<root>" + xml + "</root>";
+            XmlDocument dom = new XmlDocument();
+            dom.LoadXml(xml);
+            XmlNodeList list = dom.DocumentElement.SelectNodes("database");
+            List<db> dbs = new List<db>(); //未定义新类，直接使用的bibliodb这个类
+            foreach (XmlNode node in list)
+            {
+                Application.DoEvents();
+
+                db one = new db();
+                one.biblioDbName = DomUtil.GetAttr(node, "name");
+                one.inCirculation = DomUtil.GetAttr(node, "inCirculation");
+                one.libraryCode = DomUtil.GetAttr(node, "libraryCode");
+                dbs.Add(one);
+
+                // 把流通库单独放置
+                if (one.inCirculation == "true")
+                {
+                    if (string.IsNullOrEmpty(this._cirReaderDbs) == false)
+                    {
+                        this._cirReaderDbs += ",";
+                    }
+                    this._cirReaderDbs += one.biblioDbName;
+                }
+            }
+
+            return dbs;
+        }
+
+        // 获取读者数据库信息
+        public void GetReaderDbInfos()
+        {
+            string strError = "";
+
+            // sheet名：读者库
+            IXLWorksheet ws = this.CreateSheet("读者库");
+            // 设置标题
+            string[] titles = {
+            "读者库名",
+            "参考流通",
+            "馆代码",
+            "数据量"
+            };
+            int i = 1;
+            foreach (string s in titles)
+            {
+                ws.Cell(1, i++).Value = s;
+            }
+
+
+            // 获取全部读者库
+            List<db> dbs = this.GetReaderDbs();
+          
+
+            RestChannel channel = this._mainForm.GetChannel();
+            try
+            {
+                int index = 0;
+                long lTotalCount = 0;  //总数量
+                long lCirCount = 0; //流通库数据总量
+                int cirDbCount = 0; //流通库个数
+                foreach (db one in dbs)
+                {
+                    Application.DoEvents();
+                    index++;
+
+                    //string output = "";
+                    long lRet = channel.SearchReader(one.biblioDbName,
+                       "",
+                       -1,
+                       "__id",
+                       "left",
+                       "zh",
+                       "test",
+                       "",
+                       out strError);
+                    if (lRet == -1)
+                    {
+                        this.OutputInfo("获取读者库[" + one.biblioDbName + "]的记录数量出错：" + strError,
+                            true, false);
+                        continue;
+                    }
+
+                    // 每行内容
+                    string[] row = {
+             one.biblioDbName,
+                        one.inCirculation.ToString(),
+             one.libraryCode,
+                       lRet.ToString() };
+
+
+                    // 写excel
+                    i = 1;
+                    foreach (string s in row)
+                    {
+                        ws.Cell(index + 1, i++).Value = s;
+                    }
+
+
+                    //流通库数量和记录数
+                    if (one.inCirculation == "true")
+                    {
+                        cirDbCount++;
+                        lCirCount += lRet;
+                    }
+
+                    //总数量
+                    lTotalCount += lRet;
+                }
+
+                this.OutputInfo("\r\n图书馆系统中总共有" + index + "个读者库，读者记录总数量为" + lTotalCount
+                    + "，其中有" + cirDbCount + "个库参与流通，参与流通的读者记录数量为" + lCirCount + "。" + "\r\n",
+                    true, false);
+
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index + 1, titles.Length);
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
+            
+                return;
+            }
+            finally
+            {
+                this._mainForm.ReturnChannel(channel);
+            }
+            
+        }
+
+        List<Patron> _patrons = new List<Patron>();
+        public string _cirReaderDbs = "";
+        public  void SearchReader(CancellationToken token)
+        {
+            this._patrons.Clear(); // 先清空本地缓存的读者记录
+
+            // 空2行
+            this.OutputEmprty(2);
+
+            // 开始时间
+            DateTime start = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==开始获取读者记录==", start));
+            Application.DoEvents();
+
+            string strError = "";
+            long lRet = 0;
+
+
+            // 设置按钮状态
+            EnableControls(false);
+
+
+
+            // 检查读者信息，只检查流通的读者
+            if (string.IsNullOrEmpty(this._cirReaderDbs) == true)
+            {
+                // 如果流通库没有，则自动从服务器找一下
+                this.GetReaderDbs();
+            }
+
+            // 如果没有参与流通的数据库，则直接退出
+            if (string.IsNullOrEmpty(this._cirReaderDbs) == true)
+            {
+                this.OutputInfo("没有参与流通的读者库", true, false);
+                return;
+            }
+
+
+            // 获取所有册记录，保存到本地数组
+            //List<Entity> items = new List<Entity>();
+            RestChannel channel = this._mainForm.GetChannel();
+            try
+            {
+                token.ThrowIfCancellationRequested();
+
+                // 检查全部册
+                lRet = channel.SearchReader(//stop,
+                   this._cirReaderDbs,
+                   "", // 
+                   -1,
+                   "__id",
+                   "left",
+                   "zh",
+                   "myresult",
+                   "id,xml",
+                   out strError);
+                if (lRet == -1)
+                {
+                    this.OutputInfo("检索读者记录出错：" + strError, true, false);
+                    return;
+                }
+
+                // 输出命中信息
+                this.OutputInfo("系统中参与流通的读者数量为" + lRet.ToString() + "条。", true, false);
+                Application.DoEvents();
+                //this.OutputInfo("共命中" + lRet.ToString() + "册");
+
+
+                long lHitCount = lRet;
+                long lStart = 0;
+                long lCount = lHitCount;
+
+                // 从结果集中取出册记录
+                for (; ; )
+                {
+                    Application.DoEvents(); // 出让界面控制权
+
+                    token.ThrowIfCancellationRequested();
+
+
+                    Record[] searchresults = null;
+                    lRet = channel.GetSearchResult(
+                        //stop,
+                        "myresult",   // strResultSetName
+                        lStart,
+                        lCount,
+                        "id,xml",
+                        "zh",
+                        out searchresults,
+                        out strError);
+                    if (lRet == -1)
+                    {
+                        this.OutputInfo("已获取" + lStart.ToString() + "条，获取结果集出错：" + strError,
+                            true, false);
+                        return;
+                    }
+
+                    // 说明结果集里的记录获取完了。
+                    if (lRet == 0)
+                    {
+                        break;
+                    }
+
+
+                    // 处理本批取到的册记录
+                    for (int i = 0; i < searchresults.Length; i++)
+                    {
+                        Application.DoEvents(); // 出让界面控制权
+                        token.ThrowIfCancellationRequested();
+
+                        Record record = searchresults[i];
+
+                        Patron patron = new Patron();
+                        patron.path = record.Path;
+                        this._patrons.Add(patron);
+
+                        /*
+- <root>
+<barcode>XZP00002</barcode> 
+<name>朱婧媛</name> 
+<readerType>学生</readerType> 
+<department>2018级初中一班</department> 
+<refID>34baad2b-53cc-4e7d-8e77-5078eccb03dd</refID> 
+<libraryCode>星洲学校</libraryCode> 
+<hire expireDate="" period="" /> 
+<borrows>
+  <borrow barcode="DPB000001" oi="CN-320506-C-XZXX" recPath="中文图书实体/24" biblioRecPath="中文图书/51" location="星洲学校/图书馆" borrowDate="Thu, 04 Nov 2021 13:54:07 +0800" borrowPeriod="10day" borrowID="e1af938d-d35d-4742-ba01-f639f7181131" returningDate="Sun, 14 Nov 2021 12:00:00 +0800" operator="supervisor" type="教材" volume="123" price="CNY28.80" notifyHistory="ynyyny" /> 
+</borrows>
+ */
+                        string xml = record.RecordBody.Xml;
+                        XmlDocument dom = new XmlDocument();
+                        dom.LoadXml(xml);
+                        XmlNode root = dom.DocumentElement;
+                        patron.libraryCode = DomUtil.GetElementInnerText(root, "libraryCode");
+                        patron.barcode = DomUtil.GetElementInnerText(root, "barcode");
+                        patron.name = DomUtil.GetElementInnerText(root, "name");
+                        patron.readerType = DomUtil.GetElementInnerText(root, "readerType");
+                        if (string.IsNullOrEmpty(patron.libraryCode) == false)
+                        {
+                            patron.readerType = patron.libraryCode + "/" + patron.readerType;
+                        }
+
+                       
+                        patron.department = DomUtil.GetElementInnerText(root, "department");
+                        // 统计一下空格
+                        if (patron.department == null)
+                            patron.department = "";
+                        patron.department = patron.department.Trim();
+
+
+                        XmlNodeList borrowList = root.SelectNodes("borrows/borrow");
+                        patron.borrowCount = borrowList.Count;
+
+                        // info
+                        this.OutputInfo("获取读者第" + (lStart + i).ToString(), false, true);
+                    }
+
+                    this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条");
+
+
+                    lStart += searchresults.Length;
+                    lCount -= searchresults.Length;
+
+                    if (lStart >= lHitCount || lCount <= 0)
+                        break;
+                }
+
+
+                // 输出有在借册的读者
+                // sheet名：书目库
+                IXLWorksheet ws = this.CreateSheet("在借书读者");
+                // 设置标题
+                string[] titles = {
+            "读者证条码号",
+            "读者姓名",
+            "在借数量"
+            };
+                int j = 1;
+                foreach (string s in titles)
+                {
+                    ws.Cell(1, j++).Value = s;
+                }
+
+                // 循环读者
+                int index = 0;
+                foreach (Patron one in this._patrons)
+                {
+                    if (one.borrowCount > 0)
+                    {
+                        index++;
+
+                        // 写excel
+                        ws.Cell(index + 1, 1).Value = one.barcode;
+                        ws.Cell(index + 1, 2).Value = one.name;
+                        ws.Cell(index + 1, 3).Value = one.borrowCount;
+                    }
+                }
+
+                // 输出一句
+                this.OutputInfo("有在借图书的读者数量为"+index+"条。",true,false);
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index + 1, titles.Length);
+
+                //将第1列读者证条码设为文本格式
+                ws.Column(1).Style.NumberFormat.Format = "@";
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
+
+            }
+            finally
+            {
+                this._mainForm.ReturnChannel(channel);
+
+                EnableControls(true);
+            }
+
+
+            // 结束时间
+            DateTime end = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==结束获取读者记录,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
+
+
+            // todo，以后可以改进，保存下来
+        }
+
+        // 获取读者
+        private void button_getReader_Click(object sender, EventArgs e)
+        {
+            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+            this._cancel.Dispose();
+            this._cancel = new CancellationTokenSource();
+
+            // 开一个新线程
+            Task.Run(() =>
+            {
+                SearchReader(this._cancel.Token);
+            });
+        }
+
+        // 统计读者类型
+        private void button_readerType_Click(object sender, EventArgs e)
+        {
+
+            EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始统计读者类型==", start));
+
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
+                this.GroupReaderType(this._patrons, this._cancel.Token);
+
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束统计读者类型,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+
+        }
+
+        // 对读者类型进行聚合
+        public void GroupReaderType(List<Patron> patrons, CancellationToken token)
+        {
+            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
+            var list = patrons.GroupBy(
+                x => new { x.readerType },
+                (key, item_list) => new PatronGroup
+                {
+                    name = key.readerType,
+                    Items = new List<Patron>(item_list),
+                    count = item_list.Count()
+                }).OrderByDescending(o => o.count);
+
+
+
+            List<PatronGroup> types = new List<PatronGroup>();
+            foreach (PatronGroup group in list)
+            {
+                if (String.IsNullOrEmpty(group.name) == true)
+                    group.name = "[空]";
+
+                types.Add(group);
+            }
+
+
+            // sheet名：馆藏地
+            IXLWorksheet ws = this.CreateSheet("读者类型");
+
+            // 设置标题
+            string[] titles = {
+            "读者类型",
+            "读者数量",
+            "备注"
+            };
+            int i = 1;
+            foreach (string s in titles)
+            {
+                ws.Cell(1, i++).Value = s;
+            }
+
+            // 已输出excel，则不输出的文本了
+            // 输出表头
+            //this.OutputInfo("图书类型	\t册数量\t备注",true,false);
+
+            // 获取配置的读者类型
+            int index = 0;
+            List<string> bookTypes = this.GetCirTypes("readerTypes");
+            foreach (string one in bookTypes)
+            {
+                index++;
+
+                PatronGroup group = this.GetPatronGroup(types, one);
+                int count = 0;
+                if (group != null)
+                {
+                    count = group.count;
+                    group.isConfig = true; //表示在系统已定义过
+                }
+
+                // 已输出excel，则不输出的文本了
+                //this.OutputInfo(one +  "\t" + count, true, false);
+
+                // 写excel
+                ws.Cell(index + 1, 1).Value = one;
+                ws.Cell(index + 1, 2).Value = count.ToString();
+                ws.Cell(index + 1, 3).Value = "";
+            }
+
+            // 把没有数据的馆藏地显示在下方
+            foreach (PatronGroup one in types)
+            {
+                if (one.isConfig == false)
+                {
+                    index++;
+
+                    // 已输出excel，则不输出的文本了
+                    //this.OutputInfo(one.bookType+  "\t" +one.count+"\t" + "未定义", true, false);
+
+                    // 写excel
+                    ws.Cell(index + 1, 1).Value = one.name;
+                    ws.Cell(index + 1, 2).Value = one.count.ToString();
+                    ws.Cell(index + 1, 3).Value = "未定义";
+                }
+            }
+
+            // 设置excel格式
+            this.SetExcelStyle(ws, index + 1, titles.Length);
+
+            //保存excel
+            this._workbook.SaveAs(this.ExcelFileName);
+        }
+
+        // 对读者部门进行聚合
+        public void GroupReaderDept(List<Patron> patrons, CancellationToken token)
+        {
+            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
+            var list = patrons.GroupBy(
+                x => new { x.department },
+                (key, item_list) => new PatronGroup
+                {
+                    name = key.department,
+                    Items = new List<Patron>(item_list),
+                    count = item_list.Count()
+                }).OrderByDescending(o => o.count);
+
+
+
+            List<PatronGroup> types = new List<PatronGroup>();
+
+            foreach (PatronGroup group in list)
+            {
+                if (group.name == "")
+                    group.name = "[空]";
+                types.Add(group);
+            }
+
+
+            // sheet名：馆藏地
+            IXLWorksheet ws = this.CreateSheet("读者部门");
+            // 设置标题
+            string[] titles = {
+            "读者部门",
+            "读者数量",
+            "备注"
+            };
+            int i = 1;
+            foreach (string s in titles)
+            {
+                ws.Cell(1, i++).Value = s;
+            }
+
+            bool bHasEmpty = false;
+            // 输出读者部门到excel
+            int index = 0;
+            // 把没有数据的馆藏地显示在下方
+            foreach (PatronGroup one in types)
+            {
+                    index++;
+
+                    // 写excel
+                    ws.Cell(index + 1, 1).Value = one.name;
+                    ws.Cell(index + 1, 2).Value = one.count.ToString();
+
+                // 如果部门为空，将读者路径和证条码输出到txt
+                if (one.name=="[空]")
+                {
+                    ws.Cell(index + 1, 3).Value = "详见下方excel";
+                    bHasEmpty = true;
+                }
+
+            }
+
+            // 设置excel格式
+            this.SetExcelStyle(ws, index + 1, titles.Length);
+
+            //保存excel
+            this._workbook.SaveAs(this.ExcelFileName);
+
+
+            // 将读者单位的为空的另行输出excel
+            if (bHasEmpty == true)
+            {
+                // sheet名：馆藏地
+                ws = this.CreateSheet("部门为空的读者");
+                // 设置标题
+                string[] titles1 = {
+            "路径",
+            "证条码",
+            "姓名"
+            };
+                i = 1;
+                foreach (string s in titles1)
+                {
+                    ws.Cell(1, i++).Value = s;
+                }
+                index = 0;
+                // 把没有数据的馆藏地显示在下方
+                foreach (PatronGroup one in types)
+                {
+                    if (one.name != "[空]")
+                        continue;
+                    this.OutputInfo("读者部门为[空]的，有" + one.Items.Count.ToString() + "条。");
+                    foreach (Patron a in one.Items)
+                    {
+                        index++;
+                        ws.Cell(index + 1, 1).Value = a.path;
+                        ws.Cell(index + 1, 2).Value = a.barcode;
+                        ws.Cell(index + 1, 3).Value = a.name;
+                    }
+                }
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index + 1, titles.Length);
+
+                //将第1列读者证条码设为文本格式
+                ws.Column(2).Style.NumberFormat.Format = "@";
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
+            }
+
+        }
+
+        /*
         // 统计读者单位
         private void checkDepartment()
         {
@@ -1605,6 +2371,7 @@ namespace dp2mini
             MessageBox.Show("ok");
 
         }
+        */
 
         #endregion
 
@@ -1756,16 +2523,21 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
-
                 // 空2行
                 this.OutputEmprty(2);
 
-                this.OutputInfo("==开始统计馆藏地==");
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始统计馆藏地==", start));
+
+                // 干活
+                this._cancel.Dispose(); // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel = new CancellationTokenSource();
                 this.GroupLocation(this._items, this._cancel.Token);
-                this.OutputInfo("==结束统计馆藏地，详见excel==");
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束统计馆藏地,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -1779,16 +2551,22 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
-
                 // 空2行
                 this.OutputEmprty(2);
 
-                this.OutputInfo("==开始统计图书类型==");
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始统计图书类型==", start));
+
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
                 this.GroupType(this._items, this._cancel.Token);
-                this.OutputInfo("==结束统计图书类型，详见excel==");
+
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束统计图书类型,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -1802,18 +2580,26 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
+
 
                 // 空2行
                 this.OutputEmprty(2);
 
-                // 校验索取号
-                this.OutputInfo("==开始校验索取号==");
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始校验索取号==", start));
                 Application.DoEvents();
+
+
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
                 this.CheckAccessNo(this._items, this._cancel.Token);
-                this.OutputInfo("==结束校验索取号，详见txt文件==");
+
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束校验索取号,详见txt文件,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -1827,18 +2613,22 @@ namespace dp2mini
             EnableControls(false);
             try
             {
-                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-                this._cancel.Dispose();
-                this._cancel = new CancellationTokenSource();
 
                 // 空2行
                 this.OutputEmprty(2);
 
-                // 校验册价格
-                this.OutputInfo("==开始校验册价格==");
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始校验册价格==", start));
 
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
                 this.CheckPrice(this._items, this._cancel.Token);
-                this.OutputInfo("==结束校验册价格，详见txt文件==");
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束校验册价格,详见txt文件,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -1861,8 +2651,6 @@ namespace dp2mini
             });
         }
 
-        #endregion
-
         // 获取馆藏地
         private void button_getLocation_Click(object sender, EventArgs e)
         {
@@ -1878,7 +2666,7 @@ namespace dp2mini
 
                 foreach (simpleLoc one in locs)
                 {
-                    this.OutputInfo(one.name+"\t"+one.canBorrow,true,false);
+                    this.OutputInfo(one.name + "\t" + one.canBorrow, true, false);
                 }
 
                 this.OutputInfo("==结束获取流通权限==");
@@ -1900,10 +2688,13 @@ namespace dp2mini
                 // 空2行
                 this.OutputEmprty(2);
 
-                this.OutputInfo("==开始检查排架体系==");
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始检查排架体系==", start));
 
                 // 调服务器接口
-                string strValue = this.GetSystemParameter("circulation","callNumber");
+                string strValue = this.GetSystemParameter("circulation", "callNumber");
 
                 // 已配置了排系体系的馆藏地
                 List<string> paijiaLocs = new List<string>();
@@ -1924,14 +2715,14 @@ namespace dp2mini
                     string classType = DomUtil.GetAttr(node, "classType");
                     string qufenhaoType = DomUtil.GetAttr(node, "qufenhaoType");
 
-                    this.OutputInfo("\r\n排架体系:"+ qufenhaoType + "  类号=" + classType+"  区分号="+qufenhaoType,
-                        true,false);
+                    this.OutputInfo("\r\n排架体系:" + qufenhaoType + "  类号=" + classType + "  区分号=" + qufenhaoType,
+                        true, false);
 
                     XmlNodeList locs = node.SelectNodes("location");
                     foreach (XmlNode loc in locs)
-                    { 
-                        string locName=DomUtil.GetAttr(loc, "name");
-                        this.OutputInfo(locName,true,false);
+                    {
+                        string locName = DomUtil.GetAttr(loc, "name");
+                        this.OutputInfo(locName, true, false);
                         paijiaLocs.Add(locName);
                     }
                 }
@@ -1940,38 +2731,32 @@ namespace dp2mini
                 // 把配置的馆藏地列出来，看看哪些没有定义排架
                 bool bFirst = true;
                 List<simpleLoc> simpleLocs = this.GetLocation();
-                foreach(simpleLoc one in simpleLocs)
+                foreach (simpleLoc one in simpleLocs)
                 {
                     if (paijiaLocs.IndexOf(one.name) == -1)
                     {
                         if (bFirst == true)
                         {
                             this.OutputInfo("\r\n以下馆藏地未配置排架方式，请图书馆老师确认是否需要配置。",
-                                true,false);
+                                true, false);
                             bFirst = false;
                         }
-                        this.OutputInfo(one.name,true,false);
+                        this.OutputInfo(one.name, true, false);
                     }
                 }
 
+                // 输出空行
                 this.OutputEmprty();
-                this.OutputInfo("==结束检查排架体系==");
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束检查排架体系,用时" + this.GetSeconds(start, end) + "秒==", end));
 
                 return;
             }
             finally
             {
                 EnableControls(true);
-            }
-        }
-
-        // 输出空行
-        private void OutputEmprty(int count=1)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                // 输出空格
-                this.OutputInfo("", true, false);
             }
         }
 
@@ -1984,11 +2769,13 @@ namespace dp2mini
                 // 空2行
                 this.OutputEmprty(2);
 
-                this.OutputInfo("==开始获取条码校验规则==");
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始获取条码校验规则==", start));
 
                 //barcodeValidation
                 string strValue = this.GetSystemParameter("circulation", "barcodeValidation");
-                strValue = DomUtil.GetIndentXml("<barcodeValidation>"+strValue+ "</barcodeValidation>");
+                strValue = DomUtil.GetIndentXml("<barcodeValidation>" + strValue + "</barcodeValidation>");
 
                 if (string.IsNullOrEmpty(strValue) == false)
                 {
@@ -2037,7 +2824,10 @@ ItemCanReturn
                     this.OutputInfo(strValue, true, false);
                 }
 
-                this.OutputInfo("==结束获取条码校验规则==");
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束获取条码校验规则,用时" + this.GetSeconds(start, end) + "秒==", end));
 
                 return;
             }
@@ -2048,42 +2838,193 @@ ItemCanReturn
         }
 
 
-        // 获取系统参数
-        public string GetSystemParameter(string strCategory,string strName)
-        {
-            RestChannel channel = this._mainForm.GetChannel();
 
+
+
+
+
+
+        #endregion
+
+        private void button_checkConfig_Click(object sender, EventArgs e)
+        {
+            EnableControls(false);
             try
             {
-                GetSystemParameterResponse response = channel.GetSystemParameter(strCategory,
-                    strName);
-                long lRet = response.GetSystemParameterResult.Value;
-                string strError = response.GetSystemParameterResult.ErrorInfo;
-                if (lRet == -1)
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始检查配置==", start));
+
+                // 干活
+                this.GetConfig();
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束检查配置,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        public void GetConfig()
+        {
+            // rfid
+            string rfid = this.GetSystemParameter("system","rfid");
+            rfid=DomUtil.GetIndentXml(rfid);
+            this.OutputInfo(rfid);
+
+            // 值列表
+            string valueTables = this.GetSystemParameter("circulation", "valueTables");
+            valueTables = "<valueTables>"+valueTables+"</valueTables>";
+            valueTables = DomUtil.GetIndentXml(valueTables);
+            this.OutputInfo(valueTables);
+
+
+            
+        }
+
+        // 读者部门
+        private void button_department_Click(object sender, EventArgs e)
+        {
+
+            EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始统计读者部门==", start));
+
+                // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+                this._cancel.Dispose();
+                this._cancel = new CancellationTokenSource();
+                this.GroupReaderDept(this._patrons, this._cancel.Token);
+
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束统计读者部门,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        // 下载文件
+        void DownloadLibrary()
+        {
+            // 本地文件，如果原来有，先删除
+            string fileName = this.Dir + "/" + this._mainForm.LibraryName + "-library.xml";
+            if (File.Exists(fileName) == true)
+                File.Delete(fileName);
+            FileStream stream = File.Create(fileName);
+
+            //
+            RestChannel channel = this._mainForm.GetChannel();
+            try
+            {
+                string strPath = "!library.xml";//this.ServerFilePath;
+                string strStyle = "content,data,metadata,timestamp,outputpath,gzip";
+
+                byte[] baContent = null;
+
+                long lStart = 0;
+                int nPerLength = -1;
+
+                byte[] timestamp = null;
+                long lTotalLength = -1;
+                for (; ; )
                 {
-                    throw new Exception("针对服务器 " + channel.Url + " 获得系统参数Category=["+strCategory+"]Name=["+strName+"]发生错误：" + strError);
-                }
+                    //if (_cancel.IsCancellationRequested)
+                    //{
+                    //    strError = "中断";
+                    //    goto ERROR1;
+                    //}
 
-                return response.strValue;
+                    string strMessage = "";
+                    string strMetadata = "";
 
+                    GetResResponse response = channel.GetRes(strPath,
+                        lStart,
+                        nPerLength,
+                        strStyle);
+                    long lRet = response.GetResResult.Value;
+                    if (lRet == -1)
+                    {
+                        this.OutputInfo("获得服务器文件 '" + strPath + "' 时发生错误： " + response.GetResResult.ErrorInfo, true, false);
+                        return;
+                    }
+                    baContent = response.baContent;
+                    lTotalLength = lRet;
+
+                    // 写入本地文件
+                    if (baContent.Length > 0)
+                    {
+                        stream.Write(baContent, 0, baContent.Length);
+                        stream.Flush(); 
+                        lStart += baContent.Length;
+                    }
+                    if (lStart >= lRet)
+                    {
+                        break;
+                    }
+
+                } // end of for
+            }
+            catch (Exception ex)
+            {
+                this.OutputInfo(ExceptionUtil.GetDebugText(ex));
+                return;
             }
             finally
             {
                 this._mainForm.ReturnChannel(channel);
+
+                // 关闭文件
+                if (stream != null)
+                {
+                    stream.Close();
+                    stream = null;
+                }
             }
         }
 
-        private void toolForm_FormClosing(object sender, FormClosingEventArgs e)
+        // 下载library.xml
+        private void button_downloadLibrary_Click(object sender, EventArgs e)
         {
-            if (this._sw != null)
+            EnableControls(false);
+            try
             {
-                _sw.Close();
-                _sw = null;
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始下载library.xml==", start));
+
+                // 干活
+                this.DownloadLibrary();
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束下载library.xml,详见输出目录,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
             }
         }
     }
 
-    public class TypeGroup
+
+
+    public class BookTypeGroup
     {
         // 册类型
         public string bookType { get; set; }
@@ -2097,6 +3038,20 @@ ItemCanReturn
             return bookType + "\t"
                 + count;
         }
+
+        // 是否在系统里定义过
+        public bool isConfig { get; set; }
+    }
+
+    public class PatronGroup
+    {
+        // 册类型
+        public string name { get; set; }
+
+        public List<Patron> Items { get; set; }
+
+        public int count { get; set; }
+
 
         // 是否在系统里定义过
         public bool isConfig { get; set; }
@@ -2145,10 +3100,36 @@ ItemCanReturn
         public string price { get; set; }
 
         public string errorInfo { get; set; }
-
-
-
     }
+
+    // 读者记录
+    public class Patron
+    {
+        // 路径
+        public string path { get; set; }
+
+        // 册条码
+        public string barcode { get; set; }
+
+        // 姓名
+        public string name { get; set; }
+
+
+        // 读者类型
+        public string readerType { get; set; }
+
+        // 部门
+        public string department { get; set; }
+
+        // 馆代码
+        public string libraryCode { get; set; }
+
+        public string errorInfo { get; set; }
+
+        public int borrowCount { get; set; }
+    }
+
+
 
     public class db
     {
@@ -2165,6 +3146,9 @@ ItemCanReturn
 
         public string inCirculation { get; set; }
         public string role { get; set; }
+
+        // 读者库有用
+        public string libraryCode { get; set; }
     }
 
     public class simpleLoc

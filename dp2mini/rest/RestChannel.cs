@@ -2223,6 +2223,7 @@ namespace DigitalPlatform.LibraryRestClient
             string strPath,
             string strStyle,
             out string strResult,
+            //out byte[] baContent,
             out string strMetaData,
             out byte[] baOutputTimeStamp,
             out string strOutputResPath,
@@ -2281,7 +2282,7 @@ namespace DigitalPlatform.LibraryRestClient
             if (StringUtil.IsInList("data", strStyle) != true)
                 return 0;
 
-            strResult = ByteArray.ToString(baTotal);
+            strResult = ByteArray.ToString(baTotal,Encoding.UTF8);
 
             return 0;
         }

@@ -50,6 +50,11 @@
             this.button_loc = new System.Windows.Forms.Button();
             this.button_paijia = new System.Windows.Forms.Button();
             this.button_script = new System.Windows.Forms.Button();
+            this.button_getReader = new System.Windows.Forms.Button();
+            this.button_readerType = new System.Windows.Forms.Button();
+            this.button_checkConfig = new System.Windows.Forms.Button();
+            this.button_department = new System.Windows.Forms.Button();
+            this.button_downloadLibrary = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -78,13 +83,13 @@
             this.textBox_info.Multiline = true;
             this.textBox_info.Name = "textBox_info";
             this.textBox_info.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_info.Size = new System.Drawing.Size(970, 412);
+            this.textBox_info.Size = new System.Drawing.Size(992, 412);
             this.textBox_info.TabIndex = 5;
             // 
             // button_circulationRight
             // 
             this.button_circulationRight.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_circulationRight.Location = new System.Drawing.Point(234, 143);
+            this.button_circulationRight.Location = new System.Drawing.Point(208, 139);
             this.button_circulationRight.Margin = new System.Windows.Forms.Padding(7);
             this.button_circulationRight.Name = "button_circulationRight";
             this.button_circulationRight.Size = new System.Drawing.Size(179, 57);
@@ -101,7 +106,7 @@
             this.webBrowser1.Location = new System.Drawing.Point(3, 3);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(454, 412);
+            this.webBrowser1.Size = new System.Drawing.Size(466, 412);
             this.webBrowser1.TabIndex = 7;
             // 
             // button_entity
@@ -131,31 +136,31 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
-            this.splitContainer1.Size = new System.Drawing.Size(1467, 432);
-            this.splitContainer1.SplitterDistance = 989;
+            this.splitContainer1.Size = new System.Drawing.Size(1501, 432);
+            this.splitContainer1.SplitterDistance = 1011;
             this.splitContainer1.TabIndex = 9;
             // 
             // button_right
             // 
             this.button_right.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_right.Location = new System.Drawing.Point(620, 143);
+            this.button_right.Location = new System.Drawing.Point(1323, 145);
             this.button_right.Margin = new System.Windows.Forms.Padding(7);
             this.button_right.Name = "button_right";
-            this.button_right.Size = new System.Drawing.Size(193, 57);
+            this.button_right.Size = new System.Drawing.Size(138, 52);
             this.button_right.TabIndex = 11;
-            this.button_right.Text = "检查权限";
+            this.button_right.Text = "查权限";
             this.button_right.UseVisualStyleBackColor = true;
             this.button_right.Click += new System.EventHandler(this.button_right_Click);
             // 
             // button_patron
             // 
             this.button_patron.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_patron.Location = new System.Drawing.Point(427, 143);
+            this.button_patron.Location = new System.Drawing.Point(401, 140);
             this.button_patron.Margin = new System.Windows.Forms.Padding(7);
             this.button_patron.Name = "button_patron";
-            this.button_patron.Size = new System.Drawing.Size(184, 57);
+            this.button_patron.Size = new System.Drawing.Size(133, 57);
             this.button_patron.TabIndex = 12;
-            this.button_patron.Text = "统计读者";
+            this.button_patron.Text = "读者库";
             this.button_patron.UseVisualStyleBackColor = true;
             this.button_patron.Click += new System.EventHandler(this.button_patron_Click);
             // 
@@ -243,9 +248,9 @@
             this.button_checkPrice.Location = new System.Drawing.Point(22, 145);
             this.button_checkPrice.Margin = new System.Windows.Forms.Padding(7);
             this.button_checkPrice.Name = "button_checkPrice";
-            this.button_checkPrice.Size = new System.Drawing.Size(198, 52);
+            this.button_checkPrice.Size = new System.Drawing.Size(172, 52);
             this.button_checkPrice.TabIndex = 20;
-            this.button_checkPrice.Text = "检查册价格";
+            this.button_checkPrice.Text = "查册价格";
             this.button_checkPrice.UseVisualStyleBackColor = true;
             this.button_checkPrice.Click += new System.EventHandler(this.button_checkPrice_Click);
             // 
@@ -288,10 +293,10 @@
             // button_loc
             // 
             this.button_loc.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_loc.Location = new System.Drawing.Point(827, 143);
+            this.button_loc.Location = new System.Drawing.Point(1483, 149);
             this.button_loc.Margin = new System.Windows.Forms.Padding(7);
             this.button_loc.Name = "button_loc";
-            this.button_loc.Size = new System.Drawing.Size(190, 57);
+            this.button_loc.Size = new System.Drawing.Size(35, 48);
             this.button_loc.TabIndex = 24;
             this.button_loc.Text = "单馆藏地";
             this.button_loc.UseVisualStyleBackColor = true;
@@ -321,11 +326,76 @@
             this.button_script.UseVisualStyleBackColor = true;
             this.button_script.Click += new System.EventHandler(this.button_script_Click);
             // 
+            // button_getReader
+            // 
+            this.button_getReader.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_getReader.Location = new System.Drawing.Point(548, 145);
+            this.button_getReader.Margin = new System.Windows.Forms.Padding(7);
+            this.button_getReader.Name = "button_getReader";
+            this.button_getReader.Size = new System.Drawing.Size(180, 52);
+            this.button_getReader.TabIndex = 27;
+            this.button_getReader.Text = "获取读者";
+            this.button_getReader.UseVisualStyleBackColor = true;
+            this.button_getReader.Click += new System.EventHandler(this.button_getReader_Click);
+            // 
+            // button_readerType
+            // 
+            this.button_readerType.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_readerType.Location = new System.Drawing.Point(742, 145);
+            this.button_readerType.Margin = new System.Windows.Forms.Padding(7);
+            this.button_readerType.Name = "button_readerType";
+            this.button_readerType.Size = new System.Drawing.Size(138, 52);
+            this.button_readerType.TabIndex = 28;
+            this.button_readerType.Text = "读类型";
+            this.button_readerType.UseVisualStyleBackColor = true;
+            this.button_readerType.Click += new System.EventHandler(this.button_readerType_Click);
+            // 
+            // button_checkConfig
+            // 
+            this.button_checkConfig.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_checkConfig.Location = new System.Drawing.Point(1179, 143);
+            this.button_checkConfig.Margin = new System.Windows.Forms.Padding(7);
+            this.button_checkConfig.Name = "button_checkConfig";
+            this.button_checkConfig.Size = new System.Drawing.Size(130, 51);
+            this.button_checkConfig.TabIndex = 29;
+            this.button_checkConfig.Text = "查配置";
+            this.button_checkConfig.UseVisualStyleBackColor = true;
+            this.button_checkConfig.Click += new System.EventHandler(this.button_checkConfig_Click);
+            // 
+            // button_department
+            // 
+            this.button_department.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_department.Location = new System.Drawing.Point(894, 145);
+            this.button_department.Margin = new System.Windows.Forms.Padding(7);
+            this.button_department.Name = "button_department";
+            this.button_department.Size = new System.Drawing.Size(141, 52);
+            this.button_department.TabIndex = 30;
+            this.button_department.Text = "读单位";
+            this.button_department.UseVisualStyleBackColor = true;
+            this.button_department.Click += new System.EventHandler(this.button_department_Click);
+            // 
+            // button_downloadLibrary
+            // 
+            this.button_downloadLibrary.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_downloadLibrary.Location = new System.Drawing.Point(1049, 145);
+            this.button_downloadLibrary.Margin = new System.Windows.Forms.Padding(7);
+            this.button_downloadLibrary.Name = "button_downloadLibrary";
+            this.button_downloadLibrary.Size = new System.Drawing.Size(116, 51);
+            this.button_downloadLibrary.TabIndex = 31;
+            this.button_downloadLibrary.Text = "下lib";
+            this.button_downloadLibrary.UseVisualStyleBackColor = true;
+            this.button_downloadLibrary.Click += new System.EventHandler(this.button_downloadLibrary_Click);
+            // 
             // toolForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1508, 688);
+            this.ClientSize = new System.Drawing.Size(1542, 688);
+            this.Controls.Add(this.button_downloadLibrary);
+            this.Controls.Add(this.button_department);
+            this.Controls.Add(this.button_checkConfig);
+            this.Controls.Add(this.button_readerType);
+            this.Controls.Add(this.button_getReader);
             this.Controls.Add(this.button_script);
             this.Controls.Add(this.button_paijia);
             this.Controls.Add(this.button_loc);
@@ -384,5 +454,10 @@
         private System.Windows.Forms.Button button_loc;
         private System.Windows.Forms.Button button_paijia;
         private System.Windows.Forms.Button button_script;
+        private System.Windows.Forms.Button button_getReader;
+        private System.Windows.Forms.Button button_readerType;
+        private System.Windows.Forms.Button button_checkConfig;
+        private System.Windows.Forms.Button button_department;
+        private System.Windows.Forms.Button button_downloadLibrary;
     }
 }
