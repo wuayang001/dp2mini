@@ -264,8 +264,6 @@ namespace dp2mini
             }
         }
 
-
-
         // 统计读者
         private void button_patron_Click(object sender, EventArgs e)
         {
@@ -298,12 +296,143 @@ namespace dp2mini
             EnableControls(false);
             try
             {
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始检查权限==", start));
+
+
+
+                // sheet名
+                IXLWorksheet ws = this.CreateSheet("权限检查");
+                // 设置标题
+                string[] titles = {
+                    "帐户",
+                    "危险权限",
+                    "备注"
+                    };
+                int i = 1;
+                foreach (string s in titles)
+                {
+                    ws.Cell(1, i++).Value = s;
+                }
+
+
+                int index = 1;
+                /*
+    <accounts>
+        <account name="reader" type="reader" rights="borrow,renew,reservation,order,changereaderpassword,getbibliosummary,searchcharging,listdbfroms,searchbiblio,getbiblioinfo,searchitem,getiteminfo,search,getsystemparameter,getres,searchissue,getissueinfo,searchorder,getorderinfo,getcommentinfo,setcommentinfo,searchcomment,getpatrontempid,getreaderinfo:info|borrows|overdues|reservations|outofReservations|refID|oi|readerType|cardNumber|state|gender|?name|comment|?tel|?barcode|?department,_wx_debug" libraryCode="" access="" comment="" binding="" />
+                 */
+                XmlNodeList list = this.LibraryDom.DocumentElement.SelectNodes("accounts/account");
+                foreach (XmlNode node in list)
+                {
+                    string name=DomUtil.GetAttr(node, "name");
+                    string rights = DomUtil.GetAttr(node, "rights");
+
+                    // 这几个内部帐号过滤掉
+                    if (name == "supervisor"
+                        || name == "opac"
+                        || name == "capo")
+                    {
+                        continue;
+                    }
+
+                    // 危险权限
+                    Hashtable dangerRights= GetDangerRights();
+
+                    bool bFirst = true;
+
+
+                    // 检查本身配置的权限中有没有
+                    string[] rightList = rights.Split(new char[] {','});
+                    foreach (string right in rightList)
+                    {
+                        if (dangerRights.ContainsKey(right))
+                        { 
+                            index++;
+
+                            // 如果是第一个危险权限
+                            if (bFirst==true)
+                            {
+                                ws.Cell(index, 1).Value = name;
+                                bFirst = false;
+                            }
+
+                            ws.Cell(index, 2).Value = right;
+                            ws.Cell(index, 3).Value = dangerRights[right];
+                        }
+
+                    }
+
+                }
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index, titles.Length);
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
+
+
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束检查权限,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
 
             }
             finally
             {
                 EnableControls(true);
             }
+        }
+
+        Hashtable _dangerRights = null;
+
+        public Hashtable GetDangerRights()
+        {
+            if (this._dangerRights == null)
+            {
+                this._dangerRights = new Hashtable();
+                this._dangerRights.Add("batchtask", "批处理任务");
+                this._dangerRights.Add("clearalldbs", "清除所有数据库");
+                this._dangerRights.Add("devolvereaderinfo", "转移读者信息");
+                this._dangerRights.Add("changeuser", "修改用户信息");
+                this._dangerRights.Add("newuser", "创建新用户");
+                this._dangerRights.Add("deleteuser", "删除用户");
+                this._dangerRights.Add("changeuserpassword", "(强制)修改(其他)用户密码");
+                this._dangerRights.Add("simulatereader", "允许模拟读者登录");
+                this._dangerRights.Add("simulateworker", "允许模拟工作人员登录");
+                this._dangerRights.Add("setsystemparameter", "设置系统参数");
+                this._dangerRights.Add("urgentrecover", "应急恢复");
+                this._dangerRights.Add("repairborrowinfo", "修复借阅信息");
+
+                this._dangerRights.Add("settlement", "(费用)结算");
+                this._dangerRights.Add("undosettlement", "撤销(费用)结算");
+                this._dangerRights.Add("deletesettlement", "删除(费用)的结算记录");
+                this._dangerRights.Add("writerecord", "直接写入数据库记录");
+                this._dangerRights.Add("managedatabase", "管理数据库");
+
+                this._dangerRights.Add("restore", "完整还原数据记录");
+                this._dangerRights.Add("managecache", "管理缓存");
+                this._dangerRights.Add("managechannel", "管理服务器通道");
+                this._dangerRights.Add("upload", "上传文件");
+                this._dangerRights.Add("bindpatron", "为读者绑定号码");
+
+                this._dangerRights.Add("client_uimodifyorderrecord", "前端允许界面直接修改订购记录");
+                this._dangerRights.Add("changereaderbarcode", "强制修改读者信息中的证条码号");
+                this._dangerRights.Add("client_forceverifydata", "前端保存记录时是否强制校验数据。校验时如果发现数据有错，会拒绝保存");
+                this._dangerRights.Add("client_deletebibliosubrecords", "前端删除书目记录时是否强制删除下属的实体、期、订购、评注记录。如果不具备此权限，则需要下属记录全部删除以后才能删除书目记录");
+
+
+                this._dangerRights.Add("settailnumber", "设置种次号尾号");
+                this._dangerRights.Add("setutilinfo", "设置实用库记录信息");
+
+                this._dangerRights.Add("client_simulateborrow", "前端允许进行模拟借还操作");
+                this._dangerRights.Add("client_multiplecharging", "前端允许进行复选借还操作");
+
+            }
+
+            return this._dangerRights;
         }
 
         #endregion
@@ -2375,84 +2504,7 @@ namespace dp2mini
 
         #endregion
 
-        #region 检查权限
 
-        public static string[] danger_rights = new string[] {
-        "batchtask",
-        "clearalldbs",
-        "devolvereaderinfo",
-        "changeuser",
-        "newuser",
-        "deleteuser",
-        "changeuserpassword",
-        "simulatereader",
-        "simulateworker",
-        "setsystemparameter",
-        "urgentrecover",
-        "repairborrowinfo",
-        "settlement",
-        "undosettlement",
-        "deletesettlement",
-        "writerecord",
-        "managedatabase",
-        "restore",
-        "managecache",
-        "managechannel",
-        "upload",
-        "bindpatron",
-        };
-
-        // 检查帐号权限
-        private void CheckRights()
-        {
-            this.OutputEmprty(2);
-            this.OutputInfo("检查权限功能尚未实现",true,false);
-            return;
-
-            string result = "";
-            string[] lines = null;// this.GetLines();
-            foreach (string acc in lines)
-            {
-                if (acc == "")
-                    continue;
-
-                int nIndex = acc.IndexOf("~");
-                if (nIndex == -1)
-                    continue;
-
-                string userName = acc.Substring(0, nIndex);
-                string account = acc.Substring(nIndex + 1);
-
-
-                string[] rightList = account.Split(',');
-
-                string hasRights = "";
-                int count = 0;
-
-                foreach (string danger in danger_rights)
-                {
-                    if (rightList.Contains(danger) == true)
-                    {
-                        if (hasRights != "")
-                        {
-                            hasRights += ",";
-                        }
-
-                        hasRights += danger;
-                        count++;
-                    }
-                }
-
-                result += userName + "包含下列" + count + "个危险权限\n" + hasRights + "\r\n";
-
-            }
-
-            // this.txtResult.Text = result;
-
-            MessageBox.Show("ok");
-        }
-
-        #endregion
 
         #region 获取流通权限
         public void GetCirculationRight()
@@ -2872,19 +2924,104 @@ ItemCanReturn
 
         public void GetConfig()
         {
-            // rfid
+            // 脚本函数
+            //ItemCanBorrow 无
+            //ItemCanReturn 无
+            // 说明：符合预期，这两个函数一般是老版本采用的方式，dp2 V3在馆藏地设置是否允许借还
+
+            //值列表
+            //内容
+            //说明：检查在这里设置了馆藏地
+            /*
+ <valueTables>
+    <table name="orderSeller" dbname="">邮局,新华书店,北京华教快捷公司,天津图书大厦,天泽书店,当当网购,中国图书进出口公司,受赠,回溯,赔偿,</table>
+    <table name="orderSource" dbname="">本馆经费,年度经费,专项拨款,受赠,回溯,赔偿,其他</table>
+    <table name="orderClass" dbname="">社科,自科,综合</table>
+</valueTables>
+             */
+            // 值列表
+            string valueTables = this.GetSystemParameter("circulation", "valueTables");
+            valueTables = "<valueTables>" + valueTables + "</valueTables>";
+            valueTables = DomUtil.GetIndentXml(valueTables);
+            this.OutputInfo(valueTables);
+
+            // 查重空间
+            // 内容
+            // 说明：需配置查重空间
+            /*
+     <unique>
+         <space dbnames="中文图书,英文图书" />
+     </unique>
+             */
+
+
+            // RFID机构代码
+            // 内容
+            // 说明：如果已上线RFID，但没配置机构代码，属异常
+            /*
+    <rfid>
+        <ownerInstitution>
+            <item map="/" isil="CN-120103-C-SYZX" />
+        </ownerInstitution>
+    </rfid>
+             */
             string rfid = this.GetSystemParameter("system","rfid");
             rfid=DomUtil.GetIndentXml(rfid);
             this.OutputInfo(rfid);
 
-            // 值列表
-            string valueTables = this.GetSystemParameter("circulation", "valueTables");
-            valueTables = "<valueTables>"+valueTables+"</valueTables>";
-            valueTables = DomUtil.GetIndentXml(valueTables);
-            this.OutputInfo(valueTables);
+            //mongoDB数据库配置
+            // 说明：如果不配置这项，没有4个库
+            /*
+<mongoDB connectionString="mongodb://127.0.0.1" instancePrefix="demo" />
+             */
+
+            //预约到书配置
+            //说明:检查预约保留期
+            /*
+<arrived dbname="预约到书" reserveTimeSpan="1day" outofReservationThreshold="10" canReserveOnshelf="true" notifyTypes="dpmail,email,mq" />
+             */
 
 
-            
+            //消息配置
+            /*
+<message dbname="消息" reserveTimeSpan="365day" defaultQueue=".\private$\dp2library_demo" />
+             */
+
+
+            // smtpServer
+            //   < smtpServer address = "128.0.0.8686" managerEmail = "fjb@163.net" />
+
+            // 读者同步
+
+
+            //后台任务monitors
+            /*
+<monitors>
+        <readersMonitor notifyDef="-3day" startTime="16:10" types="dpmail,email,mq" />
+        <arriveMonitor startTime="23:00" />
+        <messageMonitor startTime="23:00" />
+    </monitors>
+             */
+
+            //实用库
+            /*
+  <utilDb>
+        <database name="出版者" type="publisher" />
+        <database name="盘点" type="inventory" />
+    </utilDb>
+
+             */
+
+
+            // 登录与读者密码设置
+            //<login patronPasswordExpireLength="90days" patronPasswordStyle="style-1" />
+            // globalAddRights
+
+            //工作人员密码设置
+            //< accounts passwordExpireLength = "90days" passwordStyle = "style-1,login" >
+
+            // 流通相关配置
+            //<circulation verifyBarcode="true" patronAdditionalFroms="证号,姓名" notifyTypes="mq" verifyReaderType="true" borrowCheckOverdue="true" />
         }
 
         // 读者部门
@@ -2926,12 +3063,14 @@ ItemCanReturn
                 File.Delete(fileName);
             FileStream stream = File.Create(fileName);
 
+
+            byte[] baTotal = null;
             //
             RestChannel channel = this._mainForm.GetChannel();
             try
             {
                 string strPath = "!library.xml";//this.ServerFilePath;
-                string strStyle = "content,data,metadata,timestamp,outputpath,gzip";
+                string strStyle = "content,data";//,metadata,timestamp,outputpath,gzip";
 
                 byte[] baContent = null;
 
@@ -2967,9 +3106,13 @@ ItemCanReturn
                     // 写入本地文件
                     if (baContent.Length > 0)
                     {
+                        baTotal = ByteArray.Add(baTotal, baContent);
+
                         stream.Write(baContent, 0, baContent.Length);
                         stream.Flush(); 
                         lStart += baContent.Length;
+
+
                     }
                     if (lStart >= lRet)
                     {
@@ -2977,6 +3120,14 @@ ItemCanReturn
                     }
 
                 } // end of for
+
+               //string  strResult = ByteArray.ToString(baTotal, Encoding.UTF8);
+
+               // // 把baTotal加载到dom
+                this._libraryDom1 = new XmlDocument();
+                stream.Seek(0,SeekOrigin.Begin);
+                this._libraryDom1.Load(stream);
+
             }
             catch (Exception ex)
             {
@@ -2996,6 +3147,23 @@ ItemCanReturn
             }
         }
 
+        XmlDocument _libraryDom1=null;
+
+        private XmlDocument LibraryDom
+        {
+            get
+            {
+                // 如果library.xml还未下载到本地，先下载
+                if (this._libraryDom1 == null)
+                {
+                    this.DownloadLibrary();
+                }
+
+                return this._libraryDom1;
+            }
+        }
+
+
         // 下载library.xml
         private void button_downloadLibrary_Click(object sender, EventArgs e)
         {
@@ -3014,6 +3182,82 @@ ItemCanReturn
                 // 结束时间
                 DateTime end = DateTime.Now;
                 this.OutputInfo(GetInfoAddTime("==结束下载library.xml,详见输出目录,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        private void button_calendar_Click(object sender, EventArgs e)
+        {
+
+            EnableControls(false);
+            try
+            {
+                // 空2行
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始获取开馆日历==", start));
+
+
+
+                // sheet名
+                IXLWorksheet ws = this.CreateSheet("开馆日历");
+                // 设置标题
+                string[] titles = {
+                    "日历名称",
+                    "日期范围",
+                    "说明",
+                    "是否设置了闭馆日期"
+                    };
+                int i = 1;
+                foreach (string s in titles)
+                {
+                    ws.Cell(1, i++).Value = s;
+                }
+
+                /*
+    <calendars>
+        <calendar name="基本日历" range="20080101-20091231" comment="图书馆开馆日历">20080101,20090101</calendar>
+    </calendars>
+                 */
+                int index = 1;
+                XmlNodeList calendarList = this.LibraryDom.DocumentElement.SelectNodes("calendars/calendar");
+                foreach (XmlNode calendar in calendarList)
+                { 
+                    index++;
+                    string name=DomUtil.GetAttr(calendar, "name");
+                    string range = DomUtil.GetAttr(calendar, "range");
+                    string comment=DomUtil.GetAttr(calendar, "comment").Trim();
+
+                    string text = calendar.InnerText.Trim();
+
+                    // 写excel
+                    ws.Cell(index, 1).Value = name;
+                    ws.Cell(index, 2).Value = range;
+                    ws.Cell(index, 3).Value = comment;
+                    if (string.IsNullOrEmpty(text) == true)
+                    {
+                        ws.Cell(index, 4).Value = "否";
+                    }
+                    else
+                    {
+                        ws.Cell(index, 4).Value = "是";
+                    }
+                }
+
+                // 设置excel格式
+                this.SetExcelStyle(ws, index, titles.Length);
+
+                //保存excel
+                this._workbook.SaveAs(this.ExcelFileName);
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束获取开馆日历,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {

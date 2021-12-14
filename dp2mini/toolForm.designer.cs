@@ -55,6 +55,7 @@
             this.button_checkConfig = new System.Windows.Forms.Button();
             this.button_department = new System.Windows.Forms.Button();
             this.button_downloadLibrary = new System.Windows.Forms.Button();
+            this.button_calendar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -83,16 +84,16 @@
             this.textBox_info.Multiline = true;
             this.textBox_info.Name = "textBox_info";
             this.textBox_info.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_info.Size = new System.Drawing.Size(992, 412);
+            this.textBox_info.Size = new System.Drawing.Size(1045, 412);
             this.textBox_info.TabIndex = 5;
             // 
             // button_circulationRight
             // 
             this.button_circulationRight.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_circulationRight.Location = new System.Drawing.Point(208, 139);
+            this.button_circulationRight.Location = new System.Drawing.Point(856, 145);
             this.button_circulationRight.Margin = new System.Windows.Forms.Padding(7);
             this.button_circulationRight.Name = "button_circulationRight";
-            this.button_circulationRight.Size = new System.Drawing.Size(179, 57);
+            this.button_circulationRight.Size = new System.Drawing.Size(179, 48);
             this.button_circulationRight.TabIndex = 6;
             this.button_circulationRight.Text = "流通权限";
             this.button_circulationRight.UseVisualStyleBackColor = true;
@@ -106,7 +107,7 @@
             this.webBrowser1.Location = new System.Drawing.Point(3, 3);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(466, 412);
+            this.webBrowser1.Size = new System.Drawing.Size(493, 412);
             this.webBrowser1.TabIndex = 7;
             // 
             // button_entity
@@ -136,8 +137,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
-            this.splitContainer1.Size = new System.Drawing.Size(1501, 432);
-            this.splitContainer1.SplitterDistance = 1011;
+            this.splitContainer1.Size = new System.Drawing.Size(1581, 432);
+            this.splitContainer1.SplitterDistance = 1064;
             this.splitContainer1.TabIndex = 9;
             // 
             // button_right
@@ -155,7 +156,7 @@
             // button_patron
             // 
             this.button_patron.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_patron.Location = new System.Drawing.Point(401, 140);
+            this.button_patron.Location = new System.Drawing.Point(25, 137);
             this.button_patron.Margin = new System.Windows.Forms.Padding(7);
             this.button_patron.Name = "button_patron";
             this.button_patron.Size = new System.Drawing.Size(133, 57);
@@ -236,21 +237,21 @@
             this.button_verifyBarcode.Location = new System.Drawing.Point(1311, 77);
             this.button_verifyBarcode.Margin = new System.Windows.Forms.Padding(7);
             this.button_verifyBarcode.Name = "button_verifyBarcode";
-            this.button_verifyBarcode.Size = new System.Drawing.Size(202, 52);
+            this.button_verifyBarcode.Size = new System.Drawing.Size(150, 52);
             this.button_verifyBarcode.TabIndex = 19;
-            this.button_verifyBarcode.Text = "校验册条码";
+            this.button_verifyBarcode.Text = "册条码";
             this.button_verifyBarcode.UseVisualStyleBackColor = true;
             this.button_verifyBarcode.Click += new System.EventHandler(this.button_verifyBarcode_Click);
             // 
             // button_checkPrice
             // 
             this.button_checkPrice.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_checkPrice.Location = new System.Drawing.Point(22, 145);
+            this.button_checkPrice.Location = new System.Drawing.Point(1471, 80);
             this.button_checkPrice.Margin = new System.Windows.Forms.Padding(7);
             this.button_checkPrice.Name = "button_checkPrice";
-            this.button_checkPrice.Size = new System.Drawing.Size(172, 52);
+            this.button_checkPrice.Size = new System.Drawing.Size(129, 48);
             this.button_checkPrice.TabIndex = 20;
-            this.button_checkPrice.Text = "查册价格";
+            this.button_checkPrice.Text = "册价格";
             this.button_checkPrice.UseVisualStyleBackColor = true;
             this.button_checkPrice.Click += new System.EventHandler(this.button_checkPrice_Click);
             // 
@@ -293,7 +294,7 @@
             // button_loc
             // 
             this.button_loc.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_loc.Location = new System.Drawing.Point(1483, 149);
+            this.button_loc.Location = new System.Drawing.Point(1565, 149);
             this.button_loc.Margin = new System.Windows.Forms.Padding(7);
             this.button_loc.Name = "button_loc";
             this.button_loc.Size = new System.Drawing.Size(35, 48);
@@ -329,7 +330,7 @@
             // button_getReader
             // 
             this.button_getReader.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_getReader.Location = new System.Drawing.Point(548, 145);
+            this.button_getReader.Location = new System.Drawing.Point(172, 142);
             this.button_getReader.Margin = new System.Windows.Forms.Padding(7);
             this.button_getReader.Name = "button_getReader";
             this.button_getReader.Size = new System.Drawing.Size(180, 52);
@@ -341,7 +342,7 @@
             // button_readerType
             // 
             this.button_readerType.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_readerType.Location = new System.Drawing.Point(742, 145);
+            this.button_readerType.Location = new System.Drawing.Point(366, 142);
             this.button_readerType.Margin = new System.Windows.Forms.Padding(7);
             this.button_readerType.Name = "button_readerType";
             this.button_readerType.Size = new System.Drawing.Size(138, 52);
@@ -353,7 +354,7 @@
             // button_checkConfig
             // 
             this.button_checkConfig.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_checkConfig.Location = new System.Drawing.Point(1179, 143);
+            this.button_checkConfig.Location = new System.Drawing.Point(1179, 146);
             this.button_checkConfig.Margin = new System.Windows.Forms.Padding(7);
             this.button_checkConfig.Name = "button_checkConfig";
             this.button_checkConfig.Size = new System.Drawing.Size(130, 51);
@@ -365,7 +366,7 @@
             // button_department
             // 
             this.button_department.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_department.Location = new System.Drawing.Point(894, 145);
+            this.button_department.Location = new System.Drawing.Point(518, 142);
             this.button_department.Margin = new System.Windows.Forms.Padding(7);
             this.button_department.Name = "button_department";
             this.button_department.Size = new System.Drawing.Size(141, 52);
@@ -386,11 +387,24 @@
             this.button_downloadLibrary.UseVisualStyleBackColor = true;
             this.button_downloadLibrary.Click += new System.EventHandler(this.button_downloadLibrary_Click);
             // 
+            // button_calendar
+            // 
+            this.button_calendar.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_calendar.Location = new System.Drawing.Point(673, 142);
+            this.button_calendar.Margin = new System.Windows.Forms.Padding(7);
+            this.button_calendar.Name = "button_calendar";
+            this.button_calendar.Size = new System.Drawing.Size(172, 52);
+            this.button_calendar.TabIndex = 32;
+            this.button_calendar.Text = "开馆日历";
+            this.button_calendar.UseVisualStyleBackColor = true;
+            this.button_calendar.Click += new System.EventHandler(this.button_calendar_Click);
+            // 
             // toolForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1542, 688);
+            this.ClientSize = new System.Drawing.Size(1622, 688);
+            this.Controls.Add(this.button_calendar);
             this.Controls.Add(this.button_downloadLibrary);
             this.Controls.Add(this.button_department);
             this.Controls.Add(this.button_checkConfig);
@@ -459,5 +473,6 @@
         private System.Windows.Forms.Button button_checkConfig;
         private System.Windows.Forms.Button button_department;
         private System.Windows.Forms.Button button_downloadLibrary;
+        private System.Windows.Forms.Button button_calendar;
     }
 }
