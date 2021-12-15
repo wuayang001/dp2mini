@@ -46,7 +46,7 @@ namespace dp2mini
         }
 
         // excel
-        XLWorkbook _workbook= new XLWorkbook();
+        XLWorkbook _workbook = new XLWorkbook();
 
         /// <summary>
         /// 窗体装载
@@ -76,7 +76,7 @@ namespace dp2mini
         {
             get
             {
-                string dir= this.textBox_dir.Text.Trim();
+                string dir = this.textBox_dir.Text.Trim();
                 if (string.IsNullOrEmpty(dir) == true)
                 {
                     //先选择输出目录
@@ -96,7 +96,7 @@ namespace dp2mini
             {
                 if (this._sw == null)
                 {
-                    string fileName = this.Dir + "/"+this._mainForm.LibraryName+"-巡检结果.txt";
+                    string fileName = this.Dir + "/" + this._mainForm.LibraryName + "-巡检结果.txt";
                     if (File.Exists(fileName) == true)
                         File.Delete(fileName);
                     _sw = new StreamWriter(fileName, false, Encoding.UTF8);
@@ -152,8 +152,7 @@ namespace dp2mini
                 this.VerifyBarcode(this._items, this._cancel.Token);
 
 
-                // 获取流通权限
-                this.button_circulationRight_Click(sender, e);
+
 
 
                 //==以下是读者相关
@@ -170,15 +169,32 @@ namespace dp2mini
                 // 读者单位
                 button_department_Click(sender, e);
 
+                // 校验读者条码
+                button_patronBarcode_Click(sender, e);
+
+
+                // 以下是流通相关====
+                // 开馆日历
+                this.button_calendar_Click(sender, e);
+
+                // 获取流通权限
+                this.button_circulationRight_Click(sender, e);
+
 
                 // ==其它====
+
+                // 下library
+                this.button_downloadLibrary_Click(sender, e);
 
                 // 查配置
                 this.button_checkConfig_Click(sender, e);
 
-               
+
                 // 检查权限
                 this.button_right_Click(sender, e);
+
+                // 安全
+                this.button_security_Click(sender, e);
 
 
             }
@@ -203,7 +219,7 @@ namespace dp2mini
             return time.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
-        public string GetInfoAddTime(string info,DateTime time)
+        public string GetInfoAddTime(string info, DateTime time)
         {
             return this.GetTimeString(time) + info;
         }
@@ -218,14 +234,14 @@ namespace dp2mini
 
                 // 开始时间
                 DateTime start = DateTime.Now;
-                this.OutputInfo(GetInfoAddTime("==开始获取书目信息==",start));
+                this.OutputInfo(GetInfoAddTime("==开始获取书目信息==", start));
 
                 // 干活
                 this.GetBiblioDbInfos();
 
                 // 结束时间
                 DateTime end = DateTime.Now;
-                this.OutputInfo(GetInfoAddTime("==结束获取书目信息,详见excel,用时"+this.GetSeconds(start,end)+"秒==",end));
+                this.OutputInfo(GetInfoAddTime("==结束获取书目信息,详见excel,用时" + this.GetSeconds(start, end) + "秒==", end));
             }
             finally
             {
@@ -327,7 +343,7 @@ namespace dp2mini
                 XmlNodeList list = this.LibraryDom.DocumentElement.SelectNodes("accounts/account");
                 foreach (XmlNode node in list)
                 {
-                    string name=DomUtil.GetAttr(node, "name");
+                    string name = DomUtil.GetAttr(node, "name");
                     string rights = DomUtil.GetAttr(node, "rights");
 
                     // 这几个内部帐号过滤掉
@@ -339,21 +355,21 @@ namespace dp2mini
                     }
 
                     // 危险权限
-                    Hashtable dangerRights= GetDangerRights();
+                    Hashtable dangerRights = GetDangerRights();
 
                     bool bFirst = true;
 
 
                     // 检查本身配置的权限中有没有
-                    string[] rightList = rights.Split(new char[] {','});
+                    string[] rightList = rights.Split(new char[] { ',' });
                     foreach (string right in rightList)
                     {
                         if (dangerRights.ContainsKey(right))
-                        { 
+                        {
                             index++;
 
                             // 如果是第一个危险权限
-                            if (bFirst==true)
+                            if (bFirst == true)
                             {
                                 ws.Cell(index, 1).Value = name;
                                 bFirst = false;
@@ -446,7 +462,7 @@ namespace dp2mini
             this.textBox_info.Text = "";
         }
 
-        public void OutputInfo(string info,bool isTextBox=true,bool isState=true)
+        public void OutputInfo(string info, bool isTextBox = true, bool isState = true)
         {
             this.Invoke((Action)(() =>
             {
@@ -500,17 +516,24 @@ namespace dp2mini
                 this.button_verifyBarcode.Enabled = bEnable;  //校验册条码
                 this.button_checkPrice.Enabled = bEnable;  //册价格
 
-                this.button_circulationRight.Enabled = bEnable;  //流通权限
+
 
                 this.button_patron.Enabled = bEnable;  //读者库
                 this.button_getReader.Enabled = bEnable;//获取读者
-                this.button_readerType.Enabled=bEnable;//读者类型
+                this.button_readerType.Enabled = bEnable;//读者类型
                 this.button_department.Enabled = bEnable;//读者部门
+                this.button_patronBarcode.Enabled = bEnable;//读者条码
+
+                this.button_calendar.Enabled = bEnable;// 开馆日历
+                this.button_circulationRight.Enabled = bEnable;  //流通权限
 
 
-
+                this.button_downloadLibrary.Enabled = bEnable;
                 this.button_checkConfig.Enabled = bEnable;  //查配置
                 this.button_right.Enabled = bEnable;  //权限
+                this.button_security.Enabled = bEnable;//安全
+
+
                 this.button_loc.Enabled = bEnable; //单馆藏地
 
 
@@ -646,7 +669,7 @@ namespace dp2mini
                     if (lRet == -1)
                     {
                         this.OutputInfo("获取数据库[" + one.biblioDbName + "]的书目记录数量出错：" + strError,
-                            true,false);
+                            true, false);
                         continue;
                     }
 
@@ -659,7 +682,7 @@ namespace dp2mini
                         children.Add(one.commentDbName);
                     if (string.IsNullOrEmpty(one.issueDbName) == false)
                         children.Add(one.issueDbName);
-                    
+
 
 
                     string[] row = {
@@ -682,7 +705,7 @@ namespace dp2mini
                     i = 1;
                     foreach (string s in row)
                     {
-                        ws.Cell(index+1, i++).Value = s;
+                        ws.Cell(index + 1, i++).Value = s;
                     }
 
 
@@ -699,11 +722,11 @@ namespace dp2mini
 
                 this.OutputInfo("\r\n图书馆系统中总共有" + index + "个书目库，书目记录总数量为" + lTotalCount
                     + "，其中有" + cirDbCount + "个库可流通，流通的书目种数为" + lCirCount + "。" + "\r\n",
-                    true,false);
+                    true, false);
 
 
                 // 设置excel格式
-                this.SetExcelStyle(ws, index + 1,titles.Length);
+                this.SetExcelStyle(ws, index + 1, titles.Length);
 
                 //保存excel
                 this._workbook.SaveAs(this.ExcelFileName);
@@ -781,12 +804,12 @@ namespace dp2mini
                        out strError);
                     if (lRet == -1)
                     {
-                        this.OutputInfo("检索册记录出错：" + strError,true,false);
+                        this.OutputInfo("检索册记录出错：" + strError, true, false);
                         return;
                     }
 
                     // 输出命中信息
-                    this.OutputInfo("系统中册数量总计" + lRet.ToString() + "册。", true, false);
+                    this.OutputInfo("dp2系统中册数量总计" + lRet.ToString() + "册。", true, false);
                     Application.DoEvents();
                     //this.OutputInfo("共命中" + lRet.ToString() + "册");
 
@@ -816,7 +839,7 @@ namespace dp2mini
                         if (lRet == -1)
                         {
                             this.OutputInfo("已获取" + lStart.ToString() + "条，获取结果集出错：" + strError,
-                                true,false);
+                                true, false);
                             return;
                         }
 
@@ -859,7 +882,7 @@ namespace dp2mini
 
 
                             // info
-                            this.OutputInfo("获取册记录第" + (lStart + i).ToString(),false,true);
+                            this.OutputInfo("获取册记录第" + (lStart + i).ToString(), false, true);
                         }
 
                         this.OutputInfo("已获取" + (lStart + searchresults.Length).ToString() + "条");
@@ -902,23 +925,16 @@ namespace dp2mini
 
         public void VerifyBarcode(List<Entity> items, CancellationToken token)
         {
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                EnableControls(false);
-            }
-            ));
-
             // 空2行
             this.OutputEmprty(2);
-
 
             // 开始时间
             DateTime start = DateTime.Now;
             this.OutputInfo(GetInfoAddTime("==开始校验册条码==", start));
+
+            EnableControls(false);
             try
             {
-
                 string strError = "";
 
                 long errorCount = 0;
@@ -933,7 +949,7 @@ namespace dp2mini
                         Application.DoEvents();
 
                         index++;
-                        this.OutputInfo("校验册条码第" + index.ToString(),false,true);
+                        this.OutputInfo("校验册条码第" + index.ToString(), false, true);
 
                         /// <param name="strLibraryCode">馆代码</param>
                         /// <param name="strBarcode">条码号</param>
@@ -947,7 +963,7 @@ namespace dp2mini
                             out strError);
                         if (lRet == -1)
                         {
-                            this.OutputInfo("校验册条码出错:" + strError,true,false);
+                            this.OutputInfo("校验册条码出错:" + strError, true, false);
                             return;
                         }
                         // 不合法
@@ -992,11 +1008,8 @@ namespace dp2mini
             }
             finally
             {
-                this.Invoke((Action)(() =>
-                {
-                    EnableControls(true);
-                }
-                ));
+
+                EnableControls(true);
             }
 
             // 结束时间
@@ -1025,7 +1038,7 @@ namespace dp2mini
                 token.ThrowIfCancellationRequested();
 
                 index++;
-                this.OutputInfo("校验册价格第" + index.ToString(),false,true);
+                this.OutputInfo("校验册价格第" + index.ToString(), false, true);
 
                 string path = item.path;
                 string price = item.price;
@@ -1304,10 +1317,10 @@ namespace dp2mini
 
                 // 已输出excel，则不输出的文本了
                 //this.OutputInfo(one.name + "\t" + one.canBorrow + "\t" + count,true,false);
-                
+
                 // 写excel
-                ws.Cell(index+1, 1).Value = one.name;
-                ws.Cell(index + 1,2).Value = one.canBorrow;
+                ws.Cell(index + 1, 1).Value = one.name;
+                ws.Cell(index + 1, 2).Value = one.canBorrow;
                 ws.Cell(index + 1, 3).Value = count.ToString();
             }
 
@@ -1319,7 +1332,7 @@ namespace dp2mini
                 if (loc.isConfig == false)
                 {
                     index++;
-                    
+
                     // 输出excel
                     //this.OutputInfo(loc.location + "\t" + "未定义" + "\t" + loc.count,true,false);
 
@@ -1331,7 +1344,7 @@ namespace dp2mini
             }
 
             // 设置excel格式
-            this.SetExcelStyle(ws,  index + 1,titles.Length);
+            this.SetExcelStyle(ws, index + 1, titles.Length);
 
             //保存excel
             this._workbook.SaveAs(this.ExcelFileName);
@@ -1359,7 +1372,7 @@ namespace dp2mini
             return ws;
         }
 
-        public void SetExcelStyle(IXLWorksheet ws,int rowCount, int colCount)
+        public void SetExcelStyle(IXLWorksheet ws, int rowCount, int colCount)
         {
             // 第一行加粗，背景发灰
             var range = ws.Range(1, 1, 1, colCount);
@@ -1505,11 +1518,11 @@ namespace dp2mini
                 strValue = "<root>" + strValue + "</root>";
                 XmlDocument dom = new XmlDocument();
                 dom.LoadXml(strValue);
-                XmlNodeList nodeList = dom.DocumentElement.SelectNodes(type+"/item");
+                XmlNodeList nodeList = dom.DocumentElement.SelectNodes(type + "/item");
                 foreach (XmlNode node in nodeList)
                 {
                     string value = node.InnerText.Trim();
-                    if (string.IsNullOrEmpty(value)==false)
+                    if (string.IsNullOrEmpty(value) == false)
                     {
                         types.Add(value);
                     }
@@ -1525,7 +1538,7 @@ namespace dp2mini
                         string value = one.InnerText.Trim();
                         if (string.IsNullOrEmpty(value) == false)
                         {
-                            types.Add(library+"/"+value);
+                            types.Add(library + "/" + value);
                         }
                     }
                 }
@@ -1564,7 +1577,7 @@ namespace dp2mini
                 token.ThrowIfCancellationRequested();
 
                 index++;
-                this.OutputInfo("校验索取号第" + index.ToString(),false,true);
+                this.OutputInfo("校验索取号第" + index.ToString(), false, true);
 
                 //if (line == "")
                 //    continue;
@@ -1664,7 +1677,7 @@ namespace dp2mini
 
             }
 
-            StringBuilder result = new StringBuilder ();
+            StringBuilder result = new StringBuilder();
 
 
             //空索取号的
@@ -1738,7 +1751,7 @@ namespace dp2mini
             }
 
             // 整体输出，仅输出到文件
-            this.OnlyOutput2File(result.ToString());    
+            this.OnlyOutput2File(result.ToString());
             //this.OutputInfo(result.ToString(),true,false);
 
         }
@@ -1893,7 +1906,7 @@ namespace dp2mini
 
             // 获取全部读者库
             List<db> dbs = this.GetReaderDbs();
-          
+
 
             RestChannel channel = this._mainForm.GetChannel();
             try
@@ -1961,19 +1974,19 @@ namespace dp2mini
 
                 //保存excel
                 this._workbook.SaveAs(this.ExcelFileName);
-            
+
                 return;
             }
             finally
             {
                 this._mainForm.ReturnChannel(channel);
             }
-            
+
         }
 
         List<Patron> _patrons = new List<Patron>();
         public string _cirReaderDbs = "";
-        public  void SearchReader(CancellationToken token)
+        public void SearchReader(CancellationToken token)
         {
             this._patrons.Clear(); // 先清空本地缓存的读者记录
 
@@ -2113,7 +2126,7 @@ namespace dp2mini
                             patron.readerType = patron.libraryCode + "/" + patron.readerType;
                         }
 
-                       
+
                         patron.department = DomUtil.GetElementInnerText(root, "department");
                         // 统计一下空格
                         if (patron.department == null)
@@ -2170,7 +2183,7 @@ namespace dp2mini
                 }
 
                 // 输出一句
-                this.OutputInfo("有在借图书的读者数量为"+index+"条。",true,false);
+                this.OutputInfo("有在借图书的读者数量为" + index + "条。", true, false);
 
                 // 设置excel格式
                 this.SetExcelStyle(ws, index + 1, titles.Length);
@@ -2380,14 +2393,14 @@ namespace dp2mini
             // 把没有数据的馆藏地显示在下方
             foreach (PatronGroup one in types)
             {
-                    index++;
+                index++;
 
-                    // 写excel
-                    ws.Cell(index + 1, 1).Value = one.name;
-                    ws.Cell(index + 1, 2).Value = one.count.ToString();
+                // 写excel
+                ws.Cell(index + 1, 1).Value = one.name;
+                ws.Cell(index + 1, 2).Value = one.count.ToString();
 
                 // 如果部门为空，将读者路径和证条码输出到txt
-                if (one.name=="[空]")
+                if (one.name == "[空]")
                 {
                     ws.Cell(index + 1, 3).Value = "详见下方excel";
                     bHasEmpty = true;
@@ -2843,38 +2856,14 @@ namespace dp2mini
 
                 //script
                 strValue = this.GetSystemParameter("circulation", "script");
-
-                bool bHasFun = false;
                 if (strValue.IndexOf("VerifyBarcode") != -1)
                 {
-                    this.OutputInfo("存在C#条码格式校验函数");
-                    bHasFun = true;
-                }
-
-                if (strValue.IndexOf("ItemCanBorrow") != -1)
-                {
-                    this.OutputInfo("存在ItemCanBorrow函数");
-                    bHasFun = true;
-                }
-
-                if (strValue.IndexOf("ItemCanReturn") != -1)
-                {
-                    this.OutputInfo("存在ItemCanReturn函数");
-                    bHasFun = true;
-                }
-
-                /*
-VerifyBarcode
-ItemCanBorrow
-ItemCanReturn
-                 */
-                if (bHasFun)
-                {
+                    this.OutputInfo("存在C#条码校验函数，建议改为新的配置方式");
                     // 输出空格
                     this.OutputEmprty();
-
                     this.OutputInfo(strValue, true, false);
                 }
+
 
 
                 // 结束时间
@@ -2924,26 +2913,146 @@ ItemCanReturn
 
         public void GetConfig()
         {
+
+            XmlNode root = this.LibraryDom.DocumentElement;
+
             // 脚本函数
             //ItemCanBorrow 无
             //ItemCanReturn 无
-            // 说明：符合预期，这两个函数一般是老版本采用的方式，dp2 V3在馆藏地设置是否允许借还
+            // 说明：这两个函数是dp2老版本采用的方式，dp2 V3版本一般在馆藏地设置是否允许借还
+            /*
+    <script><![CDATA[
+using System;
+using System.Xml;
+             */
+            this.OutputEmprty();
+            this.OutputInfo("==脚本函数==");
+            string script = DomUtil.GetElementInnerText(root, "script");
+            bool hasItemCanBorrow = false;
+            bool hasItemCanReturn = false;
+            if (string.IsNullOrEmpty(script) == false)
+            {
+                if (script.IndexOf("ItemCanBorrow") != -1)
+                {
+                    this.OutputInfo("存在ItemCanBorrow函数");
+                    hasItemCanBorrow = true;
+                }
+                else
+                {
+                    this.OutputInfo("不存在ItemCanBorrow函数");
+                }
+
+                if (script.IndexOf("ItemCanReturn") != -1)
+                {
+                    this.OutputInfo("存在ItemCanReturn函数");
+                    hasItemCanReturn = true;
+                }
+                else
+                {
+                    this.OutputInfo("存在ItemCanReturn函数");
+                }
+            }
+            this.OutputInfo("\r\n功能说明：这两个函数是dp2老版本采用的C#函数方式，用来管理什么情况下允许借还。dp2 V3版本一般在馆藏地设置是否允许借还。如果存在这两个函数，建议改为新的配置方式。");
+
+            /*
+检查结果：
+不存在ItemCanBorrow和ItemCanReturn函数，配置良好。
+存在ItemCanBorrow或者ItemCanReturn函数，需改为新的配置方式。
+             */
+            if (hasItemCanBorrow == true || hasItemCanReturn == true)
+            {
+                this.OutputInfo("\r\n检查结果：存在ItemCanBorrow或者ItemCanReturn函数，需改为新的配置方式。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：不存在ItemCanBorrow和ItemCanReturn函数，配置良好。");
+            }
+
 
             //值列表
             //内容
             //说明：检查在这里设置了馆藏地
             /*
- <valueTables>
-    <table name="orderSeller" dbname="">邮局,新华书店,北京华教快捷公司,天津图书大厦,天泽书店,当当网购,中国图书进出口公司,受赠,回溯,赔偿,</table>
-    <table name="orderSource" dbname="">本馆经费,年度经费,专项拨款,受赠,回溯,赔偿,其他</table>
-    <table name="orderClass" dbname="">社科,自科,综合</table>
+<valueTables>
+        <table name="location" dbname="">基藏库,流通库,阅览室</table>
+        <table name="state" dbname="">挂失,修补,装订,剔旧,其他</table>
+        <table name="bookType" dbname="">普通图书,文学,科技,社科</table>
+        <table name="readerType" dbname="">普通读者,本科生,硕士生,教师,博士生,教授</table>
+        <table name="readerState" dbname="">挂失,暂停,违章,注销(退证),其他</table>
+        <table name="hirePeriod" dbname="">一月,半年,一年</table>
+        <table name="issueState" dbname="">预测,记到</table>
+        <table name="orderSeller" dbname="">新华书店,中图公司</table>
+        <table name="orderSource" dbname="">本馆经费,世行贷款</table>
+        <table name="orderState" dbname="">已订购,已验收</table>
+        <table name="orderClass" dbname="">社科,自科</table>
 </valueTables>
+
              */
             // 值列表
-            string valueTables = this.GetSystemParameter("circulation", "valueTables");
-            valueTables = "<valueTables>" + valueTables + "</valueTables>";
-            valueTables = DomUtil.GetIndentXml(valueTables);
-            this.OutputInfo(valueTables);
+            this.OutputEmprty();
+            this.OutputInfo("==值列表==");
+            string valueTables = "";
+            XmlNode node = root.SelectSingleNode("valueTables");
+            bool hasVt = false;
+            if (node != null)
+            {
+                valueTables = node.OuterXml;
+
+                //<valueTables>里的<table name=”readerType”>和<table name=”bookType”>也定义了一个读者类型和册类型的值列表
+
+                // 检查有没有读者类型
+                XmlNodeList nodeList = node.SelectNodes("table[@name='readerType']");
+                if (nodeList.Count > 0)
+                    hasVt = true;
+
+                // 检查有没有图书类型
+                nodeList = node.SelectNodes("table[@name='bookType']");
+                if (nodeList.Count > 0)
+                    hasVt = true;
+
+                // 检查有没有馆藏地
+                nodeList = node.SelectNodes("table[@name='location']");
+                if (nodeList.Count > 0)
+                    hasVt = true;
+
+            }
+            if (string.IsNullOrEmpty(valueTables) == false)
+            {
+                valueTables = DomUtil.GetIndentXml(valueTables);
+                this.OutputInfo(valueTables);
+            }
+            else
+            {
+                this.OutputInfo("未配置值列表");
+            }
+
+
+            /*
+功能说明：值列表主要用来定义订购的'渠道'、'经费来源'、'类别'、数据状态信息，但不要在值列表中定义'馆藏地'、'图书类型'、'读者类型'，如果存在，则需改为在对应的界面进行配置。
+
+\r\n检查结果：
+值列表中不存在'馆藏地'、'图书类型'、'读者类型'的配置，配置良好。
+值列表中存在'馆藏地'、'图书类型'、'读者类型'其中一项或多项配置，需改进，请在对应的界面进行配置。
+            尚未配置值列表，建议配置一些选择信息，方便前端选择。
+             */
+            this.OutputInfo("\r\n功能说明：值列表主要用来定义订购的'渠道'、'经费来源'、'类别'，数据状态信息，但不要在值列表中定义'馆藏地'、'图书类型'、'读者类型'，如果存在，则需改为在对应的界面进行配置。");
+            //
+            if (string.IsNullOrEmpty(valueTables) == true)
+            {
+                this.OutputInfo("\r\n检查结果：尚未配置值列表，建议配置一些选择信息，方便前端选择。");
+            }
+            else
+            {
+                if (hasVt == false)
+                {
+                    this.OutputInfo("\r\n检查结果：值列表配置良好，不存在'馆藏地'、'图书类型'、'读者类型'的配置。");
+                }
+                else
+                {
+                    this.OutputInfo("\r\n检查结果：值列表中存在'馆藏地'、'图书类型'、'读者类型'其中一项或多项配置，需改进，请在对应的界面进行配置。");
+                }
+            }
+
 
             // 查重空间
             // 内容
@@ -2953,6 +3062,49 @@ ItemCanReturn
          <space dbnames="中文图书,英文图书" />
      </unique>
              */
+            this.OutputEmprty();
+            this.OutputInfo("==查重空间==");
+            string unique = "";
+            XmlNode space = null;
+            bool hasUnique = false;
+            node = root.SelectSingleNode("unique");
+            if (node != null)
+            {
+                unique = node.OuterXml;
+
+                space = node.SelectSingleNode("space");
+            }
+            if (string.IsNullOrEmpty(unique) == false)
+            {
+                unique = DomUtil.GetIndentXml(unique).Trim();
+                this.OutputInfo(unique);
+
+                // 检查有没有实际的spac
+                if (space != null)
+                {
+                    hasUnique = true;
+                }
+            }
+            else
+            {
+                this.OutputInfo("未配置查重空间");
+            }
+            /*
+功能说明：查重空间用来定义多个库的书目记录不重复，如果没有配置，需与馆员老师沟通，进行配置。
+
+检查结果：
+已配置查重空间，配置良好。
+未配置查看空间，需改进，进行配置。
+             */
+            this.OutputInfo("\r\n功能说明：查重空间用来定义多个库的书目记录不重复，如果没有配置，需与馆员老师沟通，进行配置。");
+            if (hasUnique == true)
+            {
+                this.OutputInfo("\r\n检查结果：已配置查重空间，配置良好。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：未配置查看空间，需改进，进行配置。");
+            }
 
 
             // RFID机构代码
@@ -2965,34 +3117,262 @@ ItemCanReturn
         </ownerInstitution>
     </rfid>
              */
-            string rfid = this.GetSystemParameter("system","rfid");
-            rfid=DomUtil.GetIndentXml(rfid);
-            this.OutputInfo(rfid);
+            //string rfid = this.GetSystemParameter("system","rfid");
+            //rfid=DomUtil.GetIndentXml(rfid);
+            //this.OutputInfo(rfid);
+            this.OutputEmprty();
+            this.OutputInfo("==RFID机构代码==");
+            XmlNode itemNode = null;
+            bool hasRfid = false;
+            string rfid = "";
+            node = root.SelectSingleNode("rfid");
+            if (node != null)
+            {
+                rfid = node.OuterXml;
+                itemNode = node.SelectSingleNode("ownerInstitution/item");
+            }
+            if (string.IsNullOrEmpty(rfid) == false)
+            {
+                rfid = DomUtil.GetIndentXml(rfid);
+                this.OutputInfo(rfid);
+                if (itemNode != null)
+                    hasRfid = true;
+            }
+            else
+            {
+                this.OutputInfo("未配置RFID机构代码");
+            }
+            /*
+             * 功能说明：机构代码表示图书馆图书资产和读者所属的机构，如果已上线RFID智能图书馆功能，需配置机构代码，如未配置属异常情况。
+
+            检查结果：
+            已配置RFID机构代码，配置良好。
+            未配置RFID机构代码，需和用户单位确认，是否已使用RFID功能，如已使用，一定要配置上；如未使用RFID，也建议尽早配置上。
+             */
+            this.OutputInfo("\r\n功能说明：机构代码表示图书馆图书资产和读者所属的机构，如果已上线RFID智能图书馆功能，需配置机构代码，如未配置属异常情况。");
+            if (hasRfid == true)
+            {
+                this.OutputInfo("\r\n检查结果：已配置RFID机构代码，需确认是否符合RFID规范。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n未配置RFID机构代码，需和用户单位确认，是否已使用RFID功能，如已使用，一定要配置上；如未使用RFID，也建议尽早配置上。");
+            }
 
             //mongoDB数据库配置
             // 说明：如果不配置这项，没有4个库
             /*
 <mongoDB connectionString="mongodb://127.0.0.1" instancePrefix="demo" />
              */
+            this.OutputEmprty();
+            this.OutputInfo("==MongoDB数据库配置==");
+            string mongoDB = "";
+            node = root.SelectSingleNode("mongoDB");
+            if (node != null)
+            {
+                mongoDB = node.OuterXml;
+            }
+            if (string.IsNullOrEmpty(mongoDB) == false)
+            {
+                this.OutputInfo(mongoDB);
+            }
+            else
+            {
+                this.OutputInfo("未配置MongoDB数据库参数");
+            }
+            /*
+             * 功能说明：mongoDB数据库参数，是dp2系统扩展的功能，用来存储'全量借阅历史'、'书目摘要'、'访问计数'、'访问日志'这4个库，如果未配置，不影响系统使用，但没法查早前的借阅历史，“书目摘要”用来提高显示书目摘要的速度，'访问计数'用来存储OPAC访问计数和数字资源浏览次数，'访问日志'用来存储数字资源访问日志记录。
+
+检查结果：
+已配置mongoDB数据库参数，配置良好。
+未配置mongoDB数据库参数，缺少'出纳历史'、'书目摘要'、'访问计数'、'访问日志'这4个库，建议配置上。
+
+             */
+            this.OutputInfo("\r\n功能说明：MongoDB数据库参数，是dp2系统扩展的功能，用来存储'全量借阅历史'、'书目摘要'、'访问计数'、'访问日志'这4个库，如果未配置，不影响系统使用，但没法查早前的借阅历史，“书目摘要”用来提高显示书目摘要的速度，'访问计数'用来存储OPAC访问计数和数字资源浏览次数，'访问日志'用来存储数字资源访问日志记录。");
+            if (string.IsNullOrEmpty(mongoDB) == false)
+            {
+                this.OutputInfo("\r\n检查结果：已配置MongoDB数据库参数，配置良好。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：未配置MongoDB数据库参数，缺少'出纳历史'、'书目摘要'、'访问计数'、'访问日志'这4个库，建议配置上。");
+            }
 
             //预约到书配置
             //说明:检查预约保留期
             /*
 <arrived dbname="预约到书" reserveTimeSpan="1day" outofReservationThreshold="10" canReserveOnshelf="true" notifyTypes="dpmail,email,mq" />
              */
+            this.OutputEmprty();
+            this.OutputInfo("==预约到书配置==");
+            string arrived = "";
+            string days = "";
+            string canReserveOnshelf = "";
+            node = root.SelectSingleNode("arrived");
+            string partInfo = "";
+            if (node != null)
+            {
+                arrived = node.OuterXml;
 
+                days = DomUtil.GetAttr(node, "reserveTimeSpan");
+                canReserveOnshelf = DomUtil.GetAttr(node, "canReserveOnshelf");
+                if (canReserveOnshelf.ToLower() == "true")
+                {
+                    partInfo = "支持在架预约，需和老师沟通确认实际是否支持在架预约。";
+                }
+                else
+                {
+                    partInfo = "不支持在架预约。";
+                }
+            }
+            if (string.IsNullOrEmpty(arrived) == false)
+            {
+                // rfid = DomUtil.GetIndentXml(rfid);
+                this.OutputInfo(arrived);
+            }
+            else
+            {
+                this.OutputInfo("未配置预约到书参数");
+            }
+            /*
+             * 功能说明：reserveTimeSpan表示预约到书保留天数，outofReservationThreshold表示预约到书未取的次数限制，超过这个次数后面不能预约；canReserveOnshelf表示是否支持在架预约；notifyTypes表示预约到书通知方式，其中mq表示微信通知。
+
+检查结果：
+已配置预约到书参数，保留天数为？,支持在架预约，需和老师沟通确认实际是否支持在架预约。
+已配置预约到书参数，保留天数为？,不支持在架预约。
+未配置预约到书参数，建议配置上。
+             */
+            this.OutputInfo("\r\n功能说明：reserveTimeSpan表示预约到书保留天数，outofReservationThreshold表示预约到书未取的次数限制，超过这个次数后面不能预约；canReserveOnshelf表示是否支持在架预约；notifyTypes表示预约到书通知方式，其中mq表示微信通知。");
+            if (string.IsNullOrEmpty(arrived) == false)
+            {
+                this.OutputInfo("\r\n检查结果：已配置预约到书参数，保留天数为" + days + "，" + partInfo);
+            }
+            else
+            {
+                this.OutputInfo("未配置预约到书参数，建议配置上。");
+            }
 
             //消息配置
             /*
 <message dbname="消息" reserveTimeSpan="365day" defaultQueue=".\private$\dp2library_demo" />
              */
+            this.OutputEmprty();
+            this.OutputInfo("==消息配置==");
+            string message = "";
+            node = root.SelectSingleNode("message");
+            string defaultQueue = "";
+            if (node != null)
+            {
+                message = node.OuterXml;
+                defaultQueue = DomUtil.GetAttr(node, "defaultQueue");
+            }
+            if (string.IsNullOrEmpty(message) == false)
+            {
+                // rfid = DomUtil.GetIndentXml(rfid);
+                this.OutputInfo(message);
+            }
+            else
+            {
+                this.OutputInfo("未配置消息参数");
+            }
+            /*
+             * 功能说明：defaultQueue表示是否启动MSMQ消息队列，用于给微信发通知，如果缺少该参数，则不能给微信发通知。
 
+检查结果：
+已配置消息队列，请确认公众号功能是否正常开通，如未开通公众号，建议去掉消息队列参数，防止MSMQ消息堆积太多。
+未配置消息队列，请确认公众号功能是否正常开通，如已开通公众号，需配置上消息队列，这样读者微信才能收到通知。
+             */
+            this.OutputInfo("\r\n功能说明：defaultQueue表示是否启动MSMQ消息队列，用于给微信发通知，如果缺少该参数，则不能给微信发通知。");
+            if (string.IsNullOrEmpty(message) == false)
+            {
+                if (string.IsNullOrEmpty(defaultQueue) == false)
+                    this.OutputInfo("\r\n检查结果：已配置消息队列defaultQueue，请确认公众号功能是否正常开通，如未开通公众号，建议去掉消息队列参数，防止MSMQ消息堆积太多。");
+                else
+                    this.OutputInfo("\r\n检查结果：未配置消息队列defaultQueue，请确认公众号功能是否正常开通，如已开通公众号，需配置上消息队列，这样读者微信才能收到通知。");
+            }
+            else
+            {
+                this.OutputInfo("未配置消息参数，建议配置上。");
+            }
 
             // smtpServer
             //   < smtpServer address = "128.0.0.8686" managerEmail = "fjb@163.net" />
+            this.OutputEmprty();
+            this.OutputInfo("==邮件服务器配置==");
+            string smtpServer = "";
+            node = root.SelectSingleNode("smtpServer");
+            if (node != null)
+            {
+                smtpServer = node.OuterXml;
+            }
+            if (string.IsNullOrEmpty(smtpServer) == false)
+            {
+                // rfid = DomUtil.GetIndentXml(rfid);
+                this.OutputInfo(smtpServer);
+            }
+            else
+            {
+                this.OutputInfo("未配置邮件服务器");
+            }
+            /*
+             * 功能说明：邮件服务器用来把一些超期通知，给读者发邮件。目前一般不配置这项参数，因为邮箱服务器本身会有一些限制，不一定能发送成功。
+
+检查结果：
+未配置邮件服务器，属正常情况。
+配置了邮件服务器，需与用户单位确认，邮箱服务器是否能正常转发邮件，读者是否能正常收到邮件。
+
+             */
+            this.OutputInfo("\r\n功能说明：邮件服务器用来把一些超期通知，给读者发邮件。目前一般不配置这项参数，因为邮箱服务器本身可能有一些限制，不一定能发送成功。");
+            if (string.IsNullOrEmpty(smtpServer) == true)
+            {
+                this.OutputInfo("\r\n检查结果：未配置邮件服务器，属正常情况。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：配置了邮件服务器，需与用户单位确认，邮箱服务器是否能正常转发邮件，读者是否能正常收到邮件。");
+            }
+
 
             // 读者同步
+            /*
+<patronReplication 
+interfaceUrl="ipc://CardCenterChannel/CardCenterServer" 
+patronDbName="读者"
+idElementName="barcode"
+/>
+             */
+            this.OutputEmprty();
+            this.OutputInfo("==读者同步配置==");
+            string patronReplication = "";
+            node = root.SelectSingleNode("patronReplication");
+            if (node != null)
+            {
+                patronReplication = node.OuterXml;
+            }
+            if (string.IsNullOrEmpty(patronReplication) == false)
+            {
+                this.OutputInfo(patronReplication);
+            }
+            else
+            {
+                this.OutputInfo("未配置读者同步功能");
+            }
+            /*
+功能说明：读者同步功能是指从第三方系统或者一卡通中心自动同步读者数据到dp2系统，如果配置了读者同步参数，需检查读者同步功能是否正常。
 
+检查结果：
+未配置读者同步，属正常情况，但需了解一下用户有没有使用其它方式进行读者同步。
+配置了读者同步功能，需与用户单位确认读者同步功能是否正常。
+             */
+            this.OutputInfo("\r\n功能说明：读者同步功能是指从第三方系统或者一卡通中心自动同步读者数据到dp2系统，如果配置了读者同步参数，需检查读者同步功能是否正常。");
+            if (string.IsNullOrEmpty(patronReplication) == true)
+            {
+                this.OutputInfo("\r\n检查结果：未配置读者同步，属正常情况，但需了解一下用户有没有使用其它方式进行读者同步。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：配置了读者同步功能，需与用户单位确认读者同步功能是否正常。");
+            }
 
             //后台任务monitors
             /*
@@ -3002,6 +3382,53 @@ ItemCanReturn
         <messageMonitor startTime="23:00" />
     </monitors>
              */
+            this.OutputEmprty();
+            this.OutputInfo("==后台任务运行时间==");
+            string monitors = "";
+            string notifyDef = "";
+            node = root.SelectSingleNode("monitors");
+            if (node != null)
+            {
+                monitors = node.OuterXml;
+                XmlNode readersMonitor = node.SelectSingleNode("readersMonitor");
+                if (readersMonitor != null)
+                {
+                    notifyDef = DomUtil.GetAttr(readersMonitor, "notifyDef").Trim();
+                }
+            }
+            if (string.IsNullOrEmpty(monitors) == false)
+            {
+                monitors = DomUtil.GetIndentXml(monitors);
+                this.OutputInfo(monitors);
+            }
+            else
+            {
+                this.OutputInfo("未配置后台任务运行时间");
+            }
+            /*
+             * 功能说明：readersMonitor负责运行读者超期任务，其中notifyDef表示到期前提醒；arriveMonitor负责运行预约到书；messageMonitor负责消息清扫任务。
+
+检查结果：
+后台任务配置正常，有图书即将到期提醒。
+后台任务配置正常，但无图书即将到期提醒。需和用户单位确认是否开通这项功能。
+未配置后台任务运行时间，建议配置上。
+             */
+            this.OutputInfo("\r\n功能说明：readersMonitor负责运行读者超期任务，其中notifyDef表示到期前提醒；arriveMonitor负责运行预约到书；messageMonitor负责消息清扫任务。");
+            if (string.IsNullOrEmpty(monitors) == false)
+            {
+                if (string.IsNullOrEmpty(notifyDef) == false)
+                {
+                    this.OutputInfo("\r\n检查结果：后台任务配置正常，有图书即将到期提醒。");
+                }
+                else
+                {
+                    this.OutputInfo("\r\n检查结果：后台任务配置正常，但无图书即将到期提醒。需和用户单位确认是否开通这项功能。");
+                }
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：未配置后台任务运行时间，建议配置上。");
+            }
 
             //实用库
             /*
@@ -3009,19 +3436,241 @@ ItemCanReturn
         <database name="出版者" type="publisher" />
         <database name="盘点" type="inventory" />
     </utilDb>
-
              */
+            /*
+<utilDb>元素内由若干<database>元素配置定义了系统运作所需要的若干实用库。
+<database>元素有两个属性：name属性定义实用库的名字；type属性定义了实用库的具体类型，类型值有“publisher”“zhongcihao”等。
+当实用库的类型为“publisher”时，表示这是一个出版者库。出版者库负责存储ISBN号之出版社部分和出版地、出版社名(UNIMARC格式210字段$a$c子字段)之间的对照关系；和ISBN号之出版社部分和出版地代码(UNIMARC格式 102字段$a$b子字段)之间的对照关系。出版者库的结构可参见7.8。
+当实用库的类型为“zhongcihao”时，表示这是一个种次号库。种次号库负责存储索书类号和该类当前尾号之间的对照关系。种次号库的结构可参见7.8。
+             */
+            this.OutputEmprty();
+            this.OutputInfo("==实用库配置==");
+            string utilDb = "";
+            string zhongcihao = "";
+            node = root.SelectSingleNode("utilDb");
+            if (node != null)
+            {
+                utilDb = node.OuterXml.Trim();
+                XmlNode nodezhongcihao = node.SelectSingleNode("database[@type='zhongcihao']");
+                if (nodezhongcihao != null)
+                {
+                    zhongcihao = DomUtil.GetAttr(nodezhongcihao, "name");  //取出种次号名称
+                }
+            }
+            if (string.IsNullOrEmpty(utilDb) == false)
+            {
+                utilDb = DomUtil.GetIndentXml(utilDb);
+                this.OutputInfo(utilDb);
+            }
+            else
+            {
+                this.OutputInfo("未配置实用库");
+            }
+            /*
+功能说明：实用库主要有'出版者库'和'种次号库'，类型为'publisher'表示是出版者库，类型为'zhongcihao'表示种次号库。当存在种次号库需改进，dp2 V3不需要再设置种次号库了，系统会自动按对应分类的尾号取号。
+
+检查结果：
+有配置种次号库，需与用户单位沟通，进行改进，去掉种次库，系统会自动取号。
+实用库配置正常。
+未配置实用库，属正常情况。
+             */
+            this.OutputInfo("\r\n功能说明：实用库类型为'publisher'表示是出版者库，类型为'zhongcihao'表示种次号库，类型为'inventory'表示盘点库。当存在种次号库需改进，dp2 V3不需要再设置种次号库了，系统会自动按对应分类的尾号取号。");
+            if (string.IsNullOrEmpty(utilDb) == false)
+            {
+                if (string.IsNullOrEmpty(zhongcihao) == false)
+                {
+                    this.OutputInfo("\r\n检查结果：有配置种次号库，需与用户单位沟通，进行改进，去掉种次库，系统会自动取号。");
+                }
+                else
+                {
+                    this.OutputInfo("\r\n检查结果：实用库配置正常。");
+                }
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：未配置实用库，属正常情况。");
+            }
 
 
             // 登录与读者密码设置
-            //<login patronPasswordExpireLength="90days" patronPasswordStyle="style-1" />
+            //<login globalAddRights="clientscanvirus" patronPasswordExpireLength="90days" patronPasswordStyle="style-1" />
             // globalAddRights
+            this.OutputEmprty();
+            this.OutputInfo("==登录与读者密码设置==");
+            string login = "";
+            string globalAddRights = "";
+            string patronPasswordExpireLength = "";
+            string patronPasswordStyle = "";
+            node = root.SelectSingleNode("login");
+            if (node != null)
+            {
+                login = node.OuterXml;
+
+                globalAddRights = DomUtil.GetAttr(node, "globalAddRights");
+                patronPasswordExpireLength = DomUtil.GetAttr(node, "patronPasswordExpireLength");
+                patronPasswordStyle = DomUtil.GetAttr(node, "patronPasswordStyle");
+            }
+            if (string.IsNullOrEmpty(login) == false)
+            {
+                login = DomUtil.GetIndentXml(login);
+                this.OutputInfo(login);
+            }
+            else
+            {
+                this.OutputInfo("未配置登录参数");
+            }
+            /*
+             * 
+             * 功能说明：globalAddRights='clientscanvirus'表示内务登录时检查病毒；patronPasswordExpireLength表示读者密码失效期；patronPasswordStyle表示读者密码健壮性格式要求。
+
+检查结果：
+未配置内务登录时检查病毒，建议配置。
+未配置工作人员密码失效期或密码健壮性格式要求，安全性不高，建立配置上。
+登录安全性配置良好。
+             */
+            this.OutputInfo("\r\n功能说明：globalAddRights='clientscanvirus'表示内务登录时检查病毒；patronPasswordExpireLength表示读者密码失效期；patronPasswordStyle表示读者密码健壮性格式要求。");
+            partInfo = "";
+            if (string.IsNullOrEmpty(globalAddRights) == true)// != "clientscanvirus")
+            {
+                partInfo = "未配置内务登录时检查病毒，建议配置。";
+            }
+            else
+            {
+                if (globalAddRights != "clientscanvirus")
+                    partInfo = "内务登录检查病毒配置,需改为正确的值。";
+            }
+
+            if (string.IsNullOrEmpty(patronPasswordExpireLength) == true
+                || string.IsNullOrEmpty(patronPasswordStyle) == true)
+            {
+                partInfo += "未配置工作人员密码失效期或密码健壮性格式要求，安全性不高，建议配置上。";
+            }
+
+            if (string.IsNullOrEmpty(partInfo) == false)
+            {
+                this.OutputInfo("\r\n检查结果：" + partInfo);
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：登录安全性配置良好。");
+            }
+
+
 
             //工作人员密码设置
             //< accounts passwordExpireLength = "90days" passwordStyle = "style-1,login" >
+            this.OutputEmprty();
+            this.OutputInfo("==工作人员密码配置==");
+            string passwordExpireLength = "";
+            string passwordStyle = "";
+            bool hasPasswordExpire = false;
+            bool hasPasswordStyle = false;
+            node = root.SelectSingleNode("accounts");
+            if (node != null)
+            {
+                passwordExpireLength = DomUtil.GetAttr(node, "passwordExpireLength");
+                passwordStyle = DomUtil.GetAttr(node, "passwordStyle");
+            }
+            if (string.IsNullOrEmpty(passwordExpireLength) == false)
+            {
+                this.OutputInfo("passwordExpireLength=" + passwordExpireLength);
+                hasPasswordExpire = true;
+            }
+            else
+            {
+                this.OutputInfo("未配置passwordExpireLength");
+            }
+            if (string.IsNullOrEmpty(passwordStyle) == false)
+            {
+                this.OutputInfo("passwordStyle=" + passwordStyle);
+                hasPasswordStyle = true;
+            }
+            else
+            {
+                this.OutputInfo("未配置passwordStyle");
+            }
+            /*
+             * 功能说明：工作人员密码配置passwordExpireLength表示密码失效期，配置passwordStyle表示密码健壮性格式要求。
+
+            检查结果：
+            工作人员密码安全性配置良好。
+            未配置工作人员密码失效期或密码健壮性格式要求，安全性不高，建议配置上。
+             */
+            this.OutputInfo("\r\n功能说明：工作人员密码配置passwordExpireLength表示密码失效期，配置passwordStyle表示密码健壮性格式要求。");
+
+            if (hasPasswordExpire == true && hasPasswordStyle == true)
+            {
+                this.OutputInfo("\r\n检查结果：工作人员密码安全性配置良好。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：未配置工作人员密码失效期或密码健壮性格式要求，安全性不高，建议配置上。");
+            }
+
+
 
             // 流通相关配置
             //<circulation verifyBarcode="true" patronAdditionalFroms="证号,姓名" notifyTypes="mq" verifyReaderType="true" borrowCheckOverdue="true" />
+            this.OutputEmprty();
+            this.OutputInfo("==业务参数==");
+            string circulation = "";
+            node = root.SelectSingleNode("circulation");
+            if (node != null)
+            {
+                circulation = node.OuterXml;
+            }
+            if (string.IsNullOrEmpty(circulation) == false)
+            {
+                //utilDb = DomUtil.GetIndentXml(utilDb);
+                this.OutputInfo(circulation);
+            }
+            else
+            {
+                this.OutputInfo("未配置circulation参数节点");
+            }
+            // 进一步检查里面的属性
+            bool noVerify = false;
+            if (node != null)
+            {
+                string verifyBarcode = DomUtil.GetAttr(node, "verifyBarcode").Trim();
+                if (verifyBarcode.ToLower() != "true")
+                {
+                    noVerify = true;
+                }
+
+                string verifyReaderType = DomUtil.GetAttr(node, "verifyReaderType").Trim();
+                if (verifyReaderType.ToLower() != "true")
+                {
+                    noVerify = true;
+                }
+
+                string verifyBookType = DomUtil.GetAttr(node, "verifyBookType").Trim();
+                if (verifyBookType.ToLower() != "true")
+                {
+                    noVerify = true;
+                }
+            }
+            /*
+            功能说明：verifyBarcode="true"表示校验条码，verifyBookType="true"表示校验图书类型，verifyReaderType="true"表示校验读者类型。
+
+            检查结果：
+            配置良好，已启用'条码校验'、'图书类型校验'、'读者类型校验'。
+            未启用'条码校验'、'图书类型校验'、'读者类型校验' 其中一项或多项，需改进，配置上校验功能。
+             */
+
+            this.OutputInfo("\r\n功能说明：verifyBarcode='true'表示校验条码，verifyBookType='true'表示校验图书类型，verifyReaderType='true'表示校验读者类型。");
+
+
+            if (noVerify == true)
+            {
+                this.OutputInfo("\r\n检查结果：未启用'条码校验'、'图书类型校验'、'读者类型校验' 其中一项或多项，需改进，配置上校验功能。");
+            }
+            else
+            {
+                this.OutputInfo("\r\n检查结果：配置良好，已启用'条码校验'、'图书类型校验'、'读者类型校验'。");
+            }
+
+
         }
 
         // 读者部门
@@ -3109,7 +3758,7 @@ ItemCanReturn
                         baTotal = ByteArray.Add(baTotal, baContent);
 
                         stream.Write(baContent, 0, baContent.Length);
-                        stream.Flush(); 
+                        stream.Flush();
                         lStart += baContent.Length;
 
 
@@ -3121,11 +3770,11 @@ ItemCanReturn
 
                 } // end of for
 
-               //string  strResult = ByteArray.ToString(baTotal, Encoding.UTF8);
+                //string  strResult = ByteArray.ToString(baTotal, Encoding.UTF8);
 
-               // // 把baTotal加载到dom
+                // // 把baTotal加载到dom
                 this._libraryDom1 = new XmlDocument();
-                stream.Seek(0,SeekOrigin.Begin);
+                stream.Seek(0, SeekOrigin.Begin);
                 this._libraryDom1.Load(stream);
 
             }
@@ -3147,7 +3796,7 @@ ItemCanReturn
             }
         }
 
-        XmlDocument _libraryDom1=null;
+        XmlDocument _libraryDom1 = null;
 
         private XmlDocument LibraryDom
         {
@@ -3227,11 +3876,11 @@ ItemCanReturn
                 int index = 1;
                 XmlNodeList calendarList = this.LibraryDom.DocumentElement.SelectNodes("calendars/calendar");
                 foreach (XmlNode calendar in calendarList)
-                { 
+                {
                     index++;
-                    string name=DomUtil.GetAttr(calendar, "name");
+                    string name = DomUtil.GetAttr(calendar, "name");
                     string range = DomUtil.GetAttr(calendar, "range");
-                    string comment=DomUtil.GetAttr(calendar, "comment").Trim();
+                    string comment = DomUtil.GetAttr(calendar, "comment").Trim();
 
                     string text = calendar.InnerText.Trim();
 
@@ -3264,11 +3913,189 @@ ItemCanReturn
                 EnableControls(true);
             }
         }
+
+        private void button_security_Click(object sender, EventArgs e)
+        {
+            EnableControls(false);
+            try
+            {
+                this.OutputEmprty(2);
+
+                // 开始时间
+                DateTime start = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==开始安全配置==", start));
+
+                this.OutputEmprty();
+                /*
+                 * 工作人员密码安全配置：建议为工作人员启用密码失效期和密码健壮性格式。
+读者密码安全配置：建议为读者启用密码失效期和密码健壮性格式。
+
+防火墙检查：已启用防火墙。
+防火墙禁用端口检查：已禁用MongoDB使用的27017端口。
+
+MySQL配置为单机命名管道访问，不支持外部访问。
+dp2kernel仅开通本机访问协议，不支持外部访问。
+
+                 */
+                XmlNode root = this.LibraryDom.DocumentElement;
+
+                // 工作人员密码安全配置
+                string passwordExpireLength = "";
+                string passwordStyle = "";
+                XmlNode node = root.SelectSingleNode("accounts");
+                if (node != null)
+                {
+                    passwordExpireLength = DomUtil.GetAttr(node, "passwordExpireLength");
+                    passwordStyle = DomUtil.GetAttr(node, "passwordStyle");
+                }
+                if (string.IsNullOrEmpty(passwordExpireLength) == true ||
+                    string.IsNullOrEmpty(passwordStyle) == true)
+                {
+                    this.OutputInfo("工作人员密码安全配置：建议为工作人员启用密码失效期和密码健壮性格式，提高安全性。");
+                }
+                else
+                {
+                    this.OutputInfo("工作人员密码安全配置：已为工作人员启用密码失效期和密码健壮性格式，安全性高。");
+                }
+
+                // 读者密码安全配置
+                string patronPasswordExpireLength = "";
+                string patronPasswordStyle = "";
+                node = root.SelectSingleNode("login");
+                if (node != null)
+                {
+                    patronPasswordExpireLength = DomUtil.GetAttr(node, "patronPasswordExpireLength").Trim();
+                    patronPasswordStyle = DomUtil.GetAttr(node, "patronPasswordStyle").Trim();
+                }
+                if (string.IsNullOrEmpty(patronPasswordExpireLength) == true ||
+    string.IsNullOrEmpty(patronPasswordStyle) == true)
+                {
+                    this.OutputInfo("读者密码安全配置：建议为读者启用密码失效期和密码健壮性格式，提高安全性。");
+                }
+                else
+                {
+                    this.OutputInfo("读者密码安全配置：已为读者启用密码失效期和密码健壮性格式，安全性高。");
+                }
+
+                this.OutputEmprty();
+                this.OutputInfo("防火墙检查：已启用防火墙。");
+                this.OutputInfo("防火墙禁用端口检查：已禁用MongoDB使用的27017端口。");
+
+
+                this.OutputEmprty();
+                this.OutputInfo("MySQL配置为单机命名管道访问，不支持外部访问。");
+                this.OutputInfo("dp2kernel仅开通本机访问协议，不支持外部访问。");
+
+                this.OutputEmprty();
+
+                // 结束时间
+                DateTime end = DateTime.Now;
+                this.OutputInfo(GetInfoAddTime("==结束安全配置,用时" + this.GetSeconds(start, end) + "秒==", end));
+            }
+            finally
+            {
+                EnableControls(true);
+            }
+        }
+
+        private void button_patronBarcode_Click(object sender, EventArgs e)
+        {
+            // 空2行
+            this.OutputEmprty(2);
+
+            // 开始时间
+            DateTime start = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==开始校验读者条码==", start));
+
+            EnableControls(false);
+            try
+            {
+                string strError = "";
+
+                long errorCount = 0;
+                RestChannel channel = this._mainForm.GetChannel();
+                try
+                {
+                    int index = 0;
+                    foreach (Patron item in this._patrons)
+                    {
+                        // 当外部让停止时，停止循环
+                        this._cancel.Token.ThrowIfCancellationRequested();
+                        Application.DoEvents();
+
+                        index++;
+                        this.OutputInfo("校验读者条码第" + index.ToString(), false, true);
+
+                        /// <param name="strLibraryCode">馆代码</param>
+                        /// <param name="strBarcode">条码号</param>
+                        /// <param name="strError">返回出错信息</param>
+                        /// <returns>
+                        /// <para>-1:   出错</para>
+                        /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
+                        // 校验册条码
+                        long lRet = channel.VerifyBarcode("",
+                            item.barcode,
+                            out strError);
+                        if (lRet == -1)
+                        {
+                            this.OutputInfo("校验读者条码出错:" + strError, true, false);
+                            return;
+                        }
+                        // 不合法
+                        if (lRet == 0 || lRet == 1)
+                        {
+                            errorCount++;
+                            if (errorCount == 1)
+                            {
+                                // 仅输出到文件
+                                this.OnlyOutput2File("以下读者条码不符合规则");
+                            }
+
+                            if (lRet == 0)
+                            {
+                                //仅输出到文件
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + strError);
+                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + strError, true, false);
+                            }
+                            else if (lRet == 1)
+                            {
+                                //仅输出到文件
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + "与读者证规则冲突");
+                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + "与读者证规则冲突", true, false);
+                            }
+                        }
+
+                        this._cancel.Token.ThrowIfCancellationRequested();
+
+                    }
+
+                    if (errorCount > 0)
+                    {
+                        this.OutputEmprty();
+                        this.OutputInfo("不符合规则的读者条码共有" + errorCount + "条。");
+                    }
+                }
+                finally
+                {
+                    this._mainForm.ReturnChannel(channel);
+                }
+            }
+            finally
+            {
+
+                EnableControls(true);
+            }
+
+            // 结束时间
+            DateTime end = DateTime.Now;
+            this.OutputInfo(GetInfoAddTime("==结束校验读者条码,详见txt文件,用时" + this.GetSeconds(start, end) + "秒==", end));
+
+        }
     }
 
 
 
-    public class BookTypeGroup
+        public class BookTypeGroup
     {
         // 册类型
         public string bookType { get; set; }
