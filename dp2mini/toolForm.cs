@@ -873,8 +873,22 @@ namespace dp2mini
     <price>a34.80b</price> 
      */
                             string xml = record.RecordBody.Xml;
+                            if (string.IsNullOrEmpty(xml) == true)
+                            {
+                                string tempInfo = "ERROR:" + record.Path + "的记录xml为空，请手动修复后，再统计。";
+                                this.OutputInfo(tempInfo);
+                                this._cancel.Cancel();//停下来。
+                                throw new Exception(tempInfo);
+                            }
                             XmlDocument dom = new XmlDocument();
-                            dom.LoadXml(xml);
+                            try
+                            {
+                                dom.LoadXml(xml);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw new Exception("装载" + record.Path + "出错:" + ex.Message);
+                            }
                             XmlNode root = dom.DocumentElement;
                             item.barcode = DomUtil.GetElementInnerText(root, "barcode");
                             item.location = DomUtil.GetElementInnerText(root, "location");
@@ -2127,8 +2141,22 @@ namespace dp2mini
 </borrows>
  */
                         string xml = record.RecordBody.Xml;
+                        if (string.IsNullOrEmpty(xml) == true)
+                        {
+                            string tempInfo = "ERROR:" + record.Path + "对应的读者记录为空，请手动修复后，再统计。";
+                            this.OutputInfo(tempInfo);
+                            this._cancel.Cancel();//停下来。
+                            throw new Exception(tempInfo);
+                        }
                         XmlDocument dom = new XmlDocument();
-                        dom.LoadXml(xml);
+                        try
+                        {
+                            dom.LoadXml(xml);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("装载" + record.Path + "出错:" + ex.Message);
+                        }
                         XmlNode root = dom.DocumentElement;
                         patron.libraryCode = DomUtil.GetElementInnerText(root, "libraryCode");
                         patron.barcode = DomUtil.GetElementInnerText(root, "barcode");
