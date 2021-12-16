@@ -139,8 +139,10 @@ namespace dp2mini
 
                 // 排架体系
                 this.button_paijia_Click(sender, e);
+
                 // 索取号
-                this.button_checkAccessNo_Click(sender, e);
+                if(this._mainForm.LibraryName!= "红泥巴数字平台图书馆")  // 红泥巴里面索取号有很多的是红泥巴分类的，不校验
+                    this.button_checkAccessNo_Click(sender, e);
 
                 // 册价格
                 this.button_checkPrice_Click(sender, e);
@@ -877,7 +879,18 @@ namespace dp2mini
                             item.barcode = DomUtil.GetElementInnerText(root, "barcode");
                             item.location = DomUtil.GetElementInnerText(root, "location");
                             item.accessNo = DomUtil.GetElementInnerText(root, "accessNo");
-                            item.bookType = DomUtil.GetElementInnerText(root, "bookType");
+
+                            // 2021/12/16 增加，图书类型前面也要带上分馆代码，要不一起统计时，分不清是哪个分馆的
+                            string bookType= DomUtil.GetElementInnerText(root, "bookType");
+                            string libraryCode = "";
+                            if (item.location.IndexOf("/") != -1)
+                            {
+                                libraryCode = item.location.Substring(0, item.location.IndexOf("/"));
+                            }
+                            if (libraryCode != "")
+                                bookType = libraryCode + "/" + bookType;
+
+                            item.bookType = bookType;//DomUtil.GetElementInnerText(root, "bookType");
                             item.price = DomUtil.GetElementInnerText(root, "price");
 
 
@@ -3543,7 +3556,7 @@ idElementName="barcode"
             if (string.IsNullOrEmpty(patronPasswordExpireLength) == true
                 || string.IsNullOrEmpty(patronPasswordStyle) == true)
             {
-                partInfo += "未配置工作人员密码失效期或密码健壮性格式要求，安全性不高，建议配置上。";
+                partInfo += "未配置读者密码失效期或密码健壮性格式要求，安全性不高，建议配置上。";
             }
 
             if (string.IsNullOrEmpty(partInfo) == false)
