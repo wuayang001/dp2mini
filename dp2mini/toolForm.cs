@@ -326,6 +326,7 @@ namespace dp2mini
                 IXLWorksheet ws = this.CreateSheet("权限检查");
                 // 设置标题
                 string[] titles = {
+                    "馆代码",
                     "帐户",
                     "危险权限",
                     "备注"
@@ -345,6 +346,7 @@ namespace dp2mini
                 XmlNodeList list = this.LibraryDom.DocumentElement.SelectNodes("accounts/account");
                 foreach (XmlNode node in list)
                 {
+                    string libraryCode = DomUtil.GetAttr(node, "libraryCode");
                     string name = DomUtil.GetAttr(node, "name");
                     string rights = DomUtil.GetAttr(node, "rights");
 
@@ -373,12 +375,13 @@ namespace dp2mini
                             // 如果是第一个危险权限
                             if (bFirst == true)
                             {
-                                ws.Cell(index, 1).Value = name;
+                                ws.Cell(index, 1).Value = libraryCode;
+                                ws.Cell(index, 2).Value = name;
                                 bFirst = false;
                             }
 
-                            ws.Cell(index, 2).Value = right;
-                            ws.Cell(index, 3).Value = dangerRights[right];
+                            ws.Cell(index, 3).Value = right;
+                            ws.Cell(index, 4).Value = dangerRights[right];
                         }
 
                     }
@@ -898,7 +901,7 @@ namespace dp2mini
                             // 2021/12/16 增加，图书类型前面也要带上分馆代码，要不一起统计时，分不清是哪个分馆的
                             string bookType= DomUtil.GetElementInnerText(root, "bookType");
                             string libraryCode = "";
-                            if (item.location.IndexOf("/") != -1)
+                            if (item.location !=null && item.location.IndexOf("/") != -1)
                             {
                                 libraryCode = item.location.Substring(0, item.location.IndexOf("/"));
                             }
@@ -2200,6 +2203,7 @@ namespace dp2mini
                 IXLWorksheet ws = this.CreateSheet("在借书读者");
                 // 设置标题
                 string[] titles = {
+                    "读者路径",
             "读者证条码号",
             "读者姓名",
             "在借数量"
@@ -2219,9 +2223,10 @@ namespace dp2mini
                         index++;
 
                         // 写excel
-                        ws.Cell(index + 1, 1).Value = one.barcode;
-                        ws.Cell(index + 1, 2).Value = one.name;
-                        ws.Cell(index + 1, 3).Value = one.borrowCount;
+                        ws.Cell(index + 1, 1).Value = one.path;
+                        ws.Cell(index + 1, 2).Value = one.barcode;
+                        ws.Cell(index + 1, 3).Value = one.name;
+                        ws.Cell(index + 1, 4).Value = one.borrowCount;
                     }
                 }
 
@@ -2232,7 +2237,7 @@ namespace dp2mini
                 this.SetExcelStyle(ws, index + 1, titles.Length);
 
                 //将第1列读者证条码设为文本格式
-                ws.Column(1).Style.NumberFormat.Format = "@";
+                ws.Column(2).Style.NumberFormat.Format = "@";
 
                 //保存excel
                 this._workbook.SaveAs(this.ExcelFileName);
@@ -2396,17 +2401,18 @@ namespace dp2mini
         {
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = patrons.GroupBy(
-                x => new { x.department },
+                x => new { x.department, x.libraryCode },
                 (key, item_list) => new PatronGroup
                 {
                     name = key.department,
+                    libraryCode = key.libraryCode,
                     Items = new List<Patron>(item_list),
                     count = item_list.Count()
-                }).OrderByDescending(o => o.count);
+                }).OrderByDescending(o => o.count).OrderBy(o => o.libraryCode);
 
+        //}).OrderByDescending(o => o.count);
 
-
-            List<PatronGroup> types = new List<PatronGroup>();
+        List<PatronGroup> types = new List<PatronGroup>();
 
             foreach (PatronGroup group in list)
             {
@@ -2420,6 +2426,7 @@ namespace dp2mini
             IXLWorksheet ws = this.CreateSheet("读者部门");
             // 设置标题
             string[] titles = {
+                "馆代码",
             "读者部门",
             "读者数量",
             "备注"
@@ -2439,13 +2446,14 @@ namespace dp2mini
                 index++;
 
                 // 写excel
-                ws.Cell(index + 1, 1).Value = one.name;
-                ws.Cell(index + 1, 2).Value = one.count.ToString();
+                ws.Cell(index + 1, 1).Value = one.libraryCode;
+                ws.Cell(index + 1, 2).Value = one.name;
+                ws.Cell(index + 1, 3).Value = one.count.ToString();
 
                 // 如果部门为空，将读者路径和证条码输出到txt
                 if (one.name == "[空]")
                 {
-                    ws.Cell(index + 1, 3).Value = "详见下方excel";
+                    ws.Cell(index + 1, 4).Value = "详见下方excel";
                     bHasEmpty = true;
                 }
 
@@ -4161,6 +4169,8 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
     {
         // 册类型
         public string name { get; set; }
+
+        public string libraryCode { get; set; }
 
         public List<Patron> Items { get; set; }
 
