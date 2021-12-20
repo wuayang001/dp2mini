@@ -877,8 +877,9 @@ namespace dp2mini
                             {
                                 string tempInfo = "ERROR:" + record.Path + "的记录xml为空，请手动修复后，再统计。";
                                 this.OutputInfo(tempInfo);
+                                Application.DoEvents();
                                 this._cancel.Cancel();//停下来。
-                                throw new Exception(tempInfo);
+                                //throw new Exception(tempInfo);
                             }
                             XmlDocument dom = new XmlDocument();
                             try
@@ -2145,8 +2146,9 @@ namespace dp2mini
                         {
                             string tempInfo = "ERROR:" + record.Path + "对应的读者记录为空，请手动修复后，再统计。";
                             this.OutputInfo(tempInfo);
+                            Application.DoEvents();
                             this._cancel.Cancel();//停下来。
-                            throw new Exception(tempInfo);
+                            //throw new Exception(tempInfo);
                         }
                         XmlDocument dom = new XmlDocument();
                         try
