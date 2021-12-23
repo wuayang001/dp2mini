@@ -963,6 +963,10 @@ namespace dp2mini
             DateTime start = DateTime.Now;
             this.OutputInfo(GetInfoAddTime("==开始校验册条码==", start));
 
+            // 空的册条码
+            List<string> emptyList = new List<string>();
+
+
             EnableControls(false);
             try
             {
@@ -981,6 +985,13 @@ namespace dp2mini
 
                         index++;
                         this.OutputInfo("校验册条码第" + index.ToString(), false, true);
+
+                        // 空条码专门处理一下
+                        if (string.IsNullOrEmpty(item.barcode) == true)
+                        {
+                            emptyList.Add(item.path);
+                            continue;
+                        }
 
                         /// <param name="strLibraryCode">馆代码</param>
                         /// <param name="strBarcode">条码号</param>
@@ -1028,8 +1039,17 @@ namespace dp2mini
 
                     if (errorCount > 0)
                     {
-                        this.OutputEmprty();
                         this.OutputInfo("不符合规则的册条码共有" + errorCount + "条。");
+                    }
+
+                    // 把空条码输出一下
+                    if (emptyList.Count > 0)
+                    {
+                        this.OnlyOutput2File("\r\n以下记录的册条码为空，共有"+emptyList.Count+"条。");
+                        foreach (string path in emptyList)
+                        {
+                            this.OnlyOutput2File(path);
+                        }
                     }
                 }
                 finally
@@ -4063,6 +4083,9 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
             {
                 string strError = "";
 
+                // 空的证条码
+                List<string> emptyList = new List<string>();
+
                 long errorCount = 0;
                 RestChannel channel = this._mainForm.GetChannel();
                 try
@@ -4076,6 +4099,12 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
 
                         index++;
                         this.OutputInfo("校验读者条码第" + index.ToString(), false, true);
+
+                        if (string.IsNullOrEmpty(item.barcode) == true)
+                        {
+                            emptyList.Add(item.path);
+                            continue;
+                        }
 
                         /// <param name="strLibraryCode">馆代码</param>
                         /// <param name="strBarcode">条码号</param>
@@ -4122,8 +4151,17 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
 
                     if (errorCount > 0)
                     {
-                        this.OutputEmprty();
                         this.OutputInfo("不符合规则的读者条码共有" + errorCount + "条。");
+                    }
+
+                    // 把空条码输出一下
+                    if (emptyList.Count > 0)
+                    {
+                        this.OnlyOutput2File("\r\n以下读者记录的证条码为空，共有" + emptyList.Count + "条。");
+                        foreach (string path in emptyList)
+                        {
+                            this.OnlyOutput2File(path);
+                        }
                     }
                 }
                 finally
