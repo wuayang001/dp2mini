@@ -1000,7 +1000,7 @@ namespace dp2mini
                         /// <para>-1:   出错</para>
                         /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
                         // 校验册条码
-                        long lRet = channel.VerifyBarcode("",
+                        long lRet = channel.VerifyBarcode(item.location,
                             item.barcode,
                             out strError);
                         if (lRet == -1)
@@ -2234,6 +2234,9 @@ namespace dp2mini
                     ws.Cell(1, j++).Value = s;
                 }
 
+                //将第1列读者证条码设为文本格式
+                ws.Column(2).Style.NumberFormat.Format = "@";
+
                 // 循环读者
                 int index = 0;
                 foreach (Patron one in this._patrons)
@@ -2256,8 +2259,7 @@ namespace dp2mini
                 // 设置excel格式
                 this.SetExcelStyle(ws, index + 1, titles.Length);
 
-                //将第1列读者证条码设为文本格式
-                ws.Column(2).Style.NumberFormat.Format = "@";
+
 
                 //保存excel
                 this._workbook.SaveAs(this.ExcelFileName);
@@ -2502,6 +2504,12 @@ namespace dp2mini
                 {
                     ws.Cell(1, i++).Value = s;
                 }
+
+
+
+                //将第1列读者证条码设为文本格式
+                ws.Column(2).Style.NumberFormat.Format = "@";
+
                 index = 0;
                 // 把没有数据的馆藏地显示在下方
                 foreach (PatronGroup one in types)
@@ -2520,9 +2528,6 @@ namespace dp2mini
 
                 // 设置excel格式
                 this.SetExcelStyle(ws, index + 1, titles.Length);
-
-                //将第1列读者证条码设为文本格式
-                ws.Column(2).Style.NumberFormat.Format = "@";
 
                 //保存excel
                 this._workbook.SaveAs(this.ExcelFileName);
@@ -4069,6 +4074,32 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
             }
         }
 
+        public Hashtable _readerDb2LibCode = null;
+
+        public string GetLibraryCode(string readerdb)
+        {
+            if (readerdb.IndexOf("/")!=-1)
+                readerdb=readerdb.Substring(0,readerdb.IndexOf("/"));
+
+            if (this._readerDb2LibCode == null)
+            {
+                this._readerDb2LibCode = new Hashtable();
+                XmlNodeList list =this.LibraryDom.DocumentElement.SelectNodes("readerdbgroup/database");
+                foreach (XmlNode node in list)
+                {
+                    string name=DomUtil.GetAttr(node, "name");
+                    string libraryCode = DomUtil.GetAttr(node, "libraryCode");
+                    this._readerDb2LibCode[name] = libraryCode;
+                }
+            }
+
+            var libcode= this._readerDb2LibCode[readerdb];
+            if (libcode == null)
+                libcode = "";
+
+            return (string)libcode;
+        }
+
         private void button_patronBarcode_Click(object sender, EventArgs e)
         {
             // 空2行
@@ -4106,6 +4137,8 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
                             continue;
                         }
 
+                        string libraryCode = this.GetLibraryCode(item.path);
+
                         /// <param name="strLibraryCode">馆代码</param>
                         /// <param name="strBarcode">条码号</param>
                         /// <param name="strError">返回出错信息</param>
@@ -4113,7 +4146,7 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
                         /// <para>-1:   出错</para>
                         /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
                         // 校验册条码
-                        long lRet = channel.VerifyBarcode("",
+                        long lRet = channel.VerifyBarcode(libraryCode,//item.libraryCode, //xml中的馆代码不可靠
                             item.barcode,
                             out strError);
                         if (lRet == -1)
@@ -4122,7 +4155,7 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
                             return;
                         }
                         // 不合法
-                        if (lRet == 0 || lRet == 1)
+                        if (lRet != 1)
                         {
                             errorCount++;
                             if (errorCount == 1)
@@ -4134,14 +4167,18 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
                             if (lRet == 0)
                             {
                                 //仅输出到文件
-                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + strError);
-                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + strError, true, false);
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode + "\t" + strError);
                             }
-                            else if (lRet == 1)
+                            else if (lRet == 2)
                             {
                                 //仅输出到文件
-                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + "与读者证规则冲突");
-                                //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + "与读者证规则冲突", true, false);
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode + "\t" + "与读者证规则冲突");
+                            }
+                            else
+                            {
+                                //仅输出到文件
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode + "\t" + "不明原因");
+
                             }
                         }
 
