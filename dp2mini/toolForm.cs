@@ -1000,7 +1000,9 @@ namespace dp2mini
                         /// <para>-1:   出错</para>
                         /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
                         // 校验册条码
-                        long lRet = channel.VerifyBarcode(item.location,
+                        string location = item.location;
+                        location = GetPureLocationString(location); // 2022/1/4 处理馆藏地有预约的形态：图书馆,#reservation
+                        long lRet = channel.VerifyBarcode(location,
                             item.barcode,
                             out strError);
                         if (lRet == -1)
@@ -4216,6 +4218,34 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
             DateTime end = DateTime.Now;
             this.OutputInfo(GetInfoAddTime("==结束校验读者条码,详见txt文件,用时" + this.GetSeconds(start, end) + "秒==", end));
 
+        }
+
+
+        // 只返回馆藏地点字段内容中的纯粹馆藏地点字符串
+        // 返回非 #xxx 的第一个子串
+        public static string GetPureLocationString(string strLocation)
+        {
+            if (string.IsNullOrEmpty(strLocation) == true)
+                return "";
+
+            // 去掉 #xxx, 部分
+            if (strLocation.IndexOf("#") != -1)
+            {
+                string[] parts = strLocation.Split(new char[] { ',' });
+                foreach (string s in parts)
+                {
+                    string strText = s.Trim();
+                    if (string.IsNullOrEmpty(strText) == true)
+                        continue;
+                    if (strText[0] == '#')
+                        continue;
+                    return strText;
+                }
+
+                return "";
+            }
+
+            return strLocation;
         }
     }
 
