@@ -986,10 +986,14 @@ namespace dp2mini
                         index++;
                         this.OutputInfo("校验册条码第" + index.ToString(), false, true);
 
+                        string location = item.location;
+                        location = GetPureLocationString(location); // 2022/1/4 处理馆藏地有预约的形态：图书馆,#reservation
+
+
                         // 空条码专门处理一下
                         if (string.IsNullOrEmpty(item.barcode) == true)
                         {
-                            emptyList.Add(item.path);
+                            emptyList.Add(item.path+"\t"+location);  //把馆藏地也输出一下
                             continue;
                         }
 
@@ -1000,8 +1004,6 @@ namespace dp2mini
                         /// <para>-1:   出错</para>
                         /// <para>0/1/2:    分别对应“不合法的标码号”/“合法的读者证条码号”/“合法的册条码号”</para>
                         // 校验册条码
-                        string location = item.location;
-                        location = GetPureLocationString(location); // 2022/1/4 处理馆藏地有预约的形态：图书馆,#reservation
                         long lRet = channel.VerifyBarcode(location,
                             item.barcode,
                             out strError);
@@ -1024,13 +1026,13 @@ namespace dp2mini
                             if (lRet == 0)
                             {
                                 //仅输出到文件
-                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + strError);
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode + "\t" +item.location);// + "\t" + strError);
                                 //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + strError, true, false);
                             }
                             else if (lRet == 1)
                             {
                                 //仅输出到文件
-                                this.OnlyOutput2File(item.path + "\t" + item.barcode);// + "\t" + "与读者证规则冲突");
+                                this.OnlyOutput2File(item.path + "\t" + item.barcode + "\t" +item.location);// + "\t" + "与读者证规则冲突");
                                 //this.OutputInfo(item.path + "\t" + item.barcode + "\t" + "与读者证规则冲突", true, false);
                             }
                         }
@@ -1100,7 +1102,8 @@ namespace dp2mini
 
                 Application.DoEvents();
 
-                string retLine = path + "\t" + price;
+                string location = GetPureLocationString(item.location);
+                string retLine = path + "\t" + price + "\t" + location;
 
                 if (price == "")
                 {
@@ -1618,7 +1621,10 @@ namespace dp2mini
             //左右有空格的
             List<string> hasKgList = new List<string>();
 
+            // 左边错误
             List<string> leftWrongList = new List<string>();
+
+            // 右边错误
             List<string> rightWrongList = new List<string>();
 
             // 其它
@@ -1640,7 +1646,8 @@ namespace dp2mini
                 if (accessNo == null)
                     accessNo = "";
 
-                string retLine = path + "\t" + accessNo;
+                string location = GetPureLocationString(item.location);
+                string retLine = path + "\t" + accessNo+"\t"+ location;
 
                 // 无索取号的
                 if (accessNo == "")
@@ -4385,6 +4392,13 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
         public string name { get; set; }
 
         public string canBorrow { get; set; }
+    }
+
+    public class simpleItem
+    {
+        public string barcode { get; set; }
+
+        public string location { get; set; }
     }
 
     }

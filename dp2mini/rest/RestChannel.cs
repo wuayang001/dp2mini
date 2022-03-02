@@ -455,6 +455,8 @@ namespace DigitalPlatform.LibraryRestClient
             long nRet = 0;
             try
             {
+                REDO:
+
                 CookieAwareWebClient client = this.GetClient();
 
 
@@ -471,6 +473,20 @@ namespace DigitalPlatform.LibraryRestClient
                 VerifyBarcodeResponse response = Deserialize<VerifyBarcodeResponse>(strResult);
                 nRet = response.VerifyBarcodeResult.Value;
                 strError = response.VerifyBarcodeResult.ErrorInfo;
+
+                // 未登录时，按需登录
+                if (response.VerifyBarcodeResult.Value == -1
+                    && response.VerifyBarcodeResult.ErrorCode == ErrorCode.NotLogin)
+                {
+                    if (DoNotLogin(ref strError) == 1)
+                        goto REDO;
+
+                    // 把按需登录的错误信息包括进去
+                    if (string.IsNullOrEmpty(strError) == false)
+                    {
+                        response.VerifyBarcodeResult.ErrorInfo += "\r\n" + strError;
+                    }
+                }
 
                 return nRet;
             }
@@ -1195,7 +1211,8 @@ namespace DigitalPlatform.LibraryRestClient
                 // 未登录的情况
 
 
-                if (response.BorrowResult.Value == -1 && response.BorrowResult.ErrorCode == ErrorCode.NotLogin)
+                if (response.BorrowResult.Value == -1 
+                    && response.BorrowResult.ErrorCode == ErrorCode.NotLogin)
                 {
                     if (DoNotLogin(ref strError) == 1)
                         goto REDO;
