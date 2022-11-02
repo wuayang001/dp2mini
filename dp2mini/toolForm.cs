@@ -669,6 +669,7 @@ namespace dp2mini
                        "left",
                        "test",
                        "",
+                       "",//strLocationFilter
                        out output,
                        out strError);
                     if (lRet == -1)
@@ -805,6 +806,7 @@ namespace dp2mini
                        "__id",
                        "left",
                        "myresult",
+                       "",//strSearchStyle
                        "id,xml",
                        out strError);
                     if (lRet == -1)

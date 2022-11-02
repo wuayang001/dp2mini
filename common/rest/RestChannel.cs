@@ -1668,7 +1668,7 @@ namespace DigitalPlatform.LibraryRestClient
             string strMatchStyle,
             string strResultSetName,
              string strOutputStyle,
-             string filter,
+             string strLocationFilter,
             out string strQueryXml,
             out string strError)
         {
@@ -1695,7 +1695,7 @@ namespace DigitalPlatform.LibraryRestClient
                 request.strSearchStyle = "";// "desc";
                 request.strOutputStyle = strOutputStyle;
 
-                request.strLocationFilter = filter;
+                request.strLocationFilter = strLocationFilter;
 
                 byte[] baData = Encoding.UTF8.GetBytes(Serialize(request));
 

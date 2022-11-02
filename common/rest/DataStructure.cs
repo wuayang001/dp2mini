@@ -177,25 +177,133 @@ namespace DigitalPlatform.LibraryRestClient
 
     #endregion
 
+
+
+    #region SearchCharging
+
+
     /*
-        LibraryServerResult SearchItem(
-            string strItemDbName,
-            string strQueryWord,
-            int nPerMax,
-
-            string strFrom,
-            string strMatchStyle,
-            string strLang,
-
-            string strResultSetName,
-            string strSearchStyle,
-            string strOutputStyle);
-
+        // parameters:
+        //      actions noResult 表示不返回 results，只返回 result.Value(totalCount)
+        public LibraryServerResult SearchCharging(
+            string patronBarcode,
+            string timeRange,
+            string actions,
+            string order,
+            long start,
+            long count,
+            out ChargingItemWrapper[] results) 
      */
+
+    // SearchItemRequest
+    [DataContract]
+    public class SearchChargingRequest
+    {
+        [DataMember]
+        public string patronBarcode { get; set; }
+
+        [DataMember]
+        public string timeRange { get; set; }
+
+
+        [DataMember]
+        public string actions { get; set; }
+
+        [DataMember]
+        public string order { get; set; }
+
+        [DataMember]
+        public long lStart { get; set; }
+
+        [DataMember]
+        public long lCount { get; set; }
+
+    }
+
+
+    //SearchItemResult
+    [DataContract]
+    public class SearchChargingResponse
+    {
+        [DataMember]
+        public LibraryServerResult SearchChargingResult { get; set; }
+
+        [DataMember]
+        public ChargingItemWrapper[] results { get; set; }
+
+    }
+
+    [DataContract(Namespace = "http://dp2003.com/dp2library/")]
+    public class ChargingItemWrapper
+    {
+        // 基本 Item
+        [DataMember]
+        public ChargingItem Item { get; set; }
+
+        // 相关的 Item。比如一个 return 动作的 item 就可能具有一个 borrow 动作的 item
+        [DataMember]
+        public ChargingItem RelatedItem { get; set; }
+    }
+
+    [DataContract(Namespace = "http://dp2003.com/dp2library/")]
+    public class ChargingItem
+    {
+        [DataMember]
+        public string Id { get; set; }
+
+        [DataMember]
+        public string LibraryCode { get; set; } // 访问者的图书馆代码
+        [DataMember]
+        public string Operation { get; set; } // 操作名
+        [DataMember]
+        public string Action { get; set; }  // 动作
+
+        [DataMember]
+        public string ItemBarcode { get; set; }
+        [DataMember]
+        public string PatronBarcode { get; set; }
+        [DataMember]
+        public string BiblioRecPath { get; set; }
+
+        [DataMember]
+        public string Period { get; set; }  // 期限
+        [DataMember]
+        public string No { get; set; }  // 续借次，序号
+
+        // 2017/5/22
+        [DataMember]
+        public string Volume { get; set; }  // 卷册
+
+        [DataMember]
+        public string ClientAddress { get; set; }  // 访问者的IP地址
+
+        [DataMember]
+        public string Operator { get; set; }  // 操作者(访问者)
+        [DataMember]
+        public string OperTime { get; set; } // 操作时间。? 格式
+
+    }
+    #endregion
+
 
     #region SearchItem
 
-    // SearchBiblioRequest
+    /*
+    LibraryServerResult SearchItem(
+        string strItemDbName,
+        string strQueryWord,
+        int nPerMax,
+
+        string strFrom,
+        string strMatchStyle,
+        string strLang,
+
+        string strResultSetName,
+        string strSearchStyle,
+        string strOutputStyle);
+
+ */
+    // SearchItemRequest
     [DataContract]
     public class SearchItemRequest
     {
@@ -793,8 +901,9 @@ LibraryServerResult.ErrorInfo		出错信息
 
     #endregion
 
+    
+    #region GetBiblioInfos  2022/10新增
 
-    #region GetBiblioInfos
 
     [DataContract]
     public class GetBiblioInfosRequest
