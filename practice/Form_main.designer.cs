@@ -139,6 +139,20 @@
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.通用练习题ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.tabPage_SearchCharging = new System.Windows.Forms.TabPage();
+            this.button_SearchCharging_begin = new System.Windows.Forms.Button();
+            this.textBox_SearchCharging_timeRange = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.textBox_searchCharging_count = new System.Windows.Forms.TextBox();
+            this.label42 = new System.Windows.Forms.Label();
+            this.textBox_searchCharging_start = new System.Windows.Forms.TextBox();
+            this.textBox_SearchCharging_patronBarcode = new System.Windows.Forms.TextBox();
+            this.label43 = new System.Windows.Forms.Label();
+            this.label44 = new System.Windows.Forms.Label();
+            this.textBox_searchCharging_order = new System.Windows.Forms.TextBox();
+            this.label45 = new System.Windows.Forms.Label();
+            this.textBox_searchCharging_actions = new System.Windows.Forms.TextBox();
+            this.label46 = new System.Windows.Forms.Label();
             this.tabPage_SearchBiblio.SuspendLayout();
             this.tabPage_Server.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -154,6 +168,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.tabPage_SearchCharging.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage_SearchBiblio
@@ -180,7 +195,7 @@
             this.tabPage_SearchBiblio.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SearchBiblio.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.tabPage_SearchBiblio.Name = "tabPage_SearchBiblio";
-            this.tabPage_SearchBiblio.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_SearchBiblio.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_SearchBiblio.TabIndex = 3;
             this.tabPage_SearchBiblio.Text = "SearchBiblio";
             this.tabPage_SearchBiblio.UseVisualStyleBackColor = true;
@@ -542,6 +557,7 @@
             this.tabControl1.Controls.Add(this.tabPage_GetBiblioInfos);
             this.tabControl1.Controls.Add(this.tabPage_Reservation);
             this.tabControl1.Controls.Add(this.tabPage_SetBiblioInfo);
+            this.tabControl1.Controls.Add(this.tabPage_SearchCharging);
             this.tabControl1.Location = new System.Drawing.Point(14, 13);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.tabControl1.Name = "tabControl1";
@@ -570,7 +586,7 @@
             this.tabPage_SearchItem.Controls.Add(this.label41);
             this.tabPage_SearchItem.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SearchItem.Name = "tabPage_SearchItem";
-            this.tabPage_SearchItem.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_SearchItem.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_SearchItem.TabIndex = 9;
             this.tabPage_SearchItem.Text = "SearchItem";
             this.tabPage_SearchItem.UseVisualStyleBackColor = true;
@@ -857,7 +873,7 @@
             this.tabPage_GetBiblioInfo.Location = new System.Drawing.Point(10, 48);
             this.tabPage_GetBiblioInfo.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_GetBiblioInfo.Name = "tabPage_GetBiblioInfo";
-            this.tabPage_GetBiblioInfo.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_GetBiblioInfo.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_GetBiblioInfo.TabIndex = 5;
             this.tabPage_GetBiblioInfo.Text = "GetBiblioInfo";
             this.tabPage_GetBiblioInfo.UseVisualStyleBackColor = true;
@@ -932,7 +948,7 @@
             this.tabPage_GetBiblioInfos.Location = new System.Drawing.Point(10, 48);
             this.tabPage_GetBiblioInfos.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_GetBiblioInfos.Name = "tabPage_GetBiblioInfos";
-            this.tabPage_GetBiblioInfos.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_GetBiblioInfos.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_GetBiblioInfos.TabIndex = 6;
             this.tabPage_GetBiblioInfos.Text = "GetBiblioInfos";
             this.tabPage_GetBiblioInfos.UseVisualStyleBackColor = true;
@@ -999,7 +1015,7 @@
             this.tabPage_Reservation.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_Reservation.Name = "tabPage_Reservation";
             this.tabPage_Reservation.Padding = new System.Windows.Forms.Padding(5);
-            this.tabPage_Reservation.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_Reservation.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_Reservation.TabIndex = 7;
             this.tabPage_Reservation.Text = "Reservation";
             // 
@@ -1102,7 +1118,7 @@
             this.tabPage_SetBiblioInfo.Controls.Add(this.label25);
             this.tabPage_SetBiblioInfo.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SetBiblioInfo.Name = "tabPage_SetBiblioInfo";
-            this.tabPage_SetBiblioInfo.Size = new System.Drawing.Size(1433, 686);
+            this.tabPage_SetBiblioInfo.Size = new System.Drawing.Size(1433, 695);
             this.tabPage_SetBiblioInfo.TabIndex = 8;
             this.tabPage_SetBiblioInfo.Text = "SetBiblioInfo";
             this.tabPage_SetBiblioInfo.UseVisualStyleBackColor = true;
@@ -1195,7 +1211,7 @@
             this.textBox_biblio.Multiline = true;
             this.textBox_biblio.Name = "textBox_biblio";
             this.textBox_biblio.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_biblio.Size = new System.Drawing.Size(621, 541);
+            this.textBox_biblio.Size = new System.Drawing.Size(621, 550);
             this.textBox_biblio.TabIndex = 48;
             // 
             // label26
@@ -1366,6 +1382,148 @@
             this.splitContainer1.SplitterDistance = 789;
             this.splitContainer1.TabIndex = 21;
             // 
+            // tabPage_SearchCharging
+            // 
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_searchCharging_order);
+            this.tabPage_SearchCharging.Controls.Add(this.label45);
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_searchCharging_actions);
+            this.tabPage_SearchCharging.Controls.Add(this.label46);
+            this.tabPage_SearchCharging.Controls.Add(this.button_SearchCharging_begin);
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_SearchCharging_timeRange);
+            this.tabPage_SearchCharging.Controls.Add(this.label33);
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_searchCharging_count);
+            this.tabPage_SearchCharging.Controls.Add(this.label42);
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_searchCharging_start);
+            this.tabPage_SearchCharging.Controls.Add(this.textBox_SearchCharging_patronBarcode);
+            this.tabPage_SearchCharging.Controls.Add(this.label43);
+            this.tabPage_SearchCharging.Controls.Add(this.label44);
+            this.tabPage_SearchCharging.Location = new System.Drawing.Point(10, 48);
+            this.tabPage_SearchCharging.Name = "tabPage_SearchCharging";
+            this.tabPage_SearchCharging.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_SearchCharging.TabIndex = 10;
+            this.tabPage_SearchCharging.Text = "SearchCharging";
+            this.tabPage_SearchCharging.UseVisualStyleBackColor = true;
+            // 
+            // button_SearchCharging_begin
+            // 
+            this.button_SearchCharging_begin.Location = new System.Drawing.Point(416, 470);
+            this.button_SearchCharging_begin.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.button_SearchCharging_begin.Name = "button_SearchCharging_begin";
+            this.button_SearchCharging_begin.Size = new System.Drawing.Size(297, 68);
+            this.button_SearchCharging_begin.TabIndex = 46;
+            this.button_SearchCharging_begin.Tag = "";
+            this.button_SearchCharging_begin.Text = "begin";
+            this.button_SearchCharging_begin.UseVisualStyleBackColor = true;
+            this.button_SearchCharging_begin.Click += new System.EventHandler(this.button_SearchCharging_begin_Click);
+            // 
+            // textBox_SearchCharging_timeRange
+            // 
+            this.textBox_SearchCharging_timeRange.Location = new System.Drawing.Point(416, 144);
+            this.textBox_SearchCharging_timeRange.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_SearchCharging_timeRange.Name = "textBox_SearchCharging_timeRange";
+            this.textBox_SearchCharging_timeRange.Size = new System.Drawing.Size(409, 42);
+            this.textBox_SearchCharging_timeRange.TabIndex = 44;
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(104, 152);
+            this.label33.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(148, 30);
+            this.label33.TabIndex = 45;
+            this.label33.Text = "timeRange";
+            // 
+            // textBox_searchCharging_count
+            // 
+            this.textBox_searchCharging_count.Location = new System.Drawing.Point(416, 382);
+            this.textBox_searchCharging_count.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_searchCharging_count.Name = "textBox_searchCharging_count";
+            this.textBox_searchCharging_count.Size = new System.Drawing.Size(409, 42);
+            this.textBox_searchCharging_count.TabIndex = 42;
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(104, 391);
+            this.label42.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(103, 30);
+            this.label42.TabIndex = 43;
+            this.label42.Text = "lCount";
+            // 
+            // textBox_searchCharging_start
+            // 
+            this.textBox_searchCharging_start.Location = new System.Drawing.Point(416, 326);
+            this.textBox_searchCharging_start.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_searchCharging_start.Name = "textBox_searchCharging_start";
+            this.textBox_searchCharging_start.Size = new System.Drawing.Size(409, 42);
+            this.textBox_searchCharging_start.TabIndex = 40;
+            // 
+            // textBox_SearchCharging_patronBarcode
+            // 
+            this.textBox_SearchCharging_patronBarcode.Location = new System.Drawing.Point(416, 86);
+            this.textBox_SearchCharging_patronBarcode.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_SearchCharging_patronBarcode.Name = "textBox_SearchCharging_patronBarcode";
+            this.textBox_SearchCharging_patronBarcode.Size = new System.Drawing.Size(409, 42);
+            this.textBox_SearchCharging_patronBarcode.TabIndex = 38;
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(104, 326);
+            this.label43.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(103, 30);
+            this.label43.TabIndex = 41;
+            this.label43.Text = "lStart";
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Location = new System.Drawing.Point(104, 86);
+            this.label44.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(208, 30);
+            this.label44.TabIndex = 39;
+            this.label44.Text = "patronBarcode";
+            // 
+            // textBox_searchCharging_order
+            // 
+            this.textBox_searchCharging_order.Location = new System.Drawing.Point(416, 260);
+            this.textBox_searchCharging_order.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_searchCharging_order.Name = "textBox_searchCharging_order";
+            this.textBox_searchCharging_order.Size = new System.Drawing.Size(409, 42);
+            this.textBox_searchCharging_order.TabIndex = 49;
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(104, 268);
+            this.label45.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(88, 30);
+            this.label45.TabIndex = 50;
+            this.label45.Text = "order";
+            // 
+            // textBox_searchCharging_actions
+            // 
+            this.textBox_searchCharging_actions.Location = new System.Drawing.Point(416, 202);
+            this.textBox_searchCharging_actions.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
+            this.textBox_searchCharging_actions.Name = "textBox_searchCharging_actions";
+            this.textBox_searchCharging_actions.Size = new System.Drawing.Size(409, 42);
+            this.textBox_searchCharging_actions.TabIndex = 47;
+            // 
+            // label46
+            // 
+            this.label46.AutoSize = true;
+            this.label46.Location = new System.Drawing.Point(104, 202);
+            this.label46.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label46.Name = "label46";
+            this.label46.Size = new System.Drawing.Size(118, 30);
+            this.label46.TabIndex = 48;
+            this.label46.Text = "actions";
+            // 
             // Form_main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
@@ -1405,6 +1563,8 @@
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.tabPage_SearchCharging.ResumeLayout(false);
+            this.tabPage_SearchCharging.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1522,6 +1682,20 @@
         private System.Windows.Forms.TextBox searchItem_strQueryWord;
         private System.Windows.Forms.Label label40;
         private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.TabPage tabPage_SearchCharging;
+        private System.Windows.Forms.Button button_SearchCharging_begin;
+        private System.Windows.Forms.TextBox textBox_SearchCharging_timeRange;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox textBox_searchCharging_count;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.TextBox textBox_searchCharging_start;
+        private System.Windows.Forms.TextBox textBox_SearchCharging_patronBarcode;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.TextBox textBox_searchCharging_order;
+        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.TextBox textBox_searchCharging_actions;
+        private System.Windows.Forms.Label label46;
     }
 }
 

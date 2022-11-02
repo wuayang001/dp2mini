@@ -1747,14 +1747,14 @@ namespace DigitalPlatform.LibraryRestClient
 
          */
         public long SearchItem(string strItemDbName,
-    string strQueryWord,
-    int nPerMax,
-    string strFrom,
-    string strMatchStyle,
-    string strResultSetName,
-    string strSearchStyle,
-     string strOutputStyle,
-    out string strError)
+            string strQueryWord,
+            int nPerMax,
+            string strFrom,
+            string strMatchStyle,
+            string strResultSetName,
+            string strSearchStyle,
+             string strOutputStyle,
+            out string strError)
         {
             strError = "";
         REDO:
@@ -1803,6 +1803,76 @@ namespace DigitalPlatform.LibraryRestClient
                 // this.ErrorCode = response.SearchBiblioResult.ErrorCode;
                 this.ClearRedoCount();
                 return response.SearchItemResult.Value;
+            }
+            catch (Exception ex)
+            {
+                int nRet = ConvertWebError(ex, out strError);
+                if (nRet == 0)
+                    return -1;
+                goto REDO;
+            }
+
+        }
+
+
+        public long SearchCharging(string patronBarcode,
+    string timeRange,
+    string actions,
+    string order,
+    long lStart,
+    long lCount,
+    out ChargingItemWrapper[] chargeItems,
+    out string strError)
+        {
+            strError = "";
+            chargeItems = null;
+        REDO:
+            try
+            {
+
+                //CookieAwareWebClient client = new CookieAwareWebClient(this.Cookies);
+                //client.Headers["Content-type"] = "application/json; charset=utf-8";
+                //client.Headers["User-Agent"] = "dp2LibraryClient";
+                CookieAwareWebClient client = this.GetClient();
+
+                SearchChargingRequest request = new SearchChargingRequest();
+                request.patronBarcode = patronBarcode;
+                request.timeRange = timeRange;
+                request.actions = actions;
+                request.order = order;
+                request.lStart = lStart;
+                request.lCount = lCount;
+
+
+
+                byte[] baData = Encoding.UTF8.GetBytes(Serialize(request));
+                string strRequest = Encoding.UTF8.GetString(baData);
+
+                // 调接口
+                byte[] result = client.UploadData(this.GetRestfulApiUrl("SearchCharging"),
+                                "POST",
+                                 baData);
+
+                string strResult = Encoding.UTF8.GetString(result);
+
+                SearchChargingResponse response = Deserialize<SearchChargingResponse>(strResult);
+
+                // 未登录的情况
+                if (response.SearchChargingResult.Value == -1
+                    && response.SearchChargingResult.ErrorCode == ErrorCode.NotLogin)
+                {
+                    if (DoNotLogin(ref strError) == 1)
+                        goto REDO;
+
+                    return -1;
+                }
+                strError = response.SearchChargingResult.ErrorInfo;
+                // this.ErrorCode = response.SearchBiblioResult.ErrorCode;
+                this.ClearRedoCount();
+
+                // 检索到的借阅历史
+                chargeItems = response.results;
+                return response.SearchChargingResult.Value;
             }
             catch (Exception ex)
             {

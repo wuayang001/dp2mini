@@ -551,6 +551,65 @@ public long SearchItem(string strItemDbName,
                 this._channelPool.ReturnChannel(channel);
             }
         }
+
+        private void button_SearchCharging_begin_Click(object sender, EventArgs e)
+        {
+            this.textBox_result.Text = "";
+
+            RestChannel channel = this.GetChannel();
+            try
+            {
+                
+                string strStart = this.textBox_searchCharging_start.Text.Trim();
+                if (strStart == "")
+                    strStart = "0";
+                long start = Convert.ToInt64(strStart);
+
+                string strCount = this.textBox_searchCharging_count.Text.Trim();
+                if (strCount == "")
+                    strCount = "10";
+                long count = Convert.ToInt64(strCount);
+
+                ChargingItemWrapper[] itemWarpperList = null;
+
+                //SearchBiblioResponse response 
+                long lRet = channel.SearchCharging(this.textBox_SearchCharging_patronBarcode.Text.Trim(),
+                    this.textBox_SearchCharging_timeRange.Text.Trim(),
+                    this.textBox_searchCharging_actions.Text.Trim(),
+                    this.textBox_searchCharging_order.Text.Trim(),
+                    start,
+                    count,
+                    out itemWarpperList,
+                    out string strError);
+                if (lRet == -1)
+                {
+                    this.textBox_result.Text = "error:" + strError;
+                }
+                else
+                {
+                    this.textBox_result.Text = "count:" + lRet;
+
+                    if (itemWarpperList != null && itemWarpperList.Length > 0)
+                    {
+                        string temp = "";
+                        foreach (ChargingItemWrapper one in itemWarpperList)
+                        {
+                            temp += one.Item.ItemBarcode + "\r\n";
+                        }
+
+                        this.textBox_result.Text+= temp;
+                    }
+
+                    
+                }
+
+
+            }
+            finally
+            {
+                this._channelPool.ReturnChannel(channel);
+            }
+        }
     }
 
 
