@@ -96,57 +96,68 @@ namespace DigitalPlatform.ChargingAnalysis
         // times：操作时间范围 2022/11/01~2022/11/01 11:00
         public void Build(string patronBarcode, string times)
         {
-
             // 先清空内存集合
             this._chargeItems.Clear(); 
 
             RestChannel channel = this.GetChannel();
             try
             {
-                // todo 要做成死循环
-                string strStart = "";// this.textBox_searchCharging_start.Text.Trim();
-                if (strStart == "")
-                    strStart = "0";
-                long start = Convert.ToInt64(strStart);
-
-                string strCount = "";// this.textBox_searchCharging_count.Text.Trim();
-                if (strCount == "")
-                    strCount = "-1";
-                long count = Convert.ToInt64(strCount);
-
                 ChargingItemWrapper[] itemWarpperList = null;
 
-                //SearchBiblioResponse response 
-                long lRet = channel.SearchCharging(patronBarcode,//this.textBox_SearchCharging_patronBarcode.Text.Trim(),
-                    times,
-                    "return,lost", //this.textBox_searchCharging_actions.Text.Trim(),
-                    "",//this.textBox_searchCharging_order.Text.Trim(),
-                    start,
-                    count,
-                    out itemWarpperList,
-                    out string strError); ;
-                if (lRet == -1)
+                long lHitCount = 0;
+                long start = 0;
+                long count = 2;   // 每次固定取几笔 //lHitCount;
+                long lRet = 0;
+                string strError = "";
+
+                // 从结果集中取出册记录
+                for (; ; )
                 {
-                    throw new Exception(strError); //直接抛出异常
+                    //Application.DoEvents(); // 出让界面控制权
+
+                    //token.ThrowIfCancellationRequested();
+                    //SearchBiblioResponse response 
+                     lRet = channel.SearchCharging(patronBarcode,//this.textBox_SearchCharging_patronBarcode.Text.Trim(),
+                        times,
+                        "return,lost", //this.textBox_searchCharging_actions.Text.Trim(),
+                        "",//this.textBox_searchCharging_order.Text.Trim(),
+                        start,
+                        count,
+                        out itemWarpperList,
+                        out  strError); ;
+                    if (lRet == -1)
+                    {
+                        throw new Exception(strError); //直接抛出异常
+                    }
+
+                    // 说明结果集里的记录获取完了。
+                    if (lRet == 0)
+                    {
+                        break;
+                    }
+
+                    if (itemWarpperList != null && itemWarpperList.Length > 0)
+                    {
+                        // 增加到内存集合中
+                        this._chargeItems.AddRange(itemWarpperList);
+
+                        //string temp = "";
+                        //foreach (ChargingItemWrapper one in itemWarpperList)
+                        //{
+                        //    temp += one.Item.ItemBarcode + "\r\n";
+                        //}
+
+                        //this.textBox_result.Text += temp;
+                    }
+
+                    start += itemWarpperList.Length;
+                    count -= itemWarpperList.Length;
+
+                    if (start >= lHitCount || count <= 0)
+                        break;
                 }
-
-
 
                 //this.textBox_result.Text = "count:" + lRet;
-
-                if (itemWarpperList != null && itemWarpperList.Length > 0)
-                {
-                    // 增加到内存集合中
-                    this._chargeItems.AddRange(itemWarpperList);
-
-                    //string temp = "";
-                    //foreach (ChargingItemWrapper one in itemWarpperList)
-                    //{
-                    //    temp += one.Item.ItemBarcode + "\r\n";
-                    //}
-
-                    //this.textBox_result.Text += temp;
-                }
             }
             finally
             {
