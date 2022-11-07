@@ -213,10 +213,10 @@ namespace DigitalPlatform.LibraryRestClient
         public string order { get; set; }
 
         [DataMember]
-        public long lStart { get; set; }
+        public long start { get; set; }
 
         [DataMember]
-        public long lCount { get; set; }
+        public long count { get; set; }
 
     }
 

@@ -1819,8 +1819,8 @@ namespace DigitalPlatform.LibraryRestClient
     string timeRange,
     string actions,
     string order,
-    long lStart,
-    long lCount,
+    long start,
+    long count,
     out ChargingItemWrapper[] chargeItems,
     out string strError)
         {
@@ -1840,8 +1840,8 @@ namespace DigitalPlatform.LibraryRestClient
                 request.timeRange = timeRange;
                 request.actions = actions;
                 request.order = order;
-                request.lStart = lStart;
-                request.lCount = lCount;
+                request.start = start;
+                request.count = count;
 
 
 

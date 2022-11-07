@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "practice", "practice\practi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestMarc", "UnitTestMarc\UnitTestMarc.csproj", "{47409D05-31B8-46EB-8A45-4C8507BBAF67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalPlatform.ChargingAnalysis", "DigitalPlatform.ChargingAnalysis\DigitalPlatform.ChargingAnalysis.csproj", "{7BDA9E0F-E5B5-4EFE-BA12-2B5B51B5242E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{47409D05-31B8-46EB-8A45-4C8507BBAF67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47409D05-31B8-46EB-8A45-4C8507BBAF67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47409D05-31B8-46EB-8A45-4C8507BBAF67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BDA9E0F-E5B5-4EFE-BA12-2B5B51B5242E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BDA9E0F-E5B5-4EFE-BA12-2B5B51B5242E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BDA9E0F-E5B5-4EFE-BA12-2B5B51B5242E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BDA9E0F-E5B5-4EFE-BA12-2B5B51B5242E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -225,6 +225,7 @@ namespace practice
             }
         }
 
+
         #endregion
 
 
@@ -599,11 +600,7 @@ public long SearchItem(string strItemDbName,
 
                         this.textBox_result.Text+= temp;
                     }
-
-                    
                 }
-
-
             }
             finally
             {

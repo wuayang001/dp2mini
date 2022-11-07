@@ -798,6 +798,16 @@ namespace dp2mini
         {
             EnsureChildForm<toolForm>(true);
         }
+
+        private void toolStripLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton_chargingAnalysis_Click(object sender, EventArgs e)
+        {
+            EnsureChildForm<TransferStatisForm>(true);
+        }
     }
 
 }
