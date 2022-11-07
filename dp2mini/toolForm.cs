@@ -927,11 +927,15 @@ namespace dp2mini
                         if (lStart >= lHitCount || lCount <= 0)
                             break;
                     }
+
+
                 }
                 finally
                 {
                     this._mainForm.ReturnChannel(channel);
                 }
+
+
             }
             finally
             {
