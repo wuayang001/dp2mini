@@ -34,11 +34,14 @@ namespace DigitalPlatform.ChargingAnalysis
             }
         }
 
-        public void Init(string serverUrl,string userName,string passowrd)
+        public void Init(string serverUrl, string userName, string passowrd, string loginParameters)
         {
             this.dp2ServerUrl = serverUrl;
             this.dp2Username = userName;
             this.dp2Password = passowrd;
+            this.dp2LoginParameters = loginParameters;
+            this._channelPool.BeforeLogin -= channelPool_BeforeLogin;
+            this._channelPool.BeforeLogin += channelPool_BeforeLogin;
         }
 
         #endregion
@@ -50,6 +53,9 @@ namespace DigitalPlatform.ChargingAnalysis
         public string dp2ServerUrl { get; set; }
         public string dp2Username { get; set; }
         public string dp2Password { get; set; }
+
+        public string dp2LoginParameters { get; set; }
+
         void channelPool_BeforeLogin(object sender, BeforeLoginEventArgs e)
         {
             if (string.IsNullOrEmpty(this.dp2Username))
@@ -60,7 +66,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
             e.LibraryServerUrl = this.dp2ServerUrl;
             e.UserName = this.dp2Username;
-            e.Parameters = "type=worker,client=dp2analysis|0.01";
+            e.Parameters = dp2LoginParameters;//"type=worker,client=dp2analysis|0.01";
             e.Password = this.dp2Password;
             //e.SavePasswordLong = true;
         }
@@ -176,7 +182,7 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 foreach (ChargingItemWrapper one in this._chargeItems)
                 {
-                    report+= one.Item.ItemBarcode +"-"+one.Item.Operator+ "\n";
+                    report+= one.Item.ItemBarcode +"-"+one.Item.Operator+ "\r\n";
 
                 }
             }

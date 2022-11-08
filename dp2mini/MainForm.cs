@@ -806,7 +806,7 @@ namespace dp2mini
 
         private void toolStripButton_chargingAnalysis_Click(object sender, EventArgs e)
         {
-            EnsureChildForm<TransferStatisForm>(true);
+            EnsureChildForm<chargingAnalysisForm>(true);
         }
     }
 

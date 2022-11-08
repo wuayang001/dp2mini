@@ -287,6 +287,12 @@
     <Compile Include="MarcQuery\MarcRecord.cs" />
     <Compile Include="MarcQuery\MarcSubfield.cs" />
     <Compile Include="MarcQuery\NaviItem.cs" />
+    <Compile Include="chargingAnalysisForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="chargingAnalysisForm.designer.cs">
+      <DependentUpon>chargingAnalysisForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="WarnDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -383,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NoteForm.resx">
       <DependentUpon>NoteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="chargingAnalysisForm.resx">
+      <DependentUpon>chargingAnalysisForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WarnDlg.resx">
       <DependentUpon>WarnDlg.cs</DependentUpon>
