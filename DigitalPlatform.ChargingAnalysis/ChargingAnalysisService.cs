@@ -3,6 +3,7 @@ using DigitalPlatform.Marc;
 using DigitalPlatform.Xml;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
@@ -199,7 +200,7 @@ namespace DigitalPlatform.ChargingAnalysis
             long lRet = channel.GetItemInfo(//null,
                 strItemBarcode,
                 "xml",
-                "xml",
+                "table",  //xml，用table格式取题名更方便
                 out strItemXml,
                 out strBiblio,
                 out strError);
@@ -218,9 +219,10 @@ namespace DigitalPlatform.ChargingAnalysis
                 goto ERROR1;
             }
 
+            XmlNode itemRoot = itemDom.DocumentElement;
 
             //获取索取号
-            string accessNo = DomUtil.GetElementInnerText(itemDom.DocumentElement, "accessNo");
+            string accessNo = DomUtil.GetElementInnerText(itemRoot, "accessNo");
 
             // 取出大类
             string bigClass = "";
@@ -236,26 +238,64 @@ namespace DigitalPlatform.ChargingAnalysis
             item.AccessNo = accessNo;
             item.BigClass = bigClass;
 
+            //获取馆藏地
+            string location = DomUtil.GetElementInnerText(itemRoot, "location");
+            item.Location = location;
 
-            // 处理题名等信息
-            string strOutMarcSyntax = "";
-            string strMARC = "";
-            int nRet = MarcUtil.Xml2Marc(strBiblio,
-                false,
-                "", // 自动识别 MARC 格式
-                out strOutMarcSyntax,
-                out strMARC,
-                out strError);
-            if (nRet == -1)
+
+            // 处理书目，取题名信息
+            /*
+            <?xml version="1.0" encoding="utf-8"?>
+            <root>
+                <line name="_coverImage" value="https://images-cn.ssl-images-amazon.com/images/I/61Q5HSrVmGL.jpg" type="coverimageurl" />
+                <line name="题名与责任者" value="钱塘西溪" type="title_area" />
+                <line name="出版发行项" value="杭州 : 浙江古籍出版社, 2017" type="publication_area" />
+                <line name="载体形态项" value="30,459页 ; 21cm" type="material_description_area" />
+                <line name="附注项" value="浙江历史文化研究中心学术成果&#xA;夏承焘全集/吴蓓主编" type="notes_area,notes" />
+                <line name="获得方式项" value="ISBN 978-7-5540-1024-2 (精装) : CNY48.00" type="resource_identifier_area" />
+                <line name="提要文摘" value="本书对唐宋5位著名词人的生卒家世、生平、交游及作品加以翔实的考订，并编年排比，得年谱5种。主要内容包括：龙川年谱、放翁年谱、张元干年谱、张于湖年谱、刘后村年谱等。" type="summary" />
+                <line name="主题分析" value="词人-年谱-中国-唐宋时期" type="subjects" />
+                <line name="分类号" value="K825.6=4" type="classes" />
+            </root>
+             */
+            XmlDocument dom = new XmlDocument();
+            try
+            {
+                dom.LoadXml(strBiblio);
+            }
+            catch (Exception ex)
+            {
+                strError = ex.Message;
                 return -1;
+            }
+            XmlNode root = dom.DocumentElement;
+            //XmlNode titleNode = root.SelectSingleNode("line[@type='title_area']");
 
-            MarcRecord marcRecord = new MarcRecord(strMARC);
-            string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
+            string title = DomUtil.GetElementAttr(root, "line[@type='title_area']", "value");
             item.Title = title;
-            //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
-            //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
 
-            return 0;
+                //// 处理题名等信息
+                //string strOutMarcSyntax = "";
+                //string strMARC = "";
+                //int nRet = MarcUtil.Xml2Marc(strBiblio,
+                //    false,
+                //    "", // 自动识别 MARC 格式
+                //    out strOutMarcSyntax,
+                //    out strMARC,
+                //    out strError);
+                //if (nRet == -1)
+                //    return -1;
+
+                //MarcRecord marcRecord = new MarcRecord(strMARC);
+                //string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
+                //item.Title = title;
+                //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
+                //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
+
+
+
+
+                return 0;
 
         ERROR1:
             //return -1;
@@ -276,6 +316,10 @@ namespace DigitalPlatform.ChargingAnalysis
                 report = "选择的日期范围该读者没有借阅记录。";
                 return report;
             }
+
+            
+            // linq语句排序，按借书日期倒序
+            var result = this._borrowedItem.OrderByDescending(x => x.BorrowDay);
 
 
 

@@ -102,6 +102,7 @@ namespace DigitalPlatform.ChargingAnalysis
         public string BigClass { get; internal set; }
         public string Title { get; internal set; }
         public string ErrorInfo { get; internal set; }
+        public string Location { get; internal set; }
 
         public string Dump()
         {
@@ -117,7 +118,8 @@ namespace DigitalPlatform.ChargingAnalysis
                 //+ "ReturnTime=" + ReturnTime + ";";
                 + "AccessNo=" + AccessNo + ";"
                 + "BigClass=" + BigClass + ";"
-                +"Error="+ErrorInfo;
+                + "Location=" + Location + ";"
+                + "Error="+ErrorInfo;
 
         }
 
