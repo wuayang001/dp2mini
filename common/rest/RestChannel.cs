@@ -1020,11 +1020,16 @@ namespace DigitalPlatform.LibraryRestClient
         /// <param name="resultType">希望在strResult参数中返回何种格式的信息，xml/html/text之一</param>
         /// <param name="biblioType">希望返回的书目信息类型，xml/html/text之一</param>
         /// <returns></returns>
-        public GetItemInfoResponse GetItemInfo(string barcode,
+        public int GetItemInfo(string itemBarcode,
             string resultType,
-            string biblioType)
+            string biblioType,
+            out string itemXml,
+            out string biblio,
+            out string strError)
         {
-            string strError = "";
+             strError = "";
+            itemXml = "";
+            biblio = "";
 
         REDO:
             try
@@ -1034,10 +1039,9 @@ namespace DigitalPlatform.LibraryRestClient
                 //client.Headers["User-Agent"] = "dp2LibraryClient";
                 CookieAwareWebClient client = this.GetClient();
 
-
                 GetItemInfoRequest request = new GetItemInfoRequest()
                 {
-                    strBarcode = barcode,
+                    strBarcode = itemBarcode,
                     strResultType = resultType,
                     strBiblioType = biblioType,
                 };
@@ -1049,22 +1053,46 @@ namespace DigitalPlatform.LibraryRestClient
                 string strResult = Encoding.UTF8.GetString(result);
 
                 GetItemInfoResponse response = Deserialize<GetItemInfoResponse>(strResult);
-                if (response.GetItemInfoResult.Value == -1 && response.GetItemInfoResult.ErrorCode == ErrorCode.NotLogin)
+                
+                if (response.GetItemInfoResult.Value == -1 
+                    && response.GetItemInfoResult.ErrorCode == ErrorCode.NotLogin)
                 {
                     if (DoNotLogin(ref strError) == 1)
                         goto REDO;
-                    return null;
+
+                    strError = response.GetItemInfoResult.ErrorInfo;
+                    return -1;
                 }
 
-                return response;
+                if (response.GetItemInfoResult.Value == -1)
+                {
+                    strError = "获取册记录'" + itemBarcode + "'出错:" + response.GetItemInfoResult.ErrorInfo;
+                    return -1;
+                }
+                else if (response.GetItemInfoResult.Value == 0)
+                {
+                    strError = "册'" + itemBarcode + "'对应的册记录不存在。";
+                    return -1;
+                }
+                else if (response.GetItemInfoResult.Value  > 1)
+                {
+                    strError = "册条码'"+ itemBarcode + "'对应的册记录存在多条，数据异常，请联系管理员";
+                    return -1;
+                }
+
+                return (int)response.GetItemInfoResult.Value ;
             }
             catch (Exception ex)
             {
+                // 检查是不是网络原因
                 int nRet = ConvertWebError(ex, out strError);
                 if (nRet == 0)
-                    return null;
-                goto REDO; ;
+                    return -1;
+
+                // 网络原因的话，重试一下
+                 goto REDO; 
             }
+
         }
 
         /// <summary>

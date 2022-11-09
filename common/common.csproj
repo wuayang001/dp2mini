@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="core\ByteArray.cs" />
     <Compile Include="core\ConfigSetting.cs" />
+    <Compile Include="core\DateTimeUtil.cs" />
     <Compile Include="core\ExceptionUtil.cs" />
     <Compile Include="core\PriceUtil.cs" />
     <Compile Include="core\Range.cs" />

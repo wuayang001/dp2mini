@@ -195,7 +195,7 @@
             this.tabPage_SearchBiblio.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SearchBiblio.Margin = new System.Windows.Forms.Padding(5, 3, 5, 3);
             this.tabPage_SearchBiblio.Name = "tabPage_SearchBiblio";
-            this.tabPage_SearchBiblio.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_SearchBiblio.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_SearchBiblio.TabIndex = 3;
             this.tabPage_SearchBiblio.Text = "SearchBiblio";
             this.tabPage_SearchBiblio.UseVisualStyleBackColor = true;
@@ -586,7 +586,7 @@
             this.tabPage_SearchItem.Controls.Add(this.label41);
             this.tabPage_SearchItem.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SearchItem.Name = "tabPage_SearchItem";
-            this.tabPage_SearchItem.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_SearchItem.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_SearchItem.TabIndex = 9;
             this.tabPage_SearchItem.Text = "SearchItem";
             this.tabPage_SearchItem.UseVisualStyleBackColor = true;
@@ -772,7 +772,7 @@
             this.tabPage_GetSearchResult.Location = new System.Drawing.Point(10, 48);
             this.tabPage_GetSearchResult.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_GetSearchResult.Name = "tabPage_GetSearchResult";
-            this.tabPage_GetSearchResult.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_GetSearchResult.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_GetSearchResult.TabIndex = 4;
             this.tabPage_GetSearchResult.Text = "GetSearchResult";
             this.tabPage_GetSearchResult.UseVisualStyleBackColor = true;
@@ -873,7 +873,7 @@
             this.tabPage_GetBiblioInfo.Location = new System.Drawing.Point(10, 48);
             this.tabPage_GetBiblioInfo.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_GetBiblioInfo.Name = "tabPage_GetBiblioInfo";
-            this.tabPage_GetBiblioInfo.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_GetBiblioInfo.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_GetBiblioInfo.TabIndex = 5;
             this.tabPage_GetBiblioInfo.Text = "GetBiblioInfo";
             this.tabPage_GetBiblioInfo.UseVisualStyleBackColor = true;
@@ -948,7 +948,7 @@
             this.tabPage_GetBiblioInfos.Location = new System.Drawing.Point(10, 48);
             this.tabPage_GetBiblioInfos.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_GetBiblioInfos.Name = "tabPage_GetBiblioInfos";
-            this.tabPage_GetBiblioInfos.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_GetBiblioInfos.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_GetBiblioInfos.TabIndex = 6;
             this.tabPage_GetBiblioInfos.Text = "GetBiblioInfos";
             this.tabPage_GetBiblioInfos.UseVisualStyleBackColor = true;
@@ -1015,7 +1015,7 @@
             this.tabPage_Reservation.Margin = new System.Windows.Forms.Padding(5);
             this.tabPage_Reservation.Name = "tabPage_Reservation";
             this.tabPage_Reservation.Padding = new System.Windows.Forms.Padding(5);
-            this.tabPage_Reservation.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_Reservation.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_Reservation.TabIndex = 7;
             this.tabPage_Reservation.Text = "Reservation";
             // 
@@ -1118,7 +1118,7 @@
             this.tabPage_SetBiblioInfo.Controls.Add(this.label25);
             this.tabPage_SetBiblioInfo.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SetBiblioInfo.Name = "tabPage_SetBiblioInfo";
-            this.tabPage_SetBiblioInfo.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_SetBiblioInfo.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_SetBiblioInfo.TabIndex = 8;
             this.tabPage_SetBiblioInfo.Text = "SetBiblioInfo";
             this.tabPage_SetBiblioInfo.UseVisualStyleBackColor = true;
@@ -1211,7 +1211,7 @@
             this.textBox_biblio.Multiline = true;
             this.textBox_biblio.Name = "textBox_biblio";
             this.textBox_biblio.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_biblio.Size = new System.Drawing.Size(621, 550);
+            this.textBox_biblio.Size = new System.Drawing.Size(621, 540);
             this.textBox_biblio.TabIndex = 48;
             // 
             // label26
@@ -1351,7 +1351,7 @@
             this.tabPage_SearchCharging.Controls.Add(this.label44);
             this.tabPage_SearchCharging.Location = new System.Drawing.Point(10, 48);
             this.tabPage_SearchCharging.Name = "tabPage_SearchCharging";
-            this.tabPage_SearchCharging.Size = new System.Drawing.Size(1433, 695);
+            this.tabPage_SearchCharging.Size = new System.Drawing.Size(1433, 685);
             this.tabPage_SearchCharging.TabIndex = 10;
             this.tabPage_SearchCharging.Text = "SearchCharging";
             this.tabPage_SearchCharging.UseVisualStyleBackColor = true;

@@ -74,12 +74,22 @@ namespace dp2mini
         /// <param name="e"></param>
         private void button_search_Click(object sender, EventArgs e)
         {
+            this.search();
+        }
+
+        private void search()
+        {
             //时间范围
             string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
             string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
 
             // 读者证条码号
-            string patronBarcode = this.textBox_patronBarcode.Text;
+            string patronBarcode = this.textBox_patronBarcode.Text.Trim();
+            if (string.IsNullOrEmpty(patronBarcode) == true)
+            {
+                MessageBox.Show(this, "请输入读者证条码号");
+                return;
+            }
 
 
             // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
@@ -130,9 +140,10 @@ namespace dp2mini
             {
                 string times = startDate + "~" + endDate;
 
-
+                // 创建数据
                 ChargingAnalysisService.Instance.Build(patronBarcode, times);
 
+                // 输出报表
                 string result = ChargingAnalysisService.Instance.OutputReport("", "");
 
 
@@ -962,7 +973,15 @@ namespace dp2mini
 
         }
 
-
+        // 在证条码输入框回车时，自动发起创建阅读分析
+        private void textBox_patronBarcode_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if条件检测按下的是不是Enter键
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.search();
+            }
+        }
     }
 
 

@@ -234,8 +234,6 @@
     <Compile Include="MarcForm.designer.cs">
       <DependentUpon>MarcForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MarcKernel\FieldNameList.cs" />
-    <Compile Include="MarcKernel\MarcDiff.cs" />
     <Content Include="rest\DataStructure.cs.txt" />
     <Compile Include="toolForm.cs">
       <SubType>Form</SubType>
@@ -274,19 +272,6 @@
     <Compile Include="Database\ReservationItem.cs" />
     <Compile Include="clientInfo\ClientInfo.cs" />
     <Compile Include="excel\ClosedXmlUtil.cs" />
-    <Compile Include="MarcKernel\MarcHeaderStruct.cs" />
-    <Compile Include="MarcKernel\MarcUtil.cs" />
-    <Compile Include="MarcKernel\MarcXmlWriter.cs" />
-    <Compile Include="MarcQuery\MarcField.cs" />
-    <Compile Include="MarcQuery\MarcHeader.cs" />
-    <Compile Include="MarcQuery\MarcLoader.cs" />
-    <Compile Include="MarcQuery\MarcNavigator.cs" />
-    <Compile Include="MarcQuery\MarcNode.cs" />
-    <Compile Include="MarcQuery\MarcNodeList.cs" />
-    <Compile Include="MarcQuery\MarcQuery.cs" />
-    <Compile Include="MarcQuery\MarcRecord.cs" />
-    <Compile Include="MarcQuery\MarcSubfield.cs" />
-    <Compile Include="MarcQuery\NaviItem.cs" />
     <Compile Include="chargingAnalysisForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -338,9 +323,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="rest\CookieAwareWebClient.cs">
+    <Content Include="rest\CookieAwareWebClient.txt">
       <SubType>Component</SubType>
-    </Compile>
+    </Content>
     <Content Include="rest\IsbnSplitter.txt" />
     <Content Include="rest\RestChannel.txt" />
     <Content Include="rest\RestChannelPool.txt" />

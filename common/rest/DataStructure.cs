@@ -847,7 +847,35 @@ LibraryServerResult.ErrorInfo		出错信息
 
     #region GetItemInfo
 
-    //getItemInfo
+    // 获得册信息
+    // TODO: 需要改进为，如果册记录存在，但是书目记录不存在，也能够适当返回
+    // parameters:
+    //      strItemDbType   2015/1/30
+    //      strBarcode  册条码号。特殊情况下，可以使用"@path:"引导的册记录路径(只需要库名和id两个部分)作为检索入口。在@path引导下，路径后面还可以跟随 "$prev"或"$next"表示方向
+    //      strResultType   指定需要在strResult参数中返回的数据格式。为"xml" "html" "uii"之一。
+    //                      如果为空，则表示strResult参数中不返回任何数据。无论这个参数为什么值，strItemRecPath中都回返回册记录路径(如果命中了的话)
+    //      strItemRecPath  返回册记录路径。可能为逗号间隔的列表，包含多个路径
+    //      strBiblioType   指定需要在strBiblio参数中返回的数据格式。为"xml" "html"之一。
+    //                      如果为空，则表示strBiblio参数中不返回任何数据，strBilbioRecPath中也不返回路径。
+    //                      如果要仅仅在strBiblioRecPath中返回路径，请使用"recpath"作为strBiblioType参数的值。
+    //                      如果为"html"或"xml"之一，则会在strBiblioRecPath中返回路径。
+    //                      之所以要这样设计，主要是为了效率考虑。用""调用时，甚至不需要返回书目记录路径，这会更多地省去一些关于种的操作。
+    //      strBiblioRecPath    返回书目记录路径
+    // return:
+    // Result.Value -1出错 0册记录没有找到 1册记录找到 >1册记录命中多于1条
+    // 权限:   需要具有getiteminfo权限
+    //public LibraryServerResult GetItemInfo(
+    //    string strItemDbType,
+    //    string strBarcode,
+    //    string strItemXml,  // 前端提供给服务器的记录内容。例如，需要模拟创建检索点，就需要前端提供记录内容
+    //    string strResultType,
+    //    out string strResult,
+    //    out string strItemRecPath,
+    //    out byte[] item_timestamp,
+    //    string strBiblioType,
+    //    out string strBiblio,
+    //    out string strBiblioRecPath)
+
     [DataContract]
     public class GetItemInfoRequest
     {
@@ -857,6 +885,12 @@ LibraryServerResult.ErrorInfo		出错信息
         public string strResultType { get; set; }
         [DataMember]
         public string strBiblioType { get; set; }
+
+        // 2022/11/9 把原来省掉的两个参数加在这里，使用的时候可以不赋值
+        [DataMember]
+        public string strItemDbType { get; set; }
+        [DataMember]
+        public string strItemXml { get; set; }
     }
     [DataContract]
     public class GetItemInfoResponse

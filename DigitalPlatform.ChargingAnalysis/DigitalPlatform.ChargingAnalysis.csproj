@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BorrowedItem.cs" />
     <Compile Include="ChargingAnalysisService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

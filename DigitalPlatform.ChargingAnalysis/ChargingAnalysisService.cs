@@ -1,6 +1,9 @@
 ﻿using DigitalPlatform.LibraryRestClient;
+using DigitalPlatform.Marc;
+using DigitalPlatform.Xml;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
 {
@@ -93,8 +96,8 @@ namespace DigitalPlatform.ChargingAnalysis
 
         #endregion
 
-        // 借阅日志数组
-        List<ChargingItemWrapper> _chargeItems=new List<ChargingItemWrapper>();
+        // 借书记录集合
+        List<BorrowedItem> _borrowedItem = new List<BorrowedItem>();
 
 
         // 创建内存结构
@@ -103,16 +106,16 @@ namespace DigitalPlatform.ChargingAnalysis
         public void Build(string patronBarcode, string times)
         {
             // 先清空内存集合
-            this._chargeItems.Clear(); 
+            this._borrowedItem.Clear();
 
             RestChannel channel = this.GetChannel();
             try
             {
                 ChargingItemWrapper[] itemWarpperList = null;
 
-                long lHitCount = 0;
+                long totalCount = 0;
                 long start = 0;
-                long count = 2;   // 每次固定取几笔 //lHitCount;
+                long preCount = 2;   // 每次固定取几笔 //lHitCount;
                 long lRet = 0;
                 string strError = "";
 
@@ -123,14 +126,14 @@ namespace DigitalPlatform.ChargingAnalysis
 
                     //token.ThrowIfCancellationRequested();
                     //SearchBiblioResponse response 
-                     lRet = channel.SearchCharging(patronBarcode,//this.textBox_SearchCharging_patronBarcode.Text.Trim(),
-                        times,
-                        "return,lost", //this.textBox_searchCharging_actions.Text.Trim(),
-                        "",//this.textBox_searchCharging_order.Text.Trim(),
-                        start,
-                        count,
-                        out itemWarpperList,
-                        out  strError); ;
+                    lRet = channel.SearchCharging(patronBarcode,//this.textBox_SearchCharging_patronBarcode.Text.Trim(),
+                       times,
+                       "return,lost", //this.textBox_searchCharging_actions.Text.Trim(),
+                       "",//this.textBox_searchCharging_order.Text.Trim(),
+                       start,
+                       preCount,
+                       out itemWarpperList,
+                       out strError); ;
                     if (lRet == -1)
                     {
                         throw new Exception(strError); //直接抛出异常
@@ -142,28 +145,33 @@ namespace DigitalPlatform.ChargingAnalysis
                         break;
                     }
 
+                    // 返回值为命中总记录数
+                    totalCount = lRet;
+
                     if (itemWarpperList != null && itemWarpperList.Length > 0)
                     {
                         // 增加到内存集合中
-                        this._chargeItems.AddRange(itemWarpperList);
+                        foreach (ChargingItemWrapper one in itemWarpperList)
+                        {
+                            BorrowedItem item = new BorrowedItem(one);
+                            this._borrowedItem.Add(item);
 
-                        //string temp = "";
-                        //foreach (ChargingItemWrapper one in itemWarpperList)
-                        //{
-                        //    temp += one.Item.ItemBarcode + "\r\n";
-                        //}
+                            // 获取索取号，用同一根通道即可
 
-                        //this.textBox_result.Text += temp;
+
+                        }
+
+
+
                     }
 
                     start += itemWarpperList.Length;
-                    count -= itemWarpperList.Length;
 
-                    if (start >= lHitCount || count <= 0)
+                    // 获取完记录时，退出循环
+                    if (start >= totalCount)
                         break;
                 }
 
-                //this.textBox_result.Text = "count:" + lRet;
             }
             finally
             {
@@ -173,21 +181,103 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
+        public int GetItemInfo(RestChannel channel,
+            string strItemBarcode,
+            BorrowedItem item,
+            out string strError)
+        {
+            strError = "";
+
+            // 获取册记录
+            string strItemXml = "";
+            string strBiblio = "";
+            long lRet = channel.GetItemInfo(//null,
+                strItemBarcode,
+                "xml",
+                "xml",
+                out strItemXml,
+                out strBiblio,
+                out strError);
+            if (lRet == -1)
+                goto ERROR1;
+
+            // 装载item到dom
+            XmlDocument itemDom = new XmlDocument();
+            try
+            {
+                itemDom.LoadXml(strItemXml);
+            }
+            catch (Exception ex)
+            {
+                strError = strItemBarcode + " 加载到dom出错：" + ex.Message;
+                goto ERROR1;
+            }
+
+
+            //获取索取号
+            string accessNo = DomUtil.GetElementInnerText(itemDom.DocumentElement, "accessNo");
+
+            // 取出大类
+            string bigClass = "";
+            if (string.IsNullOrEmpty(accessNo) == true)
+            {
+                bigClass = "[空]";
+            }
+            else
+            {
+                bigClass = accessNo.Substring(0, 1);
+            }
+
+            item.AccessNo = accessNo;
+            item.BigClass = bigClass;
+
+
+            // 处理题名等信息
+            string strOutMarcSyntax = "";
+            string strMARC = "";
+            int nRet = MarcUtil.Xml2Marc(strBiblio,
+                false,
+                "", // 自动识别 MARC 格式
+                out strOutMarcSyntax,
+                out strMARC,
+                out strError);
+            if (nRet == -1)
+                return -1;
+
+            MarcRecord marcRecord = new MarcRecord(strMARC);
+            string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
+            item.Title = title;
+        //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
+        //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
+
+
+        ERROR1:
+            return -1;
+
+        }
+    
+
+
         // 输出报表
-        public string OutputReport(string style,string fileName)
+        public string OutputReport(string style, string fileName)
         {
             string report = "";
 
-            if (this._chargeItems != null && this._chargeItems.Count > 0)
+            if (this._borrowedItem == null || this._borrowedItem.Count == 0)
             {
-                foreach (ChargingItemWrapper one in this._chargeItems)
-                {
-                    report+= one.Item.ItemBarcode +"-"+one.Item.Operator+ "\r\n";
-
-                }
+                report = "选择的日期范围该读者没有借阅记录。";
+                return report;
             }
-            
-        
+
+
+
+            // 循环输出每笔借阅记录
+            foreach (BorrowedItem one in this._borrowedItem)
+            {
+                report += one.Dump() + "\r\n";
+            }
+
+
             return report;
         }
 

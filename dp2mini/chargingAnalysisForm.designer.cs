@@ -37,7 +37,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.comboBox_quickSetFilenames = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_index = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_libraryCode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -95,12 +94,12 @@
             // button_search
             // 
             this.button_search.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_search.Location = new System.Drawing.Point(954, 81);
+            this.button_search.Location = new System.Drawing.Point(695, 27);
             this.button_search.Margin = new System.Windows.Forms.Padding(7);
             this.button_search.Name = "button_search";
-            this.button_search.Size = new System.Drawing.Size(138, 57);
+            this.button_search.Size = new System.Drawing.Size(327, 57);
             this.button_search.TabIndex = 2;
-            this.button_search.Text = "查询";
+            this.button_search.Text = "开始生成借阅报告";
             this.button_search.UseVisualStyleBackColor = true;
             this.button_search.Click += new System.EventHandler(this.button_search_Click);
             // 
@@ -108,7 +107,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(29, 92);
+            this.label1.Location = new System.Drawing.Point(29, 105);
             this.label1.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(190, 35);
@@ -118,35 +117,37 @@
             // button_stop
             // 
             this.button_stop.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_stop.Location = new System.Drawing.Point(1099, 81);
+            this.button_stop.Location = new System.Drawing.Point(1036, 27);
             this.button_stop.Margin = new System.Windows.Forms.Padding(7);
             this.button_stop.Name = "button_stop";
-            this.button_stop.Size = new System.Drawing.Size(122, 57);
+            this.button_stop.Size = new System.Drawing.Size(138, 57);
             this.button_stop.TabIndex = 3;
             this.button_stop.Text = "停止";
             this.button_stop.UseVisualStyleBackColor = true;
             // 
             // dateTimePicker_start
             // 
-            this.dateTimePicker_start.Location = new System.Drawing.Point(290, 86);
+            this.dateTimePicker_start.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.dateTimePicker_start.Location = new System.Drawing.Point(428, 99);
             this.dateTimePicker_start.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.dateTimePicker_start.Name = "dateTimePicker_start";
-            this.dateTimePicker_start.Size = new System.Drawing.Size(294, 42);
+            this.dateTimePicker_start.Size = new System.Drawing.Size(267, 47);
             this.dateTimePicker_start.TabIndex = 4;
             // 
             // dateTimePicker_end
             // 
-            this.dateTimePicker_end.Location = new System.Drawing.Point(652, 86);
+            this.dateTimePicker_end.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.dateTimePicker_end.Location = new System.Drawing.Point(760, 105);
             this.dateTimePicker_end.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.dateTimePicker_end.Name = "dateTimePicker_end";
-            this.dateTimePicker_end.Size = new System.Drawing.Size(289, 42);
+            this.dateTimePicker_end.Size = new System.Drawing.Size(267, 47);
             this.dateTimePicker_end.TabIndex = 6;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(597, 93);
+            this.label2.Location = new System.Drawing.Point(700, 105);
             this.label2.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(50, 35);
@@ -157,7 +158,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(230, 90);
+            this.label3.Location = new System.Drawing.Point(380, 105);
             this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 35);
@@ -178,23 +179,12 @@
             "最近 31 天",
             "最近 365 天",
             "最近 10 年"});
-            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(915, 27);
+            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(187, 101);
             this.comboBox_quickSetFilenames.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.comboBox_quickSetFilenames.Name = "comboBox_quickSetFilenames";
-            this.comboBox_quickSetFilenames.Size = new System.Drawing.Size(306, 43);
+            this.comboBox_quickSetFilenames.Size = new System.Drawing.Size(185, 43);
             this.comboBox_quickSetFilenames.TabIndex = 14;
             this.comboBox_quickSetFilenames.SelectedIndexChanged += new System.EventHandler(this.comboBox_quickSetFilenames_SelectedIndexChanged);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(605, 33);
-            this.label6.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(313, 35);
-            this.label6.TabIndex = 13;
-            this.label6.Text = "快速设定时间范围:";
             // 
             // columnHeader_filename
             // 
@@ -446,16 +436,18 @@
             // 
             // textBox_patronBarcode
             // 
-            this.textBox_patronBarcode.Location = new System.Drawing.Point(290, 31);
+            this.textBox_patronBarcode.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_patronBarcode.Location = new System.Drawing.Point(280, 32);
             this.textBox_patronBarcode.Name = "textBox_patronBarcode";
-            this.textBox_patronBarcode.Size = new System.Drawing.Size(295, 42);
+            this.textBox_patronBarcode.Size = new System.Drawing.Size(356, 47);
             this.textBox_patronBarcode.TabIndex = 18;
+            this.textBox_patronBarcode.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_patronBarcode_KeyDown);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(29, 33);
+            this.label4.Location = new System.Drawing.Point(29, 38);
             this.label4.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(260, 35);
@@ -464,30 +456,32 @@
             // 
             // textBox_result
             // 
+            this.textBox_result.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_result.BackColor = System.Drawing.SystemColors.ScrollBar;
-            this.textBox_result.Location = new System.Drawing.Point(37, 201);
+            this.textBox_result.Location = new System.Drawing.Point(35, 169);
             this.textBox_result.Multiline = true;
             this.textBox_result.Name = "textBox_result";
-            this.textBox_result.Size = new System.Drawing.Size(1184, 464);
+            this.textBox_result.Size = new System.Drawing.Size(1081, 540);
             this.textBox_result.TabIndex = 20;
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1510, 900);
-            this.Controls.Add(this.textBox_result);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(1202, 769);
             this.Controls.Add(this.textBox_patronBarcode);
+            this.Controls.Add(this.textBox_result);
             this.Controls.Add(this.comboBox_quickSetFilenames);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.dateTimePicker_end);
             this.Controls.Add(this.dateTimePicker_start);
             this.Controls.Add(this.button_stop);
             this.Controls.Add(this.button_search);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label4);
             this.Margin = new System.Windows.Forms.Padding(7);
             this.Name = "chargingAnalysisForm";
             this.Text = "日志查询与统计";
@@ -507,7 +501,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboBox_quickSetFilenames;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ColumnHeader columnHeader_filename;
         private System.Windows.Forms.ColumnHeader columnHeader_index;
         private System.Windows.Forms.ColumnHeader columnHeader_libraryCode;
