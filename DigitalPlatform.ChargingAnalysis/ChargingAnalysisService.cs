@@ -157,6 +157,11 @@ namespace DigitalPlatform.ChargingAnalysis
                             this._borrowedItem.Add(item);
 
                             // 获取索取号，用同一根通道即可
+                            lRet = this.GetItemInfo(channel, item.ItemBarcode, item, out strError);
+                            if (lRet == -1)
+                            {
+                                // todo 抛出异常？暂时不处理
+                            }
 
 
                         }
@@ -247,12 +252,15 @@ namespace DigitalPlatform.ChargingAnalysis
             MarcRecord marcRecord = new MarcRecord(strMARC);
             string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
             item.Title = title;
-        //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
-        //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
+            //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
+            //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
 
+            return 0;
 
         ERROR1:
-            return -1;
+            //return -1;
+            item.ErrorInfo = strError;
+            return 0;
 
         }
     

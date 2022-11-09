@@ -101,18 +101,24 @@ namespace DigitalPlatform.ChargingAnalysis
         public string AccessNo { get; internal set; }
         public string BigClass { get; internal set; }
         public string Title { get; internal set; }
+        public string ErrorInfo { get; internal set; }
 
         public string Dump()
         {
             return "ItemBarcode=" + ItemBarcode + ";"
-                + "BorrowYear=" + BorrowYear + ";"
-                + "BorrowMonth=" + BorrowMonth + ";"
+                + "Title=" + Title + ";"
+                //+ "BorrowYear=" + BorrowYear + ";"
+                //+ "BorrowMonth=" + BorrowMonth + ";"
                 + "BorrowDay=" + BorrowDay + ";"
-                + "BorrowTime=" + BorrowTime + ";"
-                + "ReturnYear=" + ReturnYear + ";"
-                + "ReturnMonth=" + ReturnMonth + ";"
+                //+ "BorrowTime=" + BorrowTime + ";"
+                //+ "ReturnYear=" + ReturnYear + ";"
+                //+ "ReturnMonth=" + ReturnMonth + ";"
                 + "ReturnDay=" + ReturnDay + ";"
-                + "ReturnTime=" + ReturnTime + ";";
+                //+ "ReturnTime=" + ReturnTime + ";";
+                + "AccessNo=" + AccessNo + ";"
+                + "BigClass=" + BigClass + ";"
+                +"Error="+ErrorInfo;
+
         }
 
 

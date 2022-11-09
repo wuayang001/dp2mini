@@ -1080,6 +1080,8 @@ namespace DigitalPlatform.LibraryRestClient
                     return -1;
                 }
 
+                itemXml = response.strResult;
+                biblio = response.strBiblio;
                 return (int)response.GetItemInfoResult.Value ;
             }
             catch (Exception ex)
