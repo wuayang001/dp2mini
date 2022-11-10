@@ -970,6 +970,7 @@ namespace DigitalPlatform.LibraryRestClient
         public int GetReaderInfo(string strBarcode,
             string strResultTypeList,
             out string[] results,
+            out string strRecPath,
             out string strError)
         {
             strError = "";
@@ -1019,6 +1020,8 @@ namespace DigitalPlatform.LibraryRestClient
 
                 // 返回的数据数组
                 results = response.results;
+
+                strRecPath = response.strRecPath;
 
                 return 0;
             }
