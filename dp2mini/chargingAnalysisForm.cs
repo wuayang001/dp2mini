@@ -141,7 +141,12 @@ namespace dp2mini
                 string times = startDate + "~" + endDate;
 
                 // 创建数据
-                ChargingAnalysisService.Instance.Build(patronBarcode, times);
+                int nRet =ChargingAnalysisService.Instance.Build(token,
+                    patronBarcode, 
+                    times,
+                    out strError);
+                if (nRet == -1)
+                    goto ERROR1;
 
                 // 输出报表
                 string result = ChargingAnalysisService.Instance.OutputReport("", "");

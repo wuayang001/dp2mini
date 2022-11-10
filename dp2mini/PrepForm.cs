@@ -389,20 +389,28 @@ namespace dp2mini
             // 获取读者信息
             if (string.IsNullOrEmpty(reserItem.PatronBarcode) == false)
             {
-                GetReaderInfoResponse readerRet = channel.GetReaderInfo(reserItem.PatronBarcode,
-                    "xml:noborrowhistory");
-                if (readerRet.GetReaderInfoResult.Value == -1)
-                {
-                    strError = "获取册记录'" + reserItem.ItemBarcode + "'出错:" + readerRet.GetReaderInfoResult.ErrorInfo;
-                    return -1;
-                }
-                if (readerRet.GetReaderInfoResult.Value == 0)
-                {
-                    strError = "获取册记录'" + reserItem.ItemBarcode + "'未命中。";// + readerRet.GetReaderInfoResult.ErrorInfo;
-                    return -1;
-                }
+                //GetReaderInfoResponse readerRet = channel.GetReaderInfo(reserItem.PatronBarcode,
+                //    "xml:noborrowhistory");
+                //if (readerRet.GetReaderInfoResult.Value == -1)
+                //{
+                //    strError = "获取册记录'" + reserItem.ItemBarcode + "'出错:" + readerRet.GetReaderInfoResult.ErrorInfo;
+                //    return -1;
+                //}
+                //if (readerRet.GetReaderInfoResult.Value == 0)
+                //{
+                //    strError = "获取册记录'" + reserItem.ItemBarcode + "'未命中。";// + readerRet.GetReaderInfoResult.ErrorInfo;
+                //    return -1;
+                //}
 
-                string strPatronXml = readerRet.results[0];
+                string[] results = null;
+                int nRet = channel.GetReaderInfo(reserItem.PatronBarcode,
+                    "xml:noborrowhistory",
+                    out results,
+                    out strError);
+                if (nRet==-1)
+                    return -1;
+
+                string strPatronXml = results[0];
                 dom.LoadXml(strPatronXml);
                 XmlNode rootNode = dom.DocumentElement;
                 reserItem.PatronName = DomUtil.GetElementText(rootNode, "name");

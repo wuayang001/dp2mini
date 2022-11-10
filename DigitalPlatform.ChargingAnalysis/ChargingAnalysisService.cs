@@ -4,6 +4,7 @@ using DigitalPlatform.Xml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
@@ -104,29 +105,68 @@ namespace DigitalPlatform.ChargingAnalysis
         // 创建内存结构
         // patronBarcode：读者证条码
         // times：操作时间范围 2022/11/01~2022/11/01 11:00
-        public void Build(string patronBarcode, string times)
+        public int Build(CancellationToken token, 
+            string patronBarcode, 
+            string times,
+            out string strError)
         {
-            // 先清空内存集合
+            strError = "";
+            long lRet = 0;
+
+            // 先清空读者借阅历史内存集合
             this._borrowedItem.Clear();
 
             RestChannel channel = this.GetChannel();
             try
             {
-                ChargingItemWrapper[] itemWarpperList = null;
+                // 获取读者信息
+                string[] results = null;
+                lRet = channel.GetReaderInfo(//null,
+                    patronBarcode, //读者卡号,
+                    "advancexml",
+                    out results,
+                    out strError);
+                if (lRet == -1)
+                {
+                    // todo要不要再丰富一下错误信息
+                    return -1;
+                }
 
-                long totalCount = 0;
+                XmlDocument dom = new XmlDocument();
+                string strReaderXml = results[0];
+                try
+                {
+                    dom.LoadXml(strReaderXml);
+                }
+                catch (Exception ex)
+                {
+                    strError = "将读者xml加载到dom出错：" + ExceptionUtil.GetDebugText(ex);
+                    return -1;
+                }
+
+                //<name>王一诺</name> 
+                //<department>1501</department> 
+                //<gender>男</gender>
+                //XmlNode root = dom.DocumentElement;
+                //patron = new Patron();
+                //patron.name = DomUtil.GetElementText(root, "name");
+                //patron.department = DomUtil.GetElementText(root, "department");
+                //patron.gender = DomUtil.GetElementText(root, "gender");
+
+                //==以下为获取借阅历史==
+
+                long totalCount = 0;  //返回的value即为总共命中条数
                 long start = 0;
-                long preCount = 2;   // 每次固定取几笔 //lHitCount;
-                long lRet = 0;
-                string strError = "";
-
+                long preCount = 2;   // 每次获取几条 //lHitCount;
+                ChargingItemWrapper[] itemWarpperList = null;
                 // 从结果集中取出册记录
                 for (; ; )
                 {
                     //Application.DoEvents(); // 出让界面控制权
 
-                    //token.ThrowIfCancellationRequested();
-                    //SearchBiblioResponse response 
+                    // 外面停止
+                    token.ThrowIfCancellationRequested();
+
                     lRet = channel.SearchCharging(patronBarcode,//this.textBox_SearchCharging_patronBarcode.Text.Trim(),
                        times,
                        "return,lost", //this.textBox_searchCharging_actions.Text.Trim(),
@@ -149,11 +189,14 @@ namespace DigitalPlatform.ChargingAnalysis
                     // 返回值为命中总记录数
                     totalCount = lRet;
 
+                    // 将借阅历史记录装载到内存集合中
                     if (itemWarpperList != null && itemWarpperList.Length > 0)
                     {
-                        // 增加到内存集合中
                         foreach (ChargingItemWrapper one in itemWarpperList)
                         {
+                            // 外面停止
+                            token.ThrowIfCancellationRequested();
+
                             BorrowedItem item = new BorrowedItem(one);
                             this._borrowedItem.Add(item);
 
@@ -163,20 +206,20 @@ namespace DigitalPlatform.ChargingAnalysis
                             {
                                 // todo 抛出异常？暂时不处理
                             }
-
-
                         }
-
-
-
                     }
 
+                    // 开始序号增加，为下一轮获取准备
                     start += itemWarpperList.Length;
 
                     // 获取完记录时，退出循环
                     if (start >= totalCount)
                         break;
                 }
+
+                //==结束==
+
+                return 0;
 
             }
             finally

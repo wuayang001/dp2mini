@@ -967,11 +967,13 @@ namespace DigitalPlatform.LibraryRestClient
         /// <para>1:    找到读者记录</para>
         /// <para>&gt;>1:   找到多于一条读者记录，返回值是找到的记录数，这是一种不正常的情况</para>
         /// </returns>
-        public GetReaderInfoResponse GetReaderInfo(
-            string strBarcode,
-            string strResultTypeList)
+        public int GetReaderInfo(string strBarcode,
+            string strResultTypeList,
+            out string[] results,
+            out string strError)
         {
-            string strError = "";
+            strError = "";
+            results = null;
 
         REDO:
             try
@@ -994,20 +996,39 @@ namespace DigitalPlatform.LibraryRestClient
 
                 GetReaderInfoResponse response = Deserialize<GetReaderInfoResponse>(strResult);
 
-                if (response.GetReaderInfoResult.Value == -1 && response.GetReaderInfoResult.ErrorCode == ErrorCode.NotLogin)
+                if (response.GetReaderInfoResult.Value == -1 
+                    && response.GetReaderInfoResult.ErrorCode == ErrorCode.NotLogin)
                 {
                     if (DoNotLogin(ref strError) == 1)
                         goto REDO;
-                    return null;
+                }
+                if (response.GetReaderInfoResult.Value == -1)
+                {
+                    return -1;
+                }
+                else if (response.GetReaderInfoResult.Value == 0)
+                {
+                    strError = "获取读者记录'" + strBarcode + "'未命中。";// + readerRet.GetReaderInfoResult.ErrorInfo;
+                    return -1;
+                }
+                else if (response.GetReaderInfoResult.Value >1)
+                {
+                    strError = "获取读者记录'" + strBarcode + "'出现多条，数据异常，请联系系统管理员。";// + readerRet.GetReaderInfoResult.ErrorInfo;
+                    return -1;
                 }
 
-                return response;
+                // 返回的数据数组
+                results = response.results;
+
+                return 0;
             }
             catch (Exception ex)
             {
                 int nRet = ConvertWebError(ex, out strError);
                 if (nRet == 0)
-                    return null;
+                    return -1;
+
+                // 网络问题重做
                 goto REDO; ;
             }
         }

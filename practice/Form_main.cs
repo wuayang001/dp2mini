@@ -291,19 +291,27 @@ namespace practice
                     this.textBox_result.Text = "errorInfo:" + strError;
                 }
 
-                if (records !=null && records.Length > 0)
+
+
+                if (records != null && records.Length > 0)
                 {
+                    this.textBox_result.Text = "命中'" + lRet + "'条，本次返回'" + records.Length + "'条。\r\n";
+
                     StringBuilder browse = new StringBuilder();
                     foreach (Record record in records)
                     {
                         browse.AppendLine(record.Path);
 
-                        if (record.Cols !=null && record.Cols.Length>0)
-                            browse.AppendLine( string.Join(",", record.Cols));
-                        if (record.RecordBody !=null && string.IsNullOrEmpty(record.RecordBody.Xml)==false)
-                             browse.AppendLine(record.RecordBody.Xml);
+                        if (record.Cols != null && record.Cols.Length > 0)
+                            browse.AppendLine(string.Join(",", record.Cols));
+                        if (record.RecordBody != null && string.IsNullOrEmpty(record.RecordBody.Xml) == false)
+                            browse.AppendLine(record.RecordBody.Xml);
                     }
                     this.textBox_result.Text += browse.ToString();
+                }
+                else
+                {
+                    this.textBox_result.Text = "命中'" + lRet + "'条，返回'0'条";
                 }
             }
             finally
