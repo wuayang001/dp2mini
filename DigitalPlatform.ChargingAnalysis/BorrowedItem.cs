@@ -1,10 +1,12 @@
 ﻿using DigitalPlatform.IO;
 using DigitalPlatform.LibraryRestClient;
+using DigitalPlatform.Xml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
 {
@@ -50,10 +52,16 @@ namespace DigitalPlatform.ChargingAnalysis
         public ChargingItem relatedItem { get; set; }
 
 
+
         public BorrowedItem(ChargingItemWrapper itemWrapper)
         {
+            // 借阅历史中的记录
+            this.Type = "0";
+
             this.chargingItem = itemWrapper.Item;
             this.relatedItem = itemWrapper.RelatedItem;
+
+
 
             // 从还书记录中获取信息
             this.ReturnTime = this.chargingItem.OperTime;
@@ -74,6 +82,46 @@ namespace DigitalPlatform.ChargingAnalysis
             this.BorrowDay= day.ToString("yyyy/MM/dd");//
 
             this.BorrowPeriod = this.relatedItem.Period;
+
+
+        }
+
+
+        public BorrowedItem(string patronBarcode,XmlNode borrowNode)
+        {
+            // 在借图书
+            this.Type = "1";
+
+            /*
+              <borrow barcode="B001" oi="" recPath="中文图书实体/13" biblioRecPath="中文图书/6" 
+            location="流通库" borrowDate="Thu, 10 Nov 2022 16:30:31 +0800" borrowPeriod="31day" 
+            borrowID="082c2aad-f092-448f-94b5-4291df159e85" returningDate="Sun, 11 Dec 2022 12:00:00 +0800" 
+            operator="supervisor" type="普通" price="CNY198.00" /> 
+             */
+
+            this.ItemBarcode = DomUtil.GetAttr(borrowNode, "barcode");// this.chargingItem.ItemBarcode;
+            this.PatronBarcode = patronBarcode;
+
+            // 从借书记录中获取信息
+            this.BorrowTime =   DateTimeUtil.LocalDate(DomUtil.GetAttr(borrowNode, "borrowDate"));
+           DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTime);
+            this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
+            this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
+            this.BorrowDay = day.ToString("yyyy/MM/dd");//
+
+            string strPeriod = DomUtil.GetAttr(borrowNode, "borrowPeriod");
+
+            // 从还书记录中获取信息
+            //this.ReturnTime = this.chargingItem.OperTime;
+            //DateTime day = DateTimeUtil.ParseFreeTimeString(this.ReturnTime);
+            //this.ReturnYear = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
+            //this.ReturnMonth = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
+            //this.ReturnDay = day.ToString("yyyy/MM/dd");
+
+
+
+
+
 
 
         }
@@ -104,6 +152,11 @@ namespace DigitalPlatform.ChargingAnalysis
         public string Title { get; internal set; }
         public string ErrorInfo { get; internal set; }
         public string Location { get; internal set; }
+
+
+
+        // 类型，1表示在借未还的，0表示借阅历史中的，排序的时候，先按type排，再按借书时倒序排
+        public string Type { get; set; }
 
         public string Dump()
         {

@@ -138,10 +138,21 @@ namespace DigitalPlatform.ChargingAnalysis
                     return -1;
                 }
                 string strPatronXml = results[0];
-                // 把xml装载到内存中
-                this._patron=this.ParsePatronXml(strPatronXml, strRecPath);
 
-                
+                XmlDocument dom = new XmlDocument();
+                dom.LoadXml(strPatronXml);
+
+                // 把读者xml解析后存到内存中
+                this._patron=this.ParsePatronXml(dom, strRecPath);
+
+                // 把在借信息存到内存数组中，目前与借阅历史存在一起
+                XmlNodeList borrowNodes = dom.DocumentElement.SelectNodes("borrows/borrow");
+                foreach (XmlNode borrowNode in borrowNodes)
+                {
+                    BorrowedItem item = new BorrowedItem(patronBarcode, borrowNode);
+                    this._borrowedItems.Add(item);
+                }
+
 
                 //==以下为获取借阅历史==
 
@@ -189,13 +200,6 @@ namespace DigitalPlatform.ChargingAnalysis
 
                             BorrowedItem item = new BorrowedItem(one);
                             this._borrowedItems.Add(item);
-
-                            // 获取索取号，用同一根通道即可
-                            lRet = this.GetItemInfo(channel, item.ItemBarcode, item, out strError);
-                            if (lRet == -1)
-                            {
-                                // todo 抛出异常？暂时不处理
-                            }
                         }
                     }
 
@@ -206,6 +210,23 @@ namespace DigitalPlatform.ChargingAnalysis
                     if (start >= totalCount)
                         break;
                 }
+
+
+                // 获取册信息与书目信息，用同一根通道即可
+                foreach (BorrowedItem item in this._borrowedItems)
+                {
+                    // 外面停止
+                    token.ThrowIfCancellationRequested();
+
+
+                    lRet = this.GetItemInfo(channel, item.ItemBarcode, item, out strError);
+                    if (lRet == -1)
+                    {
+                        // todo 抛出异常？暂时不处理
+                    }
+                }
+
+
 
                 //==结束==
 
@@ -220,15 +241,14 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
         // 解析读者xml到内存对象
-        public Patron ParsePatronXml(string strPatronXml,
+        public Patron ParsePatronXml(XmlDocument dom,
             string recPath)
         {
             // 取出个人信息
             Patron patron = new Patron();
             patron.recPath = recPath;
 
-            XmlDocument dom = new XmlDocument();
-            dom.LoadXml(strPatronXml);
+
 
             // 证条码号
             string refID = DomUtil.GetElementText(dom.DocumentElement, "refID");
@@ -436,7 +456,7 @@ namespace DigitalPlatform.ChargingAnalysis
             */
             return patron;
         }
-
+        public const String C_WeiXinIdPrefix = "weixinid:";
         private string RemoveWeiXinId(string email)
         {
             //<email>test@163.com,123,weixinid:o4xvUviTxj2HbRqbQb9W2nMl4fGg,weixinid:o4xvUvnLTg6NnflbYdcS-sxJCGFo,weixinid:testid</email>
@@ -445,7 +465,7 @@ namespace DigitalPlatform.ChargingAnalysis
             for (int i = 0; i < emailList.Length; i++)
             {
                 string oneEmail = emailList[i].Trim();
-                if (oneEmail.Length > 9 && oneEmail.Substring(0, 9) == WeiXinConst.C_WeiXinIdPrefix)
+                if (oneEmail.Length > 9 && oneEmail.Substring(0, 9) == C_WeiXinIdPrefix)
                 {
                     continue;
                 }

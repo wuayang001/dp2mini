@@ -975,6 +975,7 @@ namespace DigitalPlatform.LibraryRestClient
         {
             strError = "";
             results = null;
+            strRecPath = "";
 
         REDO:
             try
@@ -996,6 +997,7 @@ namespace DigitalPlatform.LibraryRestClient
                 string strResult = Encoding.UTF8.GetString(result);
 
                 GetReaderInfoResponse response = Deserialize<GetReaderInfoResponse>(strResult);
+                strRecPath = response.strRecPath;
 
                 if (response.GetReaderInfoResult.Value == -1 
                     && response.GetReaderInfoResult.ErrorCode == ErrorCode.NotLogin)
@@ -1021,7 +1023,6 @@ namespace DigitalPlatform.LibraryRestClient
                 // 返回的数据数组
                 results = response.results;
 
-                strRecPath = response.strRecPath;
 
                 return 0;
             }

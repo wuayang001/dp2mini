@@ -402,10 +402,13 @@ namespace dp2mini
                 //    return -1;
                 //}
 
+               string strRecPath = "";
+
                 string[] results = null;
                 int nRet = channel.GetReaderInfo(reserItem.PatronBarcode,
                     "xml:noborrowhistory",
                     out results,
+                    out strRecPath,
                     out strError);
                 if (nRet==-1)
                     return -1;
