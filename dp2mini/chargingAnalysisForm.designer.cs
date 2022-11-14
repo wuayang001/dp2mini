@@ -87,7 +87,7 @@
             this.ToolStripMenuItem_huizong = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox_patronBarcode = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox_result = new System.Windows.Forms.TextBox();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -454,25 +454,24 @@
             this.label4.TabIndex = 19;
             this.label4.Text = "读者证条码号：";
             // 
-            // textBox_result
+            // webBrowser1
             // 
-            this.textBox_result.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.webBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_result.BackColor = System.Drawing.SystemColors.ScrollBar;
-            this.textBox_result.Location = new System.Drawing.Point(35, 169);
-            this.textBox_result.Multiline = true;
-            this.textBox_result.Name = "textBox_result";
-            this.textBox_result.Size = new System.Drawing.Size(1081, 540);
-            this.textBox_result.TabIndex = 20;
+            this.webBrowser1.Location = new System.Drawing.Point(35, 176);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.Size = new System.Drawing.Size(1155, 544);
+            this.webBrowser1.TabIndex = 21;
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1202, 769);
+            this.ClientSize = new System.Drawing.Size(1202, 743);
+            this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.textBox_patronBarcode);
-            this.Controls.Add(this.textBox_result);
             this.Controls.Add(this.comboBox_quickSetFilenames);
             this.Controls.Add(this.dateTimePicker_end);
             this.Controls.Add(this.dateTimePicker_start);
@@ -551,6 +550,6 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_huizong;
         private System.Windows.Forms.TextBox textBox_patronBarcode;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox_result;
+        private System.Windows.Forms.WebBrowser webBrowser1;
     }
 }

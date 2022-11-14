@@ -4,7 +4,9 @@ using DigitalPlatform.Marc;
 using DigitalPlatform.Xml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Xml;
 
@@ -40,8 +42,14 @@ namespace DigitalPlatform.ChargingAnalysis
             }
         }
 
-        public void Init(string serverUrl, string userName, string passowrd, string loginParameters)
+        // chargingAnalysisDataDir：阅读分析的数据目录，里面有html配置文件
+        public void Init(string chargingAnalysisDataDir,
+            string serverUrl, string userName, string passowrd, string loginParameters)
         {
+            // 阅读分析的数据目录
+            this._chargingAnalysisDataDir = chargingAnalysisDataDir;
+
+            // 访问dp2服务器的地址和帐号
             this.dp2ServerUrl = serverUrl;
             this.dp2Username = userName;
             this.dp2Password = passowrd;
@@ -55,6 +63,7 @@ namespace DigitalPlatform.ChargingAnalysis
         #region 关于通道
         // 通道池
         RestChannelPool _channelPool = new RestChannelPool();
+        private string _chargingAnalysisDataDir;
 
         public string dp2ServerUrl { get; set; }
         public string dp2Username { get; set; }
@@ -597,34 +606,135 @@ namespace DigitalPlatform.ChargingAnalysis
             return 0;
 
         }
+
+        public const string C_Type_Borrow = "0";
+        public const string C_Type_History = "1";
     
 
 
         // 输出报表
         public string OutputReport(string style, string fileName)
         {
-            string report = "";
+            string error = "";
 
             if (this._borrowedItems == null || this._borrowedItems.Count == 0)
             {
-                report = "选择的日期范围该读者没有借阅记录。";
-                return report;
+                error = "选择的日期范围该读者没有借阅记录。";
+                goto ERROR1;
             }
 
-            
-            // linq语句排序，按借书日期倒序
-            var result = this._borrowedItems.OrderByDescending(x => x.BorrowDay);
-
-
-
-            // 循环输出每笔借阅记录
-            foreach (BorrowedItem one in this._borrowedItems)
+            // 装载html模板，先layout，再加body。
+            if (string.IsNullOrEmpty(this._chargingAnalysisDataDir) == true)
             {
-                report += one.Dump() + "\r\n";
+                error = "在用户目录里缺少阅读分析使用的'ChargingAnalysis'目录，请联系系统管理员。";
+                goto ERROR1;
             }
 
+            string layoutFile = Path.Combine(this._chargingAnalysisDataDir, "layout.html");
+            if (File.Exists(layoutFile) == false)
+            {
+                error = "'"+layoutFile+"'配置文件不存在，请联系系统管理员。";
+                goto ERROR1;
+            }
 
-            return report;
+            string bodyFile = Path.Combine(this._chargingAnalysisDataDir, "body.html");
+            if (File.Exists(bodyFile) == false)
+            {
+                error = "'" + bodyFile + "'配置文件不存在，请联系系统管理员。";
+                goto ERROR1;
+            }
+
+            // 把layout装载到内存
+            StreamReader sLayout = new StreamReader(layoutFile, Encoding.UTF8);
+            string layoutHtml = sLayout.ReadToEnd();
+
+            // 把layout装载到内存
+            StreamReader sBody = new StreamReader(bodyFile, Encoding.UTF8);
+            string bodyHtml = sBody.ReadToEnd();
+
+            // 把layout中的%body%替换为配置的body文件的内容。
+            string html = layoutHtml.Replace("%body%", bodyHtml);
+
+            // 替换读者信息
+            
+                html = html.Replace("%patronBarcode%", this._patron.barcode);
+            html = html.Replace("%name%", this._patron.name);
+            html = html.Replace("%gender%", this._patron.gender);
+            html = html.Replace("%department%", this._patron.department);
+
+            //html = html.Replace("%firstBorrowDate%", this._patron.firstBorrowDate);
+            //html = html.Replace("%checkoutCount%", this._patron.historyCount.ToString());
+
+
+
+
+
+
+            // 在借 和 借阅历史
+            string onlyBorrowTable = "";
+            string onlyHistoryTable = "";
+            string allBorrowedTable = "";
+
+            if (this._borrowedItems != null && this._borrowedItems.Count > 0)
+            {
+                // linq语句排序，先将在借还未的排在前面，再按借书时间倒序
+                var borrowedList = this._borrowedItems.OrderBy(x => x.Type).ThenByDescending(x => x.BorrowTime);
+                // 循环输出每笔借阅记录
+                foreach (BorrowedItem one in borrowedList)
+                {
+                    //html
+
+                    string temp = "<tr>"
+                        + "<td>" + one.ItemBarcode + "</td>"
+                        + "<td>" + one.Title + "</td>"
+                        + "<td>" + one.AccessNo + "</td>"
+                        + "<td>" + one.BorrowTime + "</td>"
+                        + "<td>" + one.ReturnTime + "</td>"
+                        + "</tr>";
+
+                    allBorrowedTable += temp;
+
+                    if (one.Type == C_Type_Borrow)
+                        onlyBorrowTable += temp;
+                    else if (one.Type == C_Type_History)
+                        onlyHistoryTable += temp;
+                }
+
+                onlyBorrowTable = "<table style='border: 1px solid green'>" + onlyBorrowTable+"</table>";
+                onlyHistoryTable = "<table style='border: 1px solid yellow'>" + onlyHistoryTable + "</table>";
+                allBorrowedTable = "<table  style='border: 1px solid red'>" + allBorrowedTable + "</table>";
+
+            }
+
+            html = html.Replace("%onlyBorrowTable%", onlyBorrowTable);
+            html = html.Replace("%onlyHistoryTable%", onlyHistoryTable);
+            html = html.Replace("%allBorrowedTable%", allBorrowedTable);
+
+            string firstBorrowDate = "";
+            string borrowedCount = "0";
+            // 第一次借书时间
+            if (this._borrowedItems != null && this._borrowedItems.Count > 0)
+            {
+                var list2 = this._borrowedItems.OrderBy(x => x.BorrowTime).ToList();
+                firstBorrowDate = list2[0].BorrowTime;
+                borrowedCount = list2.Count.ToString();
+            }
+            //首次借阅时间为%firstBorrowDate%，到目前共借阅图书%borrowedCount%册。
+            html = html.Replace("%firstBorrowDate%", firstBorrowDate);
+            html = html.Replace("%borrowedCount%", borrowedCount);
+
+            //// 按分类统计数量
+            //html = html.Replace("%covertClcCount%", patron.covertClcCount.ToString());
+            //html = html.Replace("%clcTable%", patron.clcTable);
+
+            //// 按年份统计数量
+            //html = html.Replace("%yearTable%", patron.yearTable);
+
+            return html;
+
+
+ERROR1:
+            return error;
         }
 
     }

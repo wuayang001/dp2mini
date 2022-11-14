@@ -25,6 +25,7 @@ using DigitalPlatform.dp2.Statis;
 using System.Linq;
 using DigitalPlatform.ChargingAnalysis;
 using DigitalPlatform.CirculationClient;
+using System.Web;
 
 namespace dp2mini
 {
@@ -58,13 +59,16 @@ namespace dp2mini
         {
             this._mainForm = this.MdiParent as MainForm;
 
+            // 阅读分析的数据目录
+            string chargingAnalysisDataDir = ClientInfo.UserDir + "\\ChargingAnalysis\\";
 
             // 把登录相关参数传到ChargingAnalysisService服务类
             string serverUrl = this._mainForm.GetPurlUrl(this._mainForm.Setting.Url);
             string userName = this._mainForm.Setting.UserName;
             string password = this._mainForm.Setting.Password;
             string parameters = "type=worker,client=dp2mini|" + ClientInfo.ClientVersion;//Program.ClientVersion;
-            ChargingAnalysisService.Instance.Init(serverUrl, userName, password, parameters);
+            ChargingAnalysisService.Instance.Init(chargingAnalysisDataDir,
+                serverUrl, userName, password, parameters);
         }
 
         /// <summary>
@@ -80,8 +84,8 @@ namespace dp2mini
         private void search()
         {
             //时间范围
-            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
-            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
+            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd")+" 00:00";
+            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd")+" 23:59";
 
             // 读者证条码号
             string patronBarcode = this.textBox_patronBarcode.Text.Trim();
@@ -138,6 +142,7 @@ namespace dp2mini
             RestChannel channel = this._mainForm.GetChannel();
             try
             {
+                //
                 string times = startDate + "~" + endDate;
 
                 // 创建数据
@@ -149,7 +154,7 @@ namespace dp2mini
                     goto ERROR1;
 
                 // 输出报表
-                string result = ChargingAnalysisService.Instance.OutputReport("", "");
+                string html = ChargingAnalysisService.Instance.OutputReport("", "");
 
 
 
@@ -157,7 +162,10 @@ namespace dp2mini
                 // 进行取合，放在借书报表中
                 this.Invoke((Action)(() =>
                 {
-                    this.textBox_result.Text = result;
+
+                    SetHtmlString(this.webBrowser1, html);
+
+                    //this.textBox_result.Text = result;
 
                     //// 借书统计
                     //this.StatisBorrow();
@@ -197,6 +205,20 @@ namespace dp2mini
                 MessageBox.Show(strError);
             }
             ));
+        }
+
+
+        // 给浏览器控件设置html
+        public static void SetHtmlString(WebBrowser webBrowser,
+            string strHtml)
+        {
+            webBrowser.DocumentText = strHtml;
+        }
+
+        // 设置文本
+        static void SetTextString(WebBrowser webBrowser, string strText)
+        {
+            SetHtmlString(webBrowser, "<pre>" + HttpUtility.HtmlEncode(strText) + "</pre>");
         }
 
         // 对借书日志进行聚合

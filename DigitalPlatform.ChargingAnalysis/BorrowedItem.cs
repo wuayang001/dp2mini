@@ -56,7 +56,7 @@ namespace DigitalPlatform.ChargingAnalysis
         public BorrowedItem(ChargingItemWrapper itemWrapper)
         {
             // 借阅历史中的记录
-            this.Type = "0";
+            this.Type = "1";
 
             this.chargingItem = itemWrapper.Item;
             this.relatedItem = itemWrapper.RelatedItem;
@@ -64,22 +64,24 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
             // 从还书记录中获取信息
-            this.ReturnTime = this.chargingItem.OperTime;
-            DateTime day = DateTimeUtil.ParseFreeTimeString(this.ReturnTime);
+            this.ReturnTimeOriginal = this.chargingItem.OperTime;
+            DateTime day = DateTimeUtil.ParseFreeTimeString(this.ReturnTimeOriginal);
             this.ReturnYear = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
             this.ReturnMonth = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
             this.ReturnDay = day.ToString("yyyy/MM/dd");
+            this.ReturnTime = day.ToString("yyyy-MM-dd HH:mm:ss");  //转换成统计的格式，方便排序
 
             this.ItemBarcode = this.chargingItem.ItemBarcode;
             this.PatronBarcode = this.chargingItem.PatronBarcode;
 
 
             // 从借书记录中获取信息
-            this.BorrowTime = this.relatedItem.OperTime;
-            day = DateTimeUtil.ParseFreeTimeString(this.BorrowTime);
+            this.BorrowTimeOriginal = this.relatedItem.OperTime;
+            day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
             this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
             this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
             this.BorrowDay= day.ToString("yyyy/MM/dd");//
+            this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
             this.BorrowPeriod = this.relatedItem.Period;
 
@@ -90,7 +92,7 @@ namespace DigitalPlatform.ChargingAnalysis
         public BorrowedItem(string patronBarcode,XmlNode borrowNode)
         {
             // 在借图书
-            this.Type = "1";
+            this.Type = "0";
 
             /*
               <borrow barcode="B001" oi="" recPath="中文图书实体/13" biblioRecPath="中文图书/6" 
@@ -103,11 +105,12 @@ namespace DigitalPlatform.ChargingAnalysis
             this.PatronBarcode = patronBarcode;
 
             // 从借书记录中获取信息
-            this.BorrowTime =   DateTimeUtil.LocalDate(DomUtil.GetAttr(borrowNode, "borrowDate"));
-           DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTime);
+            this.BorrowTimeOriginal =   DateTimeUtil.LocalTime(DomUtil.GetAttr(borrowNode, "borrowDate"));
+           DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
             this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
             this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
             this.BorrowDay = day.ToString("yyyy/MM/dd");//
+            this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
             string strPeriod = DomUtil.GetAttr(borrowNode, "borrowPeriod");
 
@@ -127,6 +130,7 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
         // 还书时间
+        public string ReturnTimeOriginal { get; set; }  //从服务器获取的原始时间
         public string ReturnTime { get; set; }
         public string ReturnYear { get; set; }
         public string ReturnMonth { get; set; }
@@ -140,6 +144,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
         // 借书时间
+        public string BorrowTimeOriginal { get; set; }  //从服务器获取的原始时间
         public string BorrowTime { get; set; }
         public string BorrowYear { get; set; }
         public string BorrowMonth { get; set; }
@@ -155,7 +160,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
 
-        // 类型，1表示在借未还的，0表示借阅历史中的，排序的时候，先按type排，再按借书时倒序排
+        // 类型，0表示在借未还的，1表示借阅历史中的，排序的时候，先按type排，再按借书时倒序排
         public string Type { get; set; }
 
         public string Dump()

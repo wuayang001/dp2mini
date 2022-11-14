@@ -1870,6 +1870,8 @@ namespace DigitalPlatform.LibraryRestClient
         }
 
 
+        // timeRange 2022/10/11 00:00~2022/11/09 24:00
+        
         public long SearchCharging(string patronBarcode,
     string timeRange,
     string actions,

@@ -51,5 +51,9 @@
       <Name>common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="body.html" />
+    <Content Include="layout.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
