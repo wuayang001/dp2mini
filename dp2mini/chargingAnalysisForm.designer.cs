@@ -88,6 +88,7 @@
             this.textBox_patronBarcode = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.button_download = new System.Windows.Forms.Button();
             this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -462,14 +463,25 @@
             this.webBrowser1.Location = new System.Drawing.Point(35, 176);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(1155, 544);
+            this.webBrowser1.Size = new System.Drawing.Size(1219, 544);
             this.webBrowser1.TabIndex = 21;
+            // 
+            // button_download
+            // 
+            this.button_download.Location = new System.Drawing.Point(1036, 101);
+            this.button_download.Name = "button_download";
+            this.button_download.Size = new System.Drawing.Size(138, 56);
+            this.button_download.TabIndex = 22;
+            this.button_download.Text = "下载";
+            this.button_download.UseVisualStyleBackColor = true;
+            this.button_download.Click += new System.EventHandler(this.button_download_Click);
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1202, 743);
+            this.ClientSize = new System.Drawing.Size(1266, 743);
+            this.Controls.Add(this.button_download);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.textBox_patronBarcode);
             this.Controls.Add(this.comboBox_quickSetFilenames);
@@ -551,5 +563,6 @@
         private System.Windows.Forms.TextBox textBox_patronBarcode;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.WebBrowser webBrowser1;
+        private System.Windows.Forms.Button button_download;
     }
 }

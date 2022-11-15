@@ -995,6 +995,11 @@ namespace DigitalPlatform.LibraryRestClient
                     baData);
 
                 string strResult = Encoding.UTF8.GetString(result);
+                if (string.IsNullOrEmpty(strResult) == true)
+                {
+                    strError = "返回消息为空内容。";
+                    return -1;
+                }
 
                 GetReaderInfoResponse response = Deserialize<GetReaderInfoResponse>(strResult);
                 strRecPath = response.strRecPath;

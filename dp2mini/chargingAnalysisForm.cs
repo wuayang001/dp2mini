@@ -67,8 +67,15 @@ namespace dp2mini
             string userName = this._mainForm.Setting.UserName;
             string password = this._mainForm.Setting.Password;
             string parameters = "type=worker,client=dp2mini|" + ClientInfo.ClientVersion;//Program.ClientVersion;
-            ChargingAnalysisService.Instance.Init(chargingAnalysisDataDir,
-                serverUrl, userName, password, parameters);
+            string strError = "";
+            int nRet =ChargingAnalysisService.Instance.Init(chargingAnalysisDataDir,
+                serverUrl, userName, password, parameters,
+                out strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, strError);
+                return;
+            }
         }
 
         /// <summary>
@@ -154,12 +161,15 @@ namespace dp2mini
                     goto ERROR1;
 
                 // 输出报表
-                string html = ChargingAnalysisService.Instance.OutputReport("", "");
+                string html = "";
+                nRet= ChargingAnalysisService.Instance.OutputReport("html",
+                    out html,
+                    out strError);
+                if (nRet == -1)
+                    goto ERROR1;
 
 
-
-
-                // 进行取合，放在借书报表中
+                // 把html显示在界面上
                 this.Invoke((Action)(() =>
                 {
 
@@ -291,7 +301,7 @@ namespace dp2mini
 
 
         // 对借书和还书日志进行聚合
-        public void StatisBorrowAndReturn()
+        public void GroupByClass()
         {
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = this._borrowAndReturnItems.GroupBy(
@@ -1008,6 +1018,53 @@ namespace dp2mini
             {
                 this.search();
             }
+        }
+
+        // 把html下载到本地
+        private void button_download_Click(object sender, EventArgs e)
+        {
+            // 输出报表
+            //string html = ChargingAnalysisService.Instance.OutputReport("", "");
+
+            // 输出报表
+            string html = "";
+            string strError = "";
+            int nRet = ChargingAnalysisService.Instance.OutputReport("html",
+                out html,
+                out strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, strError);
+                return;
+            }
+
+            // 把html保存到文件
+            // 询问文件名
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                Title = "请指定文件名",
+                CreatePrompt = false,
+                OverwritePrompt = true,
+                // dlg.FileName = this.ExportExcelFilename;
+                // dlg.InitialDirectory = Environment.CurrentDirectory;
+                Filter = "网页 (*.html)|*.html|All files (*.*)|*.*",
+
+                RestoreDirectory = true
+            };
+
+            // 如果在询问文件名对话框，点了取消，退不处理，返回0，
+            if (dlg.ShowDialog() != DialogResult.OK)
+                return;
+
+            string fileName=dlg.FileName;
+
+            // StreamWriter当文件不存在时，会自动创建一个新文件。
+            using (StreamWriter writer = new StreamWriter(fileName,false,Encoding.UTF8))
+            {
+                // 写到打印文件
+                writer.Write(html);
+            }
+
         }
     }
 

@@ -3,6 +3,7 @@ using DigitalPlatform.LibraryRestClient;
 using DigitalPlatform.Marc;
 using DigitalPlatform.Xml;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,12 +43,36 @@ namespace DigitalPlatform.ChargingAnalysis
             }
         }
 
+        Hashtable _clcHT = new Hashtable();
+
+        // todo要改为有返回出错信息
         // chargingAnalysisDataDir：阅读分析的数据目录，里面有html配置文件
-        public void Init(string chargingAnalysisDataDir,
-            string serverUrl, string userName, string passowrd, string loginParameters)
+        public int Init(string dataDir,
+            string serverUrl, string userName, string passowrd, string loginParameters,
+            out string strError)
         {
+            strError = "";
+
             // 阅读分析的数据目录
-            this._chargingAnalysisDataDir = chargingAnalysisDataDir;
+            this._dataDir = dataDir;
+
+            string clcclassFile = Path.Combine(this._dataDir, "clcclass.txt");
+            if (File.Exists(clcclassFile) == false)
+            {
+                strError = "'" + clcclassFile + "'配置文件不存在，请联系系统管理员。";
+               return -1;
+            }
+
+            using (StreamReader reader = new StreamReader(clcclassFile))//, Encoding.UTF8))
+            {
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] a= line.Split(new char[] { '\t' });
+                    _clcHT.Add(a[0],a[1]);
+                    //sb.Append("<p>").Append(line).Append("</p>").AppendLine();
+                }
+            }
 
             // 访问dp2服务器的地址和帐号
             this.dp2ServerUrl = serverUrl;
@@ -56,6 +81,8 @@ namespace DigitalPlatform.ChargingAnalysis
             this.dp2LoginParameters = loginParameters;
             this._channelPool.BeforeLogin -= channelPool_BeforeLogin;
             this._channelPool.BeforeLogin += channelPool_BeforeLogin;
+
+            return 0;
         }
 
         #endregion
@@ -63,7 +90,7 @@ namespace DigitalPlatform.ChargingAnalysis
         #region 关于通道
         // 通道池
         RestChannelPool _channelPool = new RestChannelPool();
-        private string _chargingAnalysisDataDir;
+        private string _dataDir;
 
         public string dp2ServerUrl { get; set; }
         public string dp2Username { get; set; }
@@ -118,13 +145,16 @@ namespace DigitalPlatform.ChargingAnalysis
         // 创建内存结构
         // patronBarcode：读者证条码
         // times：操作时间范围 2022/11/01~2022/11/01 11:00
-        public int Build(CancellationToken token, 
-            string patronBarcode, 
+        public int Build(CancellationToken token,
+            string patronBarcode,
             string times,
             out string strError)
         {
             strError = "";
             long lRet = 0;
+
+            // 选将创建完成的变量置为false
+            this._built = false;
 
             // 先清空读者借阅历史内存集合
             this._borrowedItems.Clear();
@@ -152,7 +182,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 dom.LoadXml(strPatronXml);
 
                 // 把读者xml解析后存到内存中
-                this._patron=this.ParsePatronXml(dom, strRecPath);
+                this._patron = this.ParsePatronXml(dom, strRecPath);
 
                 // 把在借信息存到内存数组中，目前与借阅历史存在一起
                 XmlNodeList borrowNodes = dom.DocumentElement.SelectNodes("borrows/borrow");
@@ -235,10 +265,20 @@ namespace DigitalPlatform.ChargingAnalysis
                     }
                 }
 
+                // 按中图法聚合
+                this._classList = this._borrowedItems.GroupBy(
+                    x => new { x.BigClass },
+                    (key, item_list) => new ClassGroup
+                    {
+                        clcClass = key.BigClass,
+                        clcName=(string)this._clcHT[key.BigClass],
+                        Items = new List<BorrowedItem>(item_list)
+                    }).OrderBy(o => o.clcClass).ToList();
+
 
 
                 //==结束==
-
+                this._built = true;
                 return 0;
 
             }
@@ -247,6 +287,18 @@ namespace DigitalPlatform.ChargingAnalysis
                 this._channelPool.ReturnChannel(channel);
             }
 
+        }
+
+        public List<ClassGroup> _classList;
+
+        public class ClassGroup
+        {
+            public string clcClass { get; set; }
+
+            public string clcName { get; set; }
+            public int totalCount { get; set; }
+
+            public List<BorrowedItem> Items { get; set; }
         }
 
         // 解析读者xml到内存对象
@@ -577,28 +629,28 @@ namespace DigitalPlatform.ChargingAnalysis
             string title = DomUtil.GetElementAttr(root, "line[@type='title_area']", "value");
             item.Title = title;
 
-                //// 处理题名等信息
-                //string strOutMarcSyntax = "";
-                //string strMARC = "";
-                //int nRet = MarcUtil.Xml2Marc(strBiblio,
-                //    false,
-                //    "", // 自动识别 MARC 格式
-                //    out strOutMarcSyntax,
-                //    out strMARC,
-                //    out strError);
-                //if (nRet == -1)
-                //    return -1;
+            //// 处理题名等信息
+            //string strOutMarcSyntax = "";
+            //string strMARC = "";
+            //int nRet = MarcUtil.Xml2Marc(strBiblio,
+            //    false,
+            //    "", // 自动识别 MARC 格式
+            //    out strOutMarcSyntax,
+            //    out strMARC,
+            //    out strError);
+            //if (nRet == -1)
+            //    return -1;
 
-                //MarcRecord marcRecord = new MarcRecord(strMARC);
-                //string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
-                //item.Title = title;
-                //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
-                //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
-
-
+            //MarcRecord marcRecord = new MarcRecord(strMARC);
+            //string title = marcRecord.select("field[@name='200']/subfield[@name='a']").FirstContent;
+            //item.Title = title;
+            //ISBN = marcRecord.select("field[@name='010']/subfield[@name='a']").FirstContent;
+            //reserItem.Author = marcRecord.select("field[@name='200']/subfield[@name='f']").FirstContent;
 
 
-                return 0;
+
+
+            return 0;
 
         ERROR1:
             //return -1;
@@ -609,35 +661,49 @@ namespace DigitalPlatform.ChargingAnalysis
 
         public const string C_Type_Borrow = "0";
         public const string C_Type_History = "1";
-    
 
+
+
+        // 是否已经创建好了数据
+        bool _built = false;
 
         // 输出报表
-        public string OutputReport(string style, string fileName)
+        // style:html/excel/xml
+        // fileName:目标文件名
+        public int OutputReport(string style,
+            out string content,
+            out string error)
         {
-            string error = "";
+            error = "";
+            content = "";
 
-            if (this._borrowedItems == null || this._borrowedItems.Count == 0)
+            if (this._built == false)
             {
-                error = "选择的日期范围该读者没有借阅记录。";
-                goto ERROR1;
+                error = "请先创建报表";
+                return -1;
+            }
+
+            if (this._patron == null)
+            {
+                error = "读者对象不存在，没有可导出的数据。";
+                return -1;
             }
 
             // 装载html模板，先layout，再加body。
-            if (string.IsNullOrEmpty(this._chargingAnalysisDataDir) == true)
+            if (string.IsNullOrEmpty(this._dataDir) == true)
             {
                 error = "在用户目录里缺少阅读分析使用的'ChargingAnalysis'目录，请联系系统管理员。";
                 goto ERROR1;
             }
 
-            string layoutFile = Path.Combine(this._chargingAnalysisDataDir, "layout.html");
+            string layoutFile = Path.Combine(this._dataDir, "layout.html");
             if (File.Exists(layoutFile) == false)
             {
-                error = "'"+layoutFile+"'配置文件不存在，请联系系统管理员。";
+                error = "'" + layoutFile + "'配置文件不存在，请联系系统管理员。";
                 goto ERROR1;
             }
 
-            string bodyFile = Path.Combine(this._chargingAnalysisDataDir, "body.html");
+            string bodyFile = Path.Combine(this._dataDir, "body.html");
             if (File.Exists(bodyFile) == false)
             {
                 error = "'" + bodyFile + "'配置文件不存在，请联系系统管理员。";
@@ -656,25 +722,20 @@ namespace DigitalPlatform.ChargingAnalysis
             string html = layoutHtml.Replace("%body%", bodyHtml);
 
             // 替换读者信息
-            
-                html = html.Replace("%patronBarcode%", this._patron.barcode);
+            html = html.Replace("%patronBarcode%", this._patron.barcode);
             html = html.Replace("%name%", this._patron.name);
             html = html.Replace("%gender%", this._patron.gender);
             html = html.Replace("%department%", this._patron.department);
 
-            //html = html.Replace("%firstBorrowDate%", this._patron.firstBorrowDate);
-            //html = html.Replace("%checkoutCount%", this._patron.historyCount.ToString());
-
-
-
-
-
-
             // 在借 和 借阅历史
+            //if (this._borrowedItems == null || this._borrowedItems.Count == 0)
+            //{
+            //    error = "选择的日期范围该读者没有借阅记录。";
+            //    goto ERROR1;
+            //}
             string onlyBorrowTable = "";
             string onlyHistoryTable = "";
             string allBorrowedTable = "";
-
             if (this._borrowedItems != null && this._borrowedItems.Count > 0)
             {
                 // linq语句排序，先将在借还未的排在前面，再按借书时间倒序
@@ -682,8 +743,6 @@ namespace DigitalPlatform.ChargingAnalysis
                 // 循环输出每笔借阅记录
                 foreach (BorrowedItem one in borrowedList)
                 {
-                    //html
-
                     string temp = "<tr>"
                         + "<td>" + one.ItemBarcode + "</td>"
                         + "<td>" + one.Title + "</td>"
@@ -700,10 +759,9 @@ namespace DigitalPlatform.ChargingAnalysis
                         onlyHistoryTable += temp;
                 }
 
-                onlyBorrowTable = "<table style='border: 1px solid green'>" + onlyBorrowTable+"</table>";
+                onlyBorrowTable = "<table style='border: 1px solid green'>" + onlyBorrowTable + "</table>";
                 onlyHistoryTable = "<table style='border: 1px solid yellow'>" + onlyHistoryTable + "</table>";
                 allBorrowedTable = "<table  style='border: 1px solid red'>" + allBorrowedTable + "</table>";
-
             }
 
             html = html.Replace("%onlyBorrowTable%", onlyBorrowTable);
@@ -724,17 +782,34 @@ namespace DigitalPlatform.ChargingAnalysis
             html = html.Replace("%borrowedCount%", borrowedCount);
 
             //// 按分类统计数量
-            //html = html.Replace("%covertClcCount%", patron.covertClcCount.ToString());
-            //html = html.Replace("%clcTable%", patron.clcTable);
+            string clcTable = "";
+            if (this._classList != null && this._classList.Count > 0)
+            {
+                // 循环输出每笔借阅记录
+                foreach (ClassGroup one in this._classList)
+                {
+                    string temp = "<tr>"
+                        + "<td>" + one.clcClass + "</td>"
+                        + "<td>" + one.clcName + "</td>"
+                        + "<td>" + one.Items.Count + "</td>"
+                        + "</tr>";
+
+                    clcTable += temp;
+                }
+
+                clcTable = "<table style='border: 1px solid green'>" + clcTable + "</table>";
+            }
+            html = html.Replace("%clcTable%", clcTable);
+
 
             //// 按年份统计数量
             //html = html.Replace("%yearTable%", patron.yearTable);
 
-            return html;
+            content = html;
+            return 0;
 
-
-ERROR1:
-            return error;
+        ERROR1:
+            return -1;
         }
 
     }
