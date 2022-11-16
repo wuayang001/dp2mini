@@ -135,6 +135,10 @@ namespace DigitalPlatform.ChargingAnalysis
 
         #endregion
 
+
+        // 分类统计显示前面的多少行
+        int _topCount = 5;
+
         // 读者对象
         Patron _patron = null;
 
@@ -265,13 +269,13 @@ namespace DigitalPlatform.ChargingAnalysis
                     }
                 }
 
-                // 按中图法聚合
+                // 按中图法聚合，todo是按分类排序，还是按数量排序？目前先按分类排序。后面看用户反馈。
                 this._classList = this._borrowedItems.GroupBy(
                     x => new { x.BigClass },
                     (key, item_list) => new ClassGroup
                     {
                         clcClass = key.BigClass,
-                        clcName=(string)this._clcHT[key.BigClass],
+                        clcName= GetClassCaption(key.BigClass),
                         Items = new List<BorrowedItem>(item_list)
                     }).OrderBy(o => o.clcClass).ToList();
 
@@ -288,6 +292,19 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
         }
+
+        public string GetClassCaption(string clcclass)
+        {
+            if (string.IsNullOrEmpty(clcclass) == true)
+                return "";
+
+            var o=this._clcHT[clcclass];
+            if (o == null)
+                return "";  //无对应的中文名称
+
+            return  (string)o;
+        }
+
 
         public List<ClassGroup> _classList;
 
@@ -549,6 +566,10 @@ namespace DigitalPlatform.ChargingAnalysis
         {
             strError = "";
 
+            // 取出大类
+            string bigClass = "空";
+            item.BigClass = bigClass;
+
             // 获取册记录
             string strItemXml = "";
             string strBiblio = "";
@@ -578,20 +599,14 @@ namespace DigitalPlatform.ChargingAnalysis
 
             //获取索取号
             string accessNo = DomUtil.GetElementInnerText(itemRoot, "accessNo");
+            item.AccessNo = accessNo;
 
             // 取出大类
-            string bigClass = "";
-            if (string.IsNullOrEmpty(accessNo) == true)
-            {
-                bigClass = "[空]";
-            }
-            else
+            if (string.IsNullOrEmpty(accessNo) == false)
             {
                 bigClass = accessNo.Substring(0, 1);
+                item.BigClass = bigClass;
             }
-
-            item.AccessNo = accessNo;
-            item.BigClass = bigClass;
 
             //获取馆藏地
             string location = DomUtil.GetElementInnerText(itemRoot, "location");
@@ -785,9 +800,21 @@ namespace DigitalPlatform.ChargingAnalysis
             string clcTable = "";
             if (this._classList != null && this._classList.Count > 0)
             {
+
+                int nCount = 0;
+
+                int restCount = 0;
+
                 // 循环输出每笔借阅记录
                 foreach (ClassGroup one in this._classList)
                 {
+
+                    if (nCount >= this._topCount)
+                    {
+                        restCount += one.Items.Count;
+                        continue;
+                    }
+
                     string temp = "<tr>"
                         + "<td>" + one.clcClass + "</td>"
                         + "<td>" + one.clcName + "</td>"
@@ -795,6 +822,18 @@ namespace DigitalPlatform.ChargingAnalysis
                         + "</tr>";
 
                     clcTable += temp;
+
+                    // 数量加1
+                    nCount++;
+                }
+
+                // 补一行其它
+                if (restCount > 0)
+                {
+                    clcTable += "<tr>"
+                        + "<td colspan='2'>其它</td>"
+                        + "<td>" + restCount + "</td>"
+                        + "</tr>";
                 }
 
                 clcTable = "<table style='border: 1px solid green'>" + clcTable + "</table>";
