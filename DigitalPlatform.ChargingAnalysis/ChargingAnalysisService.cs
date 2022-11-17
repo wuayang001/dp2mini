@@ -60,7 +60,7 @@ namespace DigitalPlatform.ChargingAnalysis
             if (File.Exists(clcclassFile) == false)
             {
                 strError = "'" + clcclassFile + "'配置文件不存在，请联系系统管理员。";
-               return -1;
+                return -1;
             }
 
             using (StreamReader reader = new StreamReader(clcclassFile))//, Encoding.UTF8))
@@ -68,8 +68,8 @@ namespace DigitalPlatform.ChargingAnalysis
                 string line = "";
                 while ((line = reader.ReadLine()) != null)
                 {
-                    string[] a= line.Split(new char[] { '\t' });
-                    _clcHT.Add(a[0],a[1]);
+                    string[] a = line.Split(new char[] { '\t' });
+                    _clcHT.Add(a[0], a[1]);
                     //sb.Append("<p>").Append(line).Append("</p>").AppendLine();
                 }
             }
@@ -138,13 +138,9 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 分类统计显示前面的多少行
         int _topCount = 5;
+        public const string C_Type_Borrow = "0";
+        public const string C_Type_History = "1";
 
-        // 读者对象
-        Patron _patron = null;
-
-        // 借书记录集合
-        List<BorrowedItem> _borrowedItems = new List<BorrowedItem>();
-        public string _times = "";
 
         // 创建内存结构
         // patronBarcode：读者证条码
@@ -154,26 +150,37 @@ namespace DigitalPlatform.ChargingAnalysis
             //string times,
             string startDate,
             string endDate,
+            out ChargingAnalysisReport report,
             out string strError)
         {
             strError = "";
             long lRet = 0;
 
+            report = new ChargingAnalysisReport();
+
             // 注意这里范围只用于显示，显示的时候就不带日期了，要不显示的很长。
             // 实际检索时要带了时间。
-            this._times = startDate + "~" + endDate;
+            report.times = startDate + "~" + endDate;
             string times = startDate + " 00:00" + "~" + endDate + " 23:59";
 
 
             // 选将创建完成的变量置为false
-            this._built = false;
+            report.built = false;
+            report.patron = null;
 
-            // 先清空读者借阅历史内存集合
-            this._borrowedItems.Clear();
+            // 先清空读者数据集合
+            report.borrowedItems = null;
+            report.classGroups = null;
+            report.yearGroups = null;
+            report.quarterGroups = null;
+            report.monthGroups = null;
 
             RestChannel channel = this.GetChannel();
             try
             {
+                report.borrowedItems = new List<BorrowedItem>();
+
+
                 // 获取读者信息
                 string[] results = null;
                 string strRecPath = "";
@@ -194,19 +201,18 @@ namespace DigitalPlatform.ChargingAnalysis
                 dom.LoadXml(strPatronXml);
 
                 // 把读者xml解析后存到内存中
-                this._patron = this.ParsePatronXml(dom, strRecPath);
+                report.patron = this.ParsePatronXml(dom, strRecPath);
 
                 // 把在借信息存到内存数组中，目前与借阅历史存在一起
                 XmlNodeList borrowNodes = dom.DocumentElement.SelectNodes("borrows/borrow");
                 foreach (XmlNode borrowNode in borrowNodes)
                 {
                     BorrowedItem item = new BorrowedItem(patronBarcode, borrowNode);
-                    this._borrowedItems.Add(item);
+                    report.borrowedItems.Add(item);
                 }
 
 
                 //==以下为获取借阅历史==
-
                 long totalCount = 0;  //返回的value即为总共命中条数
                 long start = 0;
                 long preCount = 2;   // 每次获取几条 //lHitCount;
@@ -250,7 +256,7 @@ namespace DigitalPlatform.ChargingAnalysis
                             token.ThrowIfCancellationRequested();
 
                             BorrowedItem item = new BorrowedItem(one);
-                            this._borrowedItems.Add(item);
+                            report.borrowedItems.Add(item);
                         }
                     }
 
@@ -264,7 +270,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
                 // 获取册信息与书目信息，用同一根通道即可
-                foreach (BorrowedItem item in this._borrowedItems)
+                foreach (BorrowedItem item in report.borrowedItems)
                 {
                     // 外面停止
                     token.ThrowIfCancellationRequested();
@@ -278,17 +284,17 @@ namespace DigitalPlatform.ChargingAnalysis
                 }
 
                 // 按中图法聚合，todo是按分类排序，还是按数量排序？目前先按分类排序。后面看用户反馈。
-                this._classGroups = this._borrowedItems.GroupBy(
+                report.classGroups = report.borrowedItems.GroupBy(
                     x => new { x.BigClass },
                     (key, item_list) => new GroupItem
                     {
                         name = key.BigClass,
-                        caption= GetClassCaption(key.BigClass),
+                        caption = GetClassCaption(key.BigClass),
                         items = new List<BorrowedItem>(item_list)
                     }).OrderBy(o => o.name).ToList();
 
                 // 按年聚合
-                this._yearGroups = this._borrowedItems.GroupBy(
+                report.yearGroups = report.borrowedItems.GroupBy(
                     x => new { x.BorrowDate.Year },
                     (key, item_list) => new GroupItem
                     {
@@ -298,7 +304,7 @@ namespace DigitalPlatform.ChargingAnalysis
                     }).OrderBy(o => o.name).ToList();
 
                 // 按季度聚合
-                this._quarterGroups = this._borrowedItems.GroupBy(
+                report.quarterGroups = report.borrowedItems.GroupBy(
                     x => new { x.BorrowDate.Quarter },
                     (key, item_list) => new GroupItem
                     {
@@ -308,7 +314,7 @@ namespace DigitalPlatform.ChargingAnalysis
                     }).OrderBy(o => o.name).ToList();
 
                 // 按月聚合
-                this._monthGroups = this._borrowedItems.GroupBy(
+                report.monthGroups = report.borrowedItems.GroupBy(
                     x => new { x.BorrowDate.Month },
                     (key, item_list) => new GroupItem
                     {
@@ -319,7 +325,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
                 //==结束==
-                this._built = true;
+                report.built = true;
                 return 0;
 
             }
@@ -335,29 +341,13 @@ namespace DigitalPlatform.ChargingAnalysis
             if (string.IsNullOrEmpty(clcclass) == true)
                 return "";
 
-            var o=this._clcHT[clcclass];
+            var o = this._clcHT[clcclass];
             if (o == null)
                 return "";  //无对应的中文名称
 
-            return  (string)o;
+            return (string)o;
         }
 
-
-        public List<GroupItem> _classGroups;  // 分类统计
-        public List<GroupItem> _yearGroups;// 按年统计
-        public List<GroupItem> _quarterGroups;// 按季度统计
-        public List<GroupItem> _monthGroups;// 按月统计类统计
-
-
-        public class GroupItem
-        {
-            public string name { get; set; }
-
-            public string caption { get; set; }
-            public int totalCount { get; set; }
-
-            public List<BorrowedItem> items { get; set; }
-        }
 
         // 解析读者xml到内存对象
         public Patron ParsePatronXml(XmlDocument dom,
@@ -600,7 +590,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
         // 获取册信息
-        public int GetItemInfo(RestChannel channel,
+        private int GetItemInfo(RestChannel channel,
             string strItemBarcode,
             BorrowedItem item,
             out string strError)
@@ -715,31 +705,32 @@ namespace DigitalPlatform.ChargingAnalysis
 
         }
 
-        public const string C_Type_Borrow = "0";
-        public const string C_Type_History = "1";
 
-
-
-        // 是否已经创建好了数据
-        bool _built = false;
 
         // 输出报表
         // style:html/excel/xml
         // fileName:目标文件名
-        public int OutputReport(string style,
+        public int OutputReport(ChargingAnalysisReport report,
+            string style,
             out string content,
             out string error)
         {
             error = "";
             content = "";
 
-            if (this._built == false)
+            if (report == null)
+            {
+                error = "传入的report参数不能为null";
+                return -1;
+            }
+
+            if (report.built == false)
             {
                 error = "请先创建报表";
                 return -1;
             }
 
-            if (this._patron == null)
+            if (report.patron == null)
             {
                 error = "读者对象不存在，没有可导出的数据。";
                 return -1;
@@ -759,50 +750,55 @@ namespace DigitalPlatform.ChargingAnalysis
                 goto ERROR1;
             }
 
+
+            string bodyHtml = "";
             string bodyFile = Path.Combine(this._dataDir, "body.html");
-            if (File.Exists(bodyFile) == false)
+            if (File.Exists(bodyFile) == true)  // 允许不存在
             {
-                error = "'" + bodyFile + "'配置文件不存在，请联系系统管理员。";
-                goto ERROR1;
+                //error = "'" + bodyFile + "'配置文件不存在，请联系系统管理员。";
+                //goto ERROR1;
+
+                // 把layout装载到内存
+                StreamReader sBody = new StreamReader(bodyFile, Encoding.UTF8);
+                bodyHtml = sBody.ReadToEnd();
             }
 
             // 把layout装载到内存
             StreamReader sLayout = new StreamReader(layoutFile, Encoding.UTF8);
             string layoutHtml = sLayout.ReadToEnd();
 
-            // 把layout装载到内存
-            StreamReader sBody = new StreamReader(bodyFile, Encoding.UTF8);
-            string bodyHtml = sBody.ReadToEnd();
-
             // 把layout中的%body%替换为配置的body文件的内容。
             string html = layoutHtml.Replace("%body%", bodyHtml);
 
             // 替换读者信息
-            html = html.Replace("%patronBarcode%", this._patron.barcode);
-            html = html.Replace("%name%", string.IsNullOrEmpty(this._patron.name) == false ? this._patron.name : "&nbsp;");
-            html = html.Replace("%gender%", string.IsNullOrEmpty(this._patron.gender)==false?this._patron.gender:"&nbsp;");
-            html = html.Replace("%state%", string.IsNullOrEmpty(this._patron.state) == false ? this._patron.state : "&nbsp;");
-            html = html.Replace("%department%", string.IsNullOrEmpty(this._patron.department) == false ? this._patron.department : "&nbsp;");
-            html = html.Replace("%patronType%", string.IsNullOrEmpty(this._patron.readerType) == false ? this._patron.readerType : "&nbsp;");
+            html = html.Replace("%patronBarcode%", report.patron.barcode);
+            html = html.Replace("%name%", string.IsNullOrEmpty(report.patron.name) == false ? report.patron.name : "&nbsp;");
+            html = html.Replace("%gender%", string.IsNullOrEmpty(report.patron.gender) == false ? report.patron.gender : "&nbsp;");
+            html = html.Replace("%state%", string.IsNullOrEmpty(report.patron.state) == false ? report.patron.state : "&nbsp;");
+            html = html.Replace("%department%", string.IsNullOrEmpty(report.patron.department) == false ? report.patron.department : "&nbsp;");
+            html = html.Replace("%patronType%", string.IsNullOrEmpty(report.patron.readerType) == false ? report.patron.readerType : "&nbsp;");
 
             // 时间范围
-            html = html.Replace("%times%", this._times);
+            html = html.Replace("%times%", report.times);
 
 
-
-            // 在借 和 借阅历史
-            //if (this._borrowedItems == null || this._borrowedItems.Count == 0)
+            // todo后面把每一行输出到表格
+            //string tableXml = "";
+            //string tableXmlFile = Path.Combine(this._dataDir, "table.xml");
+            //if (File.Exists(tableXmlFile) == true)  // 允许不存在
             //{
-            //    error = "选择的日期范围该读者没有借阅记录。";
-            //    goto ERROR1;
+            //    // 装载到dom
+
             //}
+
+
             string onlyBorrowTable = "";
             string onlyHistoryTable = "";
             string allBorrowedTable = "";
-            if (this._borrowedItems != null && this._borrowedItems.Count > 0)
+            if (report.borrowedItems != null && report.borrowedItems.Count > 0)
             {
                 // linq语句排序，先将在借还未的排在前面，再按借书时间倒序
-                var borrowedList = this._borrowedItems.OrderBy(x => x.Type).ThenByDescending(x => x.BorrowDate.Time);//.BorrowTime);
+                var borrowedList = report.borrowedItems.OrderBy(x => x.Type).ThenByDescending(x => x.BorrowDate.Time);//.BorrowTime);
                 // 循环输出每笔借阅记录
                 foreach (BorrowedItem one in borrowedList)
                 {
@@ -833,13 +829,13 @@ namespace DigitalPlatform.ChargingAnalysis
 
                 string titleTR = "<tr class='title'><td>册条码</td><td>题名和责任者</td><td>索取号</td><td>借书时间</td><td>还书时间</td></tr>";
 
-                if (string.IsNullOrEmpty(onlyBorrowTable)==false)
+                if (string.IsNullOrEmpty(onlyBorrowTable) == false)
                     onlyBorrowTable = "<table class='statisTable'>" + titleTR + onlyBorrowTable + "</table>";
-                
-                if (string.IsNullOrEmpty(onlyHistoryTable)==false)
+
+                if (string.IsNullOrEmpty(onlyHistoryTable) == false)
                     onlyHistoryTable = "<table class='statisTable'>" + titleTR + onlyHistoryTable + "</table>";
-                
-                if (string.IsNullOrEmpty(allBorrowedTable)==false)
+
+                if (string.IsNullOrEmpty(allBorrowedTable) == false)
                     allBorrowedTable = "<table class='statisTable'>" + titleTR + allBorrowedTable + "</table>";
             }
 
@@ -850,9 +846,9 @@ namespace DigitalPlatform.ChargingAnalysis
             string firstBorrowDate = "";
             string borrowedCount = "0";
             // 第一次借书时间
-            if (this._borrowedItems != null && this._borrowedItems.Count > 0)
+            if (report.borrowedItems != null && report.borrowedItems.Count > 0)
             {
-                var list2 = this._borrowedItems.OrderBy(x => x.BorrowDate.Time).ToList();
+                var list2 = report.borrowedItems.OrderBy(x => x.BorrowDate.Time).ToList();
                 firstBorrowDate = list2[0].BorrowDate.Date;
                 borrowedCount = list2.Count.ToString();
             }
@@ -862,7 +858,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
             //// 按分类统计数量
             string clcTable = "";
-            if (this._classGroups != null && this._classGroups.Count > 0)
+            if (report.classGroups != null && report.classGroups.Count > 0)
             {
                 int nCount = 0;
 
@@ -870,7 +866,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 int restCount = 0;
 
                 // 循环输出每笔借阅记录
-                foreach (GroupItem one in this._classGroups)
+                foreach (GroupItem one in report.classGroups)
                 {
 
                     if (nCount >= this._topCount)
@@ -907,13 +903,11 @@ namespace DigitalPlatform.ChargingAnalysis
             html = html.Replace("%clcTable%", clcTable);
 
 
-
-
             // 按年份统计数量
             string yearTable = "";
-            if (this._yearGroups != null && this._yearGroups.Count > 0)
+            if (report.yearGroups != null && report.yearGroups.Count > 0)
             {
-                foreach (GroupItem one in this._yearGroups)
+                foreach (GroupItem one in report.yearGroups)
                 {
                     string temp = "<tr>"
                         + "<td>" + one.name + "</td>"
@@ -930,9 +924,9 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 按季度统计数量
             string quarterTable = "";
-            if (this._quarterGroups != null && this._quarterGroups.Count > 0)
+            if (report.quarterGroups != null && report.quarterGroups.Count > 0)
             {
-                foreach (GroupItem one in this._quarterGroups)
+                foreach (GroupItem one in report.quarterGroups)
                 {
                     string temp = "<tr>"
                         + "<td>" + one.name + "</td>"
@@ -948,9 +942,9 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 按月统计数量
             string monthTable = "";
-            if (this._monthGroups != null && this._monthGroups.Count > 0)
+            if (report.monthGroups != null && report.monthGroups.Count > 0)
             {
-                foreach (GroupItem one in this._monthGroups)
+                foreach (GroupItem one in report.monthGroups)
                 {
                     string temp = "<tr>"
                         + "<td>" + one.name + "</td>"
@@ -964,6 +958,11 @@ namespace DigitalPlatform.ChargingAnalysis
             }
             html = html.Replace("%monthTable%", monthTable);
 
+
+            // 馆长评语
+            //%comment%
+            html = html.Replace("%comment%", report.comment);
+
             //返回
             content = html;
             return 0;
@@ -971,6 +970,34 @@ namespace DigitalPlatform.ChargingAnalysis
         ERROR1:
             return -1;
         }
+
+    }
+
+
+    public class ChargingAnalysisReport
+    {
+
+        // 时间范围
+        public string times = "";
+
+        // 读者对象
+        public Patron patron = null;
+
+        // 是否已经创建好了数据
+        public bool built = false;
+
+
+        // 借书记录集合
+        public List<BorrowedItem> borrowedItems = new List<BorrowedItem>();
+
+
+        public List<GroupItem> classGroups;  // 分类统计
+        public List<GroupItem> yearGroups;// 按年统计
+        public List<GroupItem> quarterGroups;// 按季度统计
+        public List<GroupItem> monthGroups;// 按月统计类统计
+
+
+        public string comment { get; set; }
 
     }
 
@@ -1056,5 +1083,17 @@ namespace DigitalPlatform.ChargingAnalysis
         //public int ReservationCount { get; set; }
         //public int ArrivedCount { get; set; }
         //public string ReservationCountHtml { get; set; }
+    }
+
+
+
+    public class GroupItem
+    {
+        public string name { get; set; }
+
+        public string caption { get; set; }
+        public int totalCount { get; set; }
+
+        public List<BorrowedItem> items { get; set; }
     }
 }

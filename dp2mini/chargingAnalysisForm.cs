@@ -117,6 +117,8 @@ namespace dp2mini
             });
         }
 
+        public ChargingAnalysisReport _report = null;
+
         /// <summary>
         /// 检索做事的函数
         /// </summary>
@@ -157,13 +159,15 @@ namespace dp2mini
                     patronBarcode,
                     startDate,
                     endDate,
+                    out this._report,
                     out strError);
                 if (nRet == -1)
                     goto ERROR1;
 
                 // 输出报表
                 string html = "";
-                nRet= ChargingAnalysisService.Instance.OutputReport("html",
+                nRet= ChargingAnalysisService.Instance.OutputReport(this._report,
+                    "html",
                     out html,
                     out strError);
                 if (nRet == -1)
@@ -1030,7 +1034,8 @@ namespace dp2mini
             // 输出报表
             string html = "";
             string strError = "";
-            int nRet = ChargingAnalysisService.Instance.OutputReport("html",
+            int nRet = ChargingAnalysisService.Instance.OutputReport(this._report,
+                "html",
                 out html,
                 out strError);
             if (nRet == -1)
@@ -1080,8 +1085,36 @@ namespace dp2mini
             MessageBox.Show(this, DateTimeUtil.GetQuarter(day1));
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //ChargingAnalysisService.Instance._pa
 
+            if (this._report == null
+                || this._report.built==false)
+            {
+                MessageBox.Show(this, "请先创建报表。");
+                return;
+            }
 
+            // 设置评语
+            string comment = this.textBox_comment.Text.Trim();
+            this._report.comment = comment;
+
+            // 重新生成报表
+            string html = "";
+            string strError = "";
+            int nRet = ChargingAnalysisService.Instance.OutputReport(this._report,
+                "html",
+                out html,
+                out strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, strError);
+                return;
+            }
+            SetHtmlString(this.webBrowser1, html);
+
+        }
     }
 
 

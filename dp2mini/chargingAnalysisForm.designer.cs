@@ -91,7 +91,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox_comment = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
@@ -498,21 +498,21 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(13, 277);
+            this.label6.Location = new System.Drawing.Point(25, 282);
             this.label6.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(553, 30);
             this.label6.TabIndex = 25;
-            this.label6.Text = "馆长寄语（注：编辑完不要忘记提交哦）";
+            this.label6.Text = "馆长评语（注：编辑完不要忘记提交哦）";
             // 
-            // textBox1
+            // textBox_comment
             // 
-            this.textBox1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox1.Location = new System.Drawing.Point(19, 315);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(732, 410);
-            this.textBox1.TabIndex = 26;
+            this.textBox_comment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_comment.Location = new System.Drawing.Point(19, 324);
+            this.textBox_comment.Multiline = true;
+            this.textBox_comment.Name = "textBox_comment";
+            this.textBox_comment.Size = new System.Drawing.Size(732, 401);
+            this.textBox_comment.TabIndex = 26;
             // 
             // button2
             // 
@@ -522,8 +522,9 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(194, 57);
             this.button2.TabIndex = 27;
-            this.button2.Text = "提交寄语";
+            this.button2.Text = "提交评语";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // chargingAnalysisForm
             // 
@@ -531,7 +532,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1144, 815);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBox_comment);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button_download);
@@ -619,7 +620,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox_comment;
         private System.Windows.Forms.Button button2;
     }
 }
