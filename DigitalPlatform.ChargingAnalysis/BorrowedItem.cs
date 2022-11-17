@@ -65,11 +65,15 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 从还书记录中获取信息
             this.ReturnTimeOriginal = this.chargingItem.OperTime;
-            DateTime day = DateTimeUtil.ParseFreeTimeString(this.ReturnTimeOriginal);
-            this.ReturnYear = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
-            this.ReturnMonth = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
-            this.ReturnDay = day.ToString("yyyy/MM/dd");
-            this.ReturnTime = day.ToString("yyyy-MM-dd HH:mm:ss");  //转换成统计的格式，方便排序
+            this.ReturnDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.ReturnTimeOriginal));
+            //DateTime day = DateTimeUtil.ParseFreeTimeString(this.ReturnTimeOriginal);
+            //this.ReturnYear = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
+            //this.ReturnMonth = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
+            //this.ReturnDay = day.ToString("yyyy/MM/dd");
+            //this.ReturnTime = day.ToString("yyyy-MM-dd HH:mm:ss");  //转换成统计的格式，方便排序
+
+            // 季度
+            // day.AddMonths(0 - ((day.Month - 1) % 3)).ToString("yyyy-MM-01");
 
             this.ItemBarcode = this.chargingItem.ItemBarcode;
             this.PatronBarcode = this.chargingItem.PatronBarcode;
@@ -77,11 +81,12 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 从借书记录中获取信息
             this.BorrowTimeOriginal = this.relatedItem.OperTime;
-            day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
-            this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
-            this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
-            this.BorrowDay= day.ToString("yyyy/MM/dd");//
-            this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
+            this.BorrowDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal));
+            //day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
+            //this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
+            //this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
+            //this.BorrowDay= day.ToString("yyyy/MM/dd");//
+            //this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
             this.BorrowPeriod = this.relatedItem.Period;
 
@@ -106,11 +111,12 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 从借书记录中获取信息
             this.BorrowTimeOriginal =   DateTimeUtil.LocalTime(DomUtil.GetAttr(borrowNode, "borrowDate"));
-           DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
-            this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
-            this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
-            this.BorrowDay = day.ToString("yyyy/MM/dd");//
-            this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
+            this.BorrowDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal));
+           //DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
+           // this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
+           // this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
+           // this.BorrowDay = day.ToString("yyyy/MM/dd");//
+           // this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
             string strPeriod = DomUtil.GetAttr(borrowNode, "borrowPeriod");
 
@@ -131,10 +137,14 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 还书时间
         public string ReturnTimeOriginal { get; set; }  //从服务器获取的原始时间
-        public string ReturnTime { get; set; }
-        public string ReturnYear { get; set; }
-        public string ReturnMonth { get; set; }
-        public string ReturnDay { get; set; }
+
+        // 还书日期对象，用一个日期对象，里面有年/季度/月/日期/时间 属性
+        public DateItem ReturnDate { get; set; }
+
+        //public string ReturnTime { get; set; }
+        //public string ReturnYear { get; set; }
+        //public string ReturnMonth { get; set; }
+        //public string ReturnDay { get; set; }
 
         // 册条码
         public string ItemBarcode { get; set; }
@@ -145,10 +155,13 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 借书时间
         public string BorrowTimeOriginal { get; set; }  //从服务器获取的原始时间
-        public string BorrowTime { get; set; }
-        public string BorrowYear { get; set; }
-        public string BorrowMonth { get; set; }
-        public string BorrowDay { get; set; }
+                                                        
+        // 借书日期对象，用一个日期对象，里面有年/季度/月/日期/时间 属性
+        public DateItem BorrowDate { get; set; }
+        //public string BorrowTime { get; set; }
+        //public string BorrowYear { get; set; }
+        //public string BorrowMonth { get; set; }
+        //public string BorrowDay { get; set; }
 
         // 借期
         public string BorrowPeriod { get; set; }
@@ -169,11 +182,11 @@ namespace DigitalPlatform.ChargingAnalysis
                 + "Title=" + Title + ";"
                 //+ "BorrowYear=" + BorrowYear + ";"
                 //+ "BorrowMonth=" + BorrowMonth + ";"
-                + "BorrowDay=" + BorrowDay + ";"
+                + "BorrowDate=" + BorrowDate.Date + ";"
                 //+ "BorrowTime=" + BorrowTime + ";"
                 //+ "ReturnYear=" + ReturnYear + ";"
                 //+ "ReturnMonth=" + ReturnMonth + ";"
-                + "ReturnDay=" + ReturnDay + ";"
+                + "ReturnDate=" + ReturnDate.Date + ";"
                 //+ "ReturnTime=" + ReturnTime + ";";
                 + "AccessNo=" + AccessNo + ";"
                 + "BigClass=" + BigClass + ";"
@@ -183,5 +196,25 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
+    }
+
+    public class DateItem
+    {
+
+        public DateItem(DateTime day)
+        {
+            this.Year = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
+            this.Quarter=DateTimeUtil.GetQuarter(day);
+            this.Month = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
+            this.Date = day.ToString("yyyy/MM/dd");
+            this.Time = day.ToString("yyyy-MM-dd HH:mm:ss");  //转换成统计的格式，方便排序
+
+        }
+
+        public string Year { get; set; }
+        public string Quarter { get; set; }  //季度
+        public string Month { get; set; }
+        public string Date { get; set; }
+        public string Time { get; set; }
     }
 }

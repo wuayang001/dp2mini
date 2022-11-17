@@ -91,8 +91,8 @@ namespace dp2mini
         private void search()
         {
             //时间范围
-            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd")+" 00:00";
-            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd")+" 23:59";
+            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
+            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
 
             // 读者证条码号
             string patronBarcode = this.textBox_patronBarcode.Text.Trim();
@@ -150,12 +150,13 @@ namespace dp2mini
             try
             {
                 //
-                string times = startDate + "~" + endDate;
+                //string times = startDate + "~" + endDate;
 
                 // 创建数据
                 int nRet =ChargingAnalysisService.Instance.Build(token,
-                    patronBarcode, 
-                    times,
+                    patronBarcode,
+                    startDate,
+                    endDate,
                     out strError);
                 if (nRet == -1)
                     goto ERROR1;
@@ -1066,6 +1067,21 @@ namespace dp2mini
             }
 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //时间范围
+            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd") + " 00:00";
+            DateTime day1 = DateTimeUtil.ParseFreeTimeString(startDate);
+
+          //DateTime qd=   day1.AddMonths(0 - ((day1.Month - 1) % 3));
+          //  int q = qd.Month / 3 + 1;
+          //  string text = qd.ToString("yyyy-MM")+";"+ qd.ToString("yyyy") + "第"+q+"季度";
+            MessageBox.Show(this, DateTimeUtil.GetQuarter(day1));
+        }
+
+
+
     }
 
 

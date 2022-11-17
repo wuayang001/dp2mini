@@ -11,6 +11,15 @@ namespace DigitalPlatform.IO
     /// </summary>
     public class DateTimeUtil
     {
+
+        // 根据日期换算出季度
+        public static string GetQuarter(DateTime day)
+        {
+            DateTime qd = day.AddMonths(0 - ((day.Month - 1) % 3));
+            int q = qd.Month / 3 + 1;
+            return qd.ToString("yyyy") + "第" + q + "季度";
+        }
+
         // 日期转换成yyyy-MM-dd HH:mm:ss格式字符串
         public static string DateTimeToString(DateTime time)
         {

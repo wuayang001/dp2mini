@@ -289,7 +289,7 @@
     <Compile Include="opeLog\OperLogLoader.cs" />
     <Compile Include="opeLog\ProgressEstimate.cs" />
     <Compile Include="opeLog\Stop.cs" />
-    <Compile Include="io\DateTimeUtil.cs" />
+    <Content Include="io\DateTimeUtil.txt" />
     <Compile Include="io\PathUtil.cs" />
     <Compile Include="LoginForm.cs">
       <SubType>Form</SubType>

@@ -144,18 +144,26 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 借书记录集合
         List<BorrowedItem> _borrowedItems = new List<BorrowedItem>();
-
+        public string _times = "";
 
         // 创建内存结构
         // patronBarcode：读者证条码
         // times：操作时间范围 2022/11/01~2022/11/01 11:00
         public int Build(CancellationToken token,
             string patronBarcode,
-            string times,
+            //string times,
+            string startDate,
+            string endDate,
             out string strError)
         {
             strError = "";
             long lRet = 0;
+
+            // 注意这里范围只用于显示，显示的时候就不带日期了，要不显示的很长。
+            // 实际检索时要带了时间。
+            this._times = startDate + "~" + endDate;
+            string times = startDate + " 00:00" + "~" + endDate + " 23:59";
+
 
             // 选将创建完成的变量置为false
             this._built = false;
@@ -270,15 +278,44 @@ namespace DigitalPlatform.ChargingAnalysis
                 }
 
                 // 按中图法聚合，todo是按分类排序，还是按数量排序？目前先按分类排序。后面看用户反馈。
-                this._classList = this._borrowedItems.GroupBy(
+                this._classGroups = this._borrowedItems.GroupBy(
                     x => new { x.BigClass },
-                    (key, item_list) => new ClassGroup
+                    (key, item_list) => new GroupItem
                     {
-                        clcClass = key.BigClass,
-                        clcName= GetClassCaption(key.BigClass),
-                        Items = new List<BorrowedItem>(item_list)
-                    }).OrderBy(o => o.clcClass).ToList();
+                        name = key.BigClass,
+                        caption= GetClassCaption(key.BigClass),
+                        items = new List<BorrowedItem>(item_list)
+                    }).OrderBy(o => o.name).ToList();
 
+                // 按年聚合
+                this._yearGroups = this._borrowedItems.GroupBy(
+                    x => new { x.BorrowDate.Year },
+                    (key, item_list) => new GroupItem
+                    {
+                        name = key.Year,
+                        //caption = GetClassCaption(key.BigClass),
+                        items = new List<BorrowedItem>(item_list)
+                    }).OrderBy(o => o.name).ToList();
+
+                // 按季度聚合
+                this._quarterGroups = this._borrowedItems.GroupBy(
+                    x => new { x.BorrowDate.Quarter },
+                    (key, item_list) => new GroupItem
+                    {
+                        name = key.Quarter,
+                        //caption = GetClassCaption(key.BigClass),
+                        items = new List<BorrowedItem>(item_list)
+                    }).OrderBy(o => o.name).ToList();
+
+                // 按月聚合
+                this._monthGroups = this._borrowedItems.GroupBy(
+                    x => new { x.BorrowDate.Month },
+                    (key, item_list) => new GroupItem
+                    {
+                        name = key.Month,
+                        //caption = GetClassCaption(key.BigClass),
+                        items = new List<BorrowedItem>(item_list)
+                    }).OrderBy(o => o.name).ToList();
 
 
                 //==结束==
@@ -306,16 +343,20 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
-        public List<ClassGroup> _classList;
+        public List<GroupItem> _classGroups;  // 分类统计
+        public List<GroupItem> _yearGroups;// 按年统计
+        public List<GroupItem> _quarterGroups;// 按季度统计
+        public List<GroupItem> _monthGroups;// 按月统计类统计
 
-        public class ClassGroup
+
+        public class GroupItem
         {
-            public string clcClass { get; set; }
+            public string name { get; set; }
 
-            public string clcName { get; set; }
+            public string caption { get; set; }
             public int totalCount { get; set; }
 
-            public List<BorrowedItem> Items { get; set; }
+            public List<BorrowedItem> items { get; set; }
         }
 
         // 解析读者xml到内存对象
@@ -738,9 +779,16 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 替换读者信息
             html = html.Replace("%patronBarcode%", this._patron.barcode);
-            html = html.Replace("%name%", this._patron.name);
-            html = html.Replace("%gender%", this._patron.gender);
-            html = html.Replace("%department%", this._patron.department);
+            html = html.Replace("%name%", string.IsNullOrEmpty(this._patron.name) == false ? this._patron.name : "&nbsp;");
+            html = html.Replace("%gender%", string.IsNullOrEmpty(this._patron.gender)==false?this._patron.gender:"&nbsp;");
+            html = html.Replace("%state%", string.IsNullOrEmpty(this._patron.state) == false ? this._patron.state : "&nbsp;");
+            html = html.Replace("%department%", string.IsNullOrEmpty(this._patron.department) == false ? this._patron.department : "&nbsp;");
+            html = html.Replace("%patronType%", string.IsNullOrEmpty(this._patron.readerType) == false ? this._patron.readerType : "&nbsp;");
+
+            // 时间范围
+            html = html.Replace("%times%", this._times);
+
+
 
             // 在借 和 借阅历史
             //if (this._borrowedItems == null || this._borrowedItems.Count == 0)
@@ -754,16 +802,25 @@ namespace DigitalPlatform.ChargingAnalysis
             if (this._borrowedItems != null && this._borrowedItems.Count > 0)
             {
                 // linq语句排序，先将在借还未的排在前面，再按借书时间倒序
-                var borrowedList = this._borrowedItems.OrderBy(x => x.Type).ThenByDescending(x => x.BorrowTime);
+                var borrowedList = this._borrowedItems.OrderBy(x => x.Type).ThenByDescending(x => x.BorrowDate.Time);//.BorrowTime);
                 // 循环输出每笔借阅记录
                 foreach (BorrowedItem one in borrowedList)
                 {
+                    string borrowTime = "";
+                    if (one.BorrowDate != null)
+                        borrowTime = one.BorrowDate.Time;
+
+                    string returnTime = "";
+                    if (one.ReturnDate != null)
+                        returnTime = one.ReturnDate.Time;
+
+
                     string temp = "<tr>"
                         + "<td>" + one.ItemBarcode + "</td>"
                         + "<td>" + one.Title + "</td>"
                         + "<td>" + one.AccessNo + "</td>"
-                        + "<td>" + one.BorrowTime + "</td>"
-                        + "<td>" + one.ReturnTime + "</td>"
+                        + "<td>" + borrowTime + "</td>"
+                        + "<td>" + returnTime + "</td>"
                         + "</tr>";
 
                     allBorrowedTable += temp;
@@ -774,9 +831,16 @@ namespace DigitalPlatform.ChargingAnalysis
                         onlyHistoryTable += temp;
                 }
 
-                onlyBorrowTable = "<table style='border: 1px solid green'>" + onlyBorrowTable + "</table>";
-                onlyHistoryTable = "<table style='border: 1px solid yellow'>" + onlyHistoryTable + "</table>";
-                allBorrowedTable = "<table  style='border: 1px solid red'>" + allBorrowedTable + "</table>";
+                string titleTR = "<tr class='title'><td>册条码</td><td>题名和责任者</td><td>索取号</td><td>借书时间</td><td>还书时间</td></tr>";
+
+                if (string.IsNullOrEmpty(onlyBorrowTable)==false)
+                    onlyBorrowTable = "<table class='statisTable'>" + titleTR + onlyBorrowTable + "</table>";
+                
+                if (string.IsNullOrEmpty(onlyHistoryTable)==false)
+                    onlyHistoryTable = "<table class='statisTable'>" + titleTR + onlyHistoryTable + "</table>";
+                
+                if (string.IsNullOrEmpty(allBorrowedTable)==false)
+                    allBorrowedTable = "<table class='statisTable'>" + titleTR + allBorrowedTable + "</table>";
             }
 
             html = html.Replace("%onlyBorrowTable%", onlyBorrowTable);
@@ -788,8 +852,8 @@ namespace DigitalPlatform.ChargingAnalysis
             // 第一次借书时间
             if (this._borrowedItems != null && this._borrowedItems.Count > 0)
             {
-                var list2 = this._borrowedItems.OrderBy(x => x.BorrowTime).ToList();
-                firstBorrowDate = list2[0].BorrowTime;
+                var list2 = this._borrowedItems.OrderBy(x => x.BorrowDate.Time).ToList();
+                firstBorrowDate = list2[0].BorrowDate.Date;
                 borrowedCount = list2.Count.ToString();
             }
             //首次借阅时间为%firstBorrowDate%，到目前共借阅图书%borrowedCount%册。
@@ -798,27 +862,27 @@ namespace DigitalPlatform.ChargingAnalysis
 
             //// 按分类统计数量
             string clcTable = "";
-            if (this._classList != null && this._classList.Count > 0)
+            if (this._classGroups != null && this._classGroups.Count > 0)
             {
-
                 int nCount = 0;
 
+                // 其它
                 int restCount = 0;
 
                 // 循环输出每笔借阅记录
-                foreach (ClassGroup one in this._classList)
+                foreach (GroupItem one in this._classGroups)
                 {
 
                     if (nCount >= this._topCount)
                     {
-                        restCount += one.Items.Count;
+                        restCount += one.items.Count;
                         continue;
                     }
 
                     string temp = "<tr>"
-                        + "<td>" + one.clcClass + "</td>"
-                        + "<td>" + one.clcName + "</td>"
-                        + "<td>" + one.Items.Count + "</td>"
+                        + "<td>" + one.name + "</td>"
+                        + "<td>" + one.caption + "</td>"
+                        + "<td>" + one.items.Count + "</td>"
                         + "</tr>";
 
                     clcTable += temp;
@@ -836,14 +900,71 @@ namespace DigitalPlatform.ChargingAnalysis
                         + "</tr>";
                 }
 
-                clcTable = "<table style='border: 1px solid green'>" + clcTable + "</table>";
+                string titleTR = "<tr class='title'><td>分类</td><td>分类名称</td><td>数量</td></tr>";
+
+                clcTable = "<table class='statisTable'>" + titleTR + clcTable + "</table>";
             }
             html = html.Replace("%clcTable%", clcTable);
 
 
-            //// 按年份统计数量
-            //html = html.Replace("%yearTable%", patron.yearTable);
 
+
+            // 按年份统计数量
+            string yearTable = "";
+            if (this._yearGroups != null && this._yearGroups.Count > 0)
+            {
+                foreach (GroupItem one in this._yearGroups)
+                {
+                    string temp = "<tr>"
+                        + "<td>" + one.name + "</td>"
+                        + "<td>" + one.items.Count + "</td>"
+                        + "</tr>";
+
+                    yearTable += temp;
+                }
+                string titleTR = "<tr class='title'><td class='label'>年份</td><td>借阅量</td></tr>";
+                yearTable = "<table class='statisTable'>" + titleTR + yearTable + "</table>";
+            }
+            html = html.Replace("%yearTable%", yearTable);
+
+
+            // 按季度统计数量
+            string quarterTable = "";
+            if (this._quarterGroups != null && this._quarterGroups.Count > 0)
+            {
+                foreach (GroupItem one in this._quarterGroups)
+                {
+                    string temp = "<tr>"
+                        + "<td>" + one.name + "</td>"
+                        + "<td>" + one.items.Count + "</td>"
+                        + "</tr>";
+
+                    quarterTable += temp;
+                }
+                string titleTR = "<tr class='title'><td class='label'>季度</td><td>借阅量</td></tr>";
+                quarterTable = "<table class='statisTable'>" + titleTR + quarterTable + "</table>";
+            }
+            html = html.Replace("%quarterTable%", quarterTable);
+
+            // 按月统计数量
+            string monthTable = "";
+            if (this._monthGroups != null && this._monthGroups.Count > 0)
+            {
+                foreach (GroupItem one in this._monthGroups)
+                {
+                    string temp = "<tr>"
+                        + "<td>" + one.name + "</td>"
+                        + "<td>" + one.items.Count + "</td>"
+                        + "</tr>";
+
+                    monthTable += temp;
+                }
+                string titleTR = "<tr class='title'><td class='label'>月份</td><td>借阅量</td></tr>";
+                monthTable = "<table class='statisTable'>" + titleTR + monthTable + "</table>";
+            }
+            html = html.Replace("%monthTable%", monthTable);
+
+            //返回
             content = html;
             return 0;
 
