@@ -68,7 +68,7 @@ namespace dp2mini
             string password = this._mainForm.Setting.Password;
             string parameters = "type=worker,client=dp2mini|" + ClientInfo.ClientVersion;//Program.ClientVersion;
             string strError = "";
-            int nRet =ChargingAnalysisService.Instance.Init(chargingAnalysisDataDir,
+            int nRet =BorrowAnalysisService.Instance.Init(chargingAnalysisDataDir,
                 serverUrl, userName, password, parameters,
                 out strError);
             if (nRet == -1)
@@ -155,7 +155,7 @@ namespace dp2mini
                 //string times = startDate + "~" + endDate;
 
                 // 创建数据
-                int nRet =ChargingAnalysisService.Instance.Build(token,
+                int nRet =BorrowAnalysisService.Instance.Build(token,
                     patronBarcode,
                     startDate,
                     endDate,
@@ -166,7 +166,7 @@ namespace dp2mini
 
                 // 输出报表
                 string html = "";
-                nRet= ChargingAnalysisService.Instance.OutputReport(this._report,
+                nRet= BorrowAnalysisService.Instance.OutputReport(this._report,
                     "html",
                     out html,
                     out strError);
@@ -1032,11 +1032,11 @@ namespace dp2mini
             //string html = ChargingAnalysisService.Instance.OutputReport("", "");
 
             // 输出报表
-            string html = "";
+            string xml = "";
             string strError = "";
-            int nRet = ChargingAnalysisService.Instance.OutputReport(this._report,
-                "html",
-                out html,
+            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+                "xml",
+                out xml,
                 out strError);
             if (nRet == -1)
             {
@@ -1053,7 +1053,8 @@ namespace dp2mini
                 OverwritePrompt = true,
                 // dlg.FileName = this.ExportExcelFilename;
                 // dlg.InitialDirectory = Environment.CurrentDirectory;
-                Filter = "网页 (*.html)|*.html|All files (*.*)|*.*",
+                Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
+
 
                 RestoreDirectory = true
             };
@@ -1068,7 +1069,7 @@ namespace dp2mini
             using (StreamWriter writer = new StreamWriter(fileName,false,Encoding.UTF8))
             {
                 // 写到打印文件
-                writer.Write(html);
+                writer.Write(xml);
             }
 
         }
@@ -1103,7 +1104,7 @@ namespace dp2mini
             // 重新生成报表
             string html = "";
             string strError = "";
-            int nRet = ChargingAnalysisService.Instance.OutputReport(this._report,
+            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
                 "html",
                 out html,
                 out strError);

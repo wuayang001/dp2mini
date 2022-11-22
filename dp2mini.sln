@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "practice", "practice\practi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestMarc", "UnitTestMarc\UnitTestMarc.csproj", "{47409D05-31B8-46EB-8A45-4C8507BBAF67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalPlatform.ChargingAnalysis", "DigitalPlatform.ChargingAnalysis\DigitalPlatform.ChargingAnalysis.csproj", "{5BE6C455-9D9A-4255-B650-9E0231F3581A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalPlatform.BorrowAnalysis", "DigitalPlatform.ChargingAnalysis\DigitalPlatform.BorrowAnalysis.csproj", "{5BE6C455-9D9A-4255-B650-9E0231F3581A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

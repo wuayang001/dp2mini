@@ -94,7 +94,7 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
-        public BorrowedItem(string patronBarcode,XmlNode borrowNode)
+        public BorrowedItem(string patronBarcode, XmlNode borrowNode)
         {
             // 在借图书
             this.Type = "0";
@@ -110,13 +110,13 @@ namespace DigitalPlatform.ChargingAnalysis
             this.PatronBarcode = patronBarcode;
 
             // 从借书记录中获取信息
-            this.BorrowTimeOriginal =   DateTimeUtil.LocalTime(DomUtil.GetAttr(borrowNode, "borrowDate"));
+            this.BorrowTimeOriginal = DateTimeUtil.LocalTime(DomUtil.GetAttr(borrowNode, "borrowDate"));
             this.BorrowDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal));
-           //DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
-           // this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
-           // this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
-           // this.BorrowDay = day.ToString("yyyy/MM/dd");//
-           // this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
+            //DateTime day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
+            // this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
+            // this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
+            // this.BorrowDay = day.ToString("yyyy/MM/dd");//
+            // this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
             string strPeriod = DomUtil.GetAttr(borrowNode, "borrowPeriod");
 
@@ -155,7 +155,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 借书时间
         public string BorrowTimeOriginal { get; set; }  //从服务器获取的原始时间
-                                                        
+
         // 借书日期对象，用一个日期对象，里面有年/季度/月/日期/时间 属性
         public DateItem BorrowDate { get; set; }
         //public string BorrowTime { get; set; }
@@ -176,22 +176,50 @@ namespace DigitalPlatform.ChargingAnalysis
         // 类型，0表示在借未还的，1表示借阅历史中的，排序的时候，先按type排，再按借书时倒序排
         public string Type { get; set; }
 
-        public string Dump()
+        public string DumpXml()
         {
-            return "ItemBarcode=" + ItemBarcode + ";"
-                + "Title=" + Title + ";"
-                //+ "BorrowYear=" + BorrowYear + ";"
-                //+ "BorrowMonth=" + BorrowMonth + ";"
-                + "BorrowDate=" + BorrowDate.Date + ";"
-                //+ "BorrowTime=" + BorrowTime + ";"
-                //+ "ReturnYear=" + ReturnYear + ";"
-                //+ "ReturnMonth=" + ReturnMonth + ";"
-                + "ReturnDate=" + ReturnDate.Date + ";"
-                //+ "ReturnTime=" + ReturnTime + ";";
-                + "AccessNo=" + AccessNo + ";"
-                + "BigClass=" + BigClass + ";"
-                + "Location=" + Location + ";"
-                + "Error="+ErrorInfo;
+            string borrowTime = "";
+            string borrowDate = "";
+            string borrowMonth = "";
+            string borrowYear = "";
+            if (this.BorrowDate != null)
+            {
+                borrowTime = this.BorrowDate.Time;
+                borrowDate = this.BorrowDate.Date;
+                borrowMonth = this.BorrowDate.Month;
+                borrowYear = this.BorrowDate.Year;
+            }
+
+            string returnTime = "";
+            string returnDate = "";
+            string returnMonth = "";
+            string returnYear = "";
+            if (this.ReturnDate != null)
+            {
+                returnTime = this.ReturnDate.Time;
+                returnDate = this.ReturnDate.Date;
+                returnMonth = this.ReturnDate.Month;
+                returnYear = this.ReturnDate.Year;
+            }
+
+            return "<borrowItem ItemBarcode='" + ItemBarcode + "' "
+                + " Title='" + Title + "' "
+
+                + " BorrowTime='" + borrowTime + "' "
+                //+ " BorrowDate='" + borrowDate + "' "
+                //+ " BorrowMonth='" + borrowMonth + "' "
+                //+ " BorrowYear='" + borrowYear + "' "
+
+                + " ReturnTime='" + returnTime + "' "
+                //+ " ReturnDate='" + returnDate + "' "
+                //+ " ReturnMonth='" + returnMonth + "' "
+                //+ " ReturnYear='" + returnYear + "' "
+
+                + " AccessNo='" + AccessNo + "' "
+                //+ " BigClass='" + BigClass + "' "
+                + " Location='" + Location + "' "
+                + "/>";
+            
 
         }
 
@@ -204,7 +232,7 @@ namespace DigitalPlatform.ChargingAnalysis
         public DateItem(DateTime day)
         {
             this.Year = day.ToString("yyyy");//DateTimeUtil.ToYearString(day);
-            this.Quarter=DateTimeUtil.GetQuarter(day);
+            this.Quarter = DateTimeUtil.GetQuarter(day);
             this.Month = day.ToString("yyyy/MM"); //DateTimeUtil.ToMonthString(day);
             this.Date = day.ToString("yyyy/MM/dd");
             this.Time = day.ToString("yyyy-MM-dd HH:mm:ss");  //转换成统计的格式，方便排序

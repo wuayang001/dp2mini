@@ -13,14 +13,14 @@ using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
 {
-    public class ChargingAnalysisService
+    public class BorrowAnalysisService
     {
         #region 单一实例
 
-        static ChargingAnalysisService _instance;
+        static BorrowAnalysisService _instance;
 
         // 构造函数
-        private ChargingAnalysisService()
+        private BorrowAnalysisService()
         {
             //this.dp2ServerUrl = Properties.Settings.Default.dp2ServerUrl;
             //this.dp2Username = Properties.Settings.Default.dp2Username;
@@ -28,7 +28,7 @@ namespace DigitalPlatform.ChargingAnalysis
             //this._libraryChannelPool.BeforeLogin += new BeforeLoginEventHandle(_channelPool_BeforeLogin);
         }
         private static object _lock = new object();
-        static public ChargingAnalysisService Instance
+        static public BorrowAnalysisService Instance
         {
             get
             {
@@ -36,7 +36,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 {
                     lock (_lock)  //线程安全的
                     {
-                        _instance = new ChargingAnalysisService();
+                        _instance = new BorrowAnalysisService();
                     }
                 }
                 return _instance;
@@ -186,7 +186,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 string strRecPath = "";
                 lRet = channel.GetReaderInfo(//null,
                     patronBarcode, //读者卡号,
-                    "advancexml",
+                    "advancexml",   //xml:noborrowhistory,用advancexml不能去掉noborrowhistory
                     out results,
                     out strRecPath,
                     out strError);
@@ -199,6 +199,8 @@ namespace DigitalPlatform.ChargingAnalysis
 
                 XmlDocument dom = new XmlDocument();
                 dom.LoadXml(strPatronXml);
+
+                report.patronXml = strPatronXml;
 
                 // 把读者xml解析后存到内存中
                 report.patron = this.ParsePatronXml(dom, strRecPath);
@@ -706,6 +708,145 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
+        // 导出xml
+        private int OutputXml(ChargingAnalysisReport report,
+            out string xml,
+            out string error)
+        {
+            error = "";
+            xml = "";
+
+            // 输出读者信息
+            string patronXml = report.patronXml;
+            XmlDocument dom = new XmlDocument();
+            dom.LoadXml(patronXml);
+
+            // 删除borrows节点，后面会输出清洗后在借
+            XmlNode borrowsNode = dom.DocumentElement.SelectSingleNode("borrows");
+            dom.DocumentElement.RemoveChild(borrowsNode);
+
+            // 删除borrowHistory节点，后面会输出清洗后在借
+            XmlNode borrowHistoryNode = dom.DocumentElement.SelectSingleNode("borrowHistory");
+            dom.DocumentElement.RemoveChild(borrowHistoryNode);
+
+            // 拼出新的xml
+            patronXml =  "<patron>"+dom.DocumentElement.InnerXml+"</patron>";
+
+            //======
+            // 清洗后的在借
+            string borrowsXml = "";
+            // 清洗后的借阅历史
+            string historyXml = "";
+            if (report.borrowedItems != null && report.borrowedItems.Count > 0)
+            {
+                // 类型，0表示在借未还的，1表示借阅历史中的
+                // 筛选在借图书，按借书时间倒序排
+                var borrowList = report.borrowedItems.Where(x=>x.Type == "0").OrderByDescending(x => x.BorrowDate.Time).ToList();
+                if (borrowList.Count > 0)
+                {
+                    string tempXml = "";
+                    foreach (BorrowedItem one in borrowList)
+                    {
+                        tempXml+= one.DumpXml();
+                    }
+                    borrowsXml = "<borrows count='"+borrowList.Count+"'>" +tempXml + "</borrows>";
+                }
+
+
+                // 筛选借阅历史，按借书时间倒序排
+                var historyList = report.borrowedItems.Where(x => x.Type == "1").OrderByDescending(x => x.BorrowDate.Time).ToList();
+                if (historyList.Count > 0)
+                {
+                    string tempXml = "";
+                    foreach (BorrowedItem one in historyList)
+                    {
+                        tempXml += one.DumpXml();
+                    }
+                    historyXml = "<borrowHistory count='" + historyList.Count + "'>" + tempXml + "</borrowHistory>";
+                }
+            }
+
+            // 首次借书时间和借书总量（包括在借+历史）
+            string firstBorrowDate = "";
+            string totalBorrowedCount = "0";
+            // 第一次借书时间
+            if (report.borrowedItems != null && report.borrowedItems.Count > 0)
+            {
+                var list = report.borrowedItems.OrderBy(x => x.BorrowDate.Time).ToList();
+                firstBorrowDate = list[0].BorrowDate.Date;
+                totalBorrowedCount = list.Count.ToString();
+            }
+            //借阅汇总信息
+            string borrowInfo = "<borrowInfo firstBorrowDate='"+ firstBorrowDate+"' totalBorrowedCount='"+totalBorrowedCount+"'/>";
+
+            /*
+            //=====
+            // 按分类统计数量
+            string clcXml = "";
+            if (report.classGroups != null && report.classGroups.Count > 0)
+            {
+                int nCount = 0;
+
+                // 其它
+                int restCount = 0;
+
+                // 循环输出每笔借阅记录
+                foreach (GroupItem one in report.classGroups)
+                {
+
+                    if (nCount >= this._topCount)
+                    {
+                        restCount += one.items.Count;
+                        continue;
+                    }
+
+                    string temp = "<tr>"
+                        + "<td>" + one.name + "</td>"
+                        + "<td>" + one.caption + "</td>"
+                        + "<td>" + one.items.Count + "</td>"
+                        + "</tr>";
+
+                    clcTable += temp;
+
+                    // 数量加1
+                    nCount++;
+                }
+
+                // 补一行其它
+                if (restCount > 0)
+                {
+                    clcTable += "<tr>"
+                        + "<td colspan='2'>其它</td>"
+                        + "<td>" + restCount + "</td>"
+                        + "</tr>";
+                }
+
+                string titleTR = "<tr class='title'><td>分类</td><td>分类名称</td><td>数量</td></tr>";
+
+                clcTable = "<table class='statisTable'>" + titleTR + clcTable + "</table>";
+            }
+            html = html.Replace("%clcTable%", clcTable);
+            */
+
+
+
+
+            // 汇总xml
+            xml = "<root>"
+                +patronXml
+                +borrowInfo
+                +borrowsXml
+                +historyXml
+                +"</root>";
+
+
+            // 以缩进格式显示
+            xml=DomUtil.GetIndentXml(xml);
+
+
+            return 0;
+        }
+
 
         // 输出报表
         // style:html/excel/xml
@@ -736,18 +877,44 @@ namespace DigitalPlatform.ChargingAnalysis
                 return -1;
             }
 
+            if (style == "xml")
+            {
+                return this.OutputXml(report,
+                    out content,
+                    out error);
+            }
+            else if (style == "html")
+            {
+                return this.OutputHtml(report,
+                    out content,
+                    out error);
+            }
+            
+
+            return 0;
+
+        }
+
+
+        private int OutputHtml(ChargingAnalysisReport report,
+            out string html,
+            out string error)
+        {
+            error = "";
+            html = "";
+
             // 装载html模板，先layout，再加body。
             if (string.IsNullOrEmpty(this._dataDir) == true)
             {
                 error = "在用户目录里缺少阅读分析使用的'ChargingAnalysis'目录，请联系系统管理员。";
-                goto ERROR1;
+                return -1;
             }
 
             string layoutFile = Path.Combine(this._dataDir, "layout.html");
             if (File.Exists(layoutFile) == false)
             {
                 error = "'" + layoutFile + "'配置文件不存在，请联系系统管理员。";
-                goto ERROR1;
+                return -1;
             }
 
 
@@ -768,7 +935,7 @@ namespace DigitalPlatform.ChargingAnalysis
             string layoutHtml = sLayout.ReadToEnd();
 
             // 把layout中的%body%替换为配置的body文件的内容。
-            string html = layoutHtml.Replace("%body%", bodyHtml);
+            html = layoutHtml.Replace("%body%", bodyHtml);
 
             // 替换读者信息
             html = html.Replace("%patronBarcode%", report.patron.barcode);
@@ -856,7 +1023,7 @@ namespace DigitalPlatform.ChargingAnalysis
             html = html.Replace("%firstBorrowDate%", firstBorrowDate);
             html = html.Replace("%borrowedCount%", borrowedCount);
 
-            //// 按分类统计数量
+            // 按分类统计数量
             string clcTable = "";
             if (report.classGroups != null && report.classGroups.Count > 0)
             {
@@ -963,14 +1130,8 @@ namespace DigitalPlatform.ChargingAnalysis
             //%comment%
             html = html.Replace("%comment%", report.comment);
 
-            //返回
-            content = html;
             return 0;
-
-        ERROR1:
-            return -1;
         }
-
     }
 
 
@@ -982,6 +1143,8 @@ namespace DigitalPlatform.ChargingAnalysis
 
         // 读者对象
         public Patron patron = null;
+
+        public string patronXml = "";
 
         // 是否已经创建好了数据
         public bool built = false;

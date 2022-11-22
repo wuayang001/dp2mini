@@ -440,9 +440,9 @@
       <Project>{58653586-420c-4060-942f-a47d1d613b35}</Project>
       <Name>common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DigitalPlatform.ChargingAnalysis\DigitalPlatform.ChargingAnalysis.csproj">
+    <ProjectReference Include="..\DigitalPlatform.ChargingAnalysis\DigitalPlatform.BorrowAnalysis.csproj">
       <Project>{5be6c455-9d9a-4255-b650-9e0231f3581a}</Project>
-      <Name>DigitalPlatform.ChargingAnalysis</Name>
+      <Name>DigitalPlatform.BorrowAnalysis</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
