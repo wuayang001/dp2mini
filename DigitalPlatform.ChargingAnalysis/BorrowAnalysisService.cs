@@ -45,6 +45,9 @@ namespace DigitalPlatform.ChargingAnalysis
 
         Hashtable _clcHT = new Hashtable();
 
+        string _commentFile = "";
+        Hashtable _commentHT = new Hashtable();
+
         // todo要改为有返回出错信息
         // chargingAnalysisDataDir：阅读分析的数据目录，里面有html配置文件
         public int Init(string dataDir,
@@ -69,8 +72,24 @@ namespace DigitalPlatform.ChargingAnalysis
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] a = line.Split(new char[] { '\t' });
-                    _clcHT.Add(a[0], a[1]);
+                    _clcHT[a[0]]= a[1];
                     //sb.Append("<p>").Append(line).Append("</p>").AppendLine();
+                }
+            }
+
+            // 馆员评语
+            this._commentFile = Path.Combine(this._dataDir, "comment.xml");
+            if (File.Exists(this._commentFile) == true)
+            {
+                XmlDocument dom = new XmlDocument();
+                dom.Load(this._commentFile);
+
+                XmlNodeList list = dom.DocumentElement.SelectNodes("comment");
+                foreach (XmlNode node in list)
+                {
+                    string patronBarcode = DomUtil.GetAttr(node, "patronBarcode");
+                    string comment = DomUtil.GetNodeText(node);
+                    _commentHT[patronBarcode] = comment;
                 }
             }
 
@@ -135,6 +154,25 @@ namespace DigitalPlatform.ChargingAnalysis
 
         #endregion
 
+        public void SetComment(BorrowAnalysisReport report, string comment)
+        { 
+            // 设到内存对象
+            report.comment = comment;
+
+            // hashtable设置
+            this._commentHT[report.patron.barcode] = comment;
+
+            // 保存到文件里
+            string xml = "";
+            foreach (string key in this._commentHT.Keys)
+            {
+                xml += "<comment patronBarcode='"+key+"'>"+ this._commentHT[key]+"</comment>";
+            }
+            xml = "<root>"+xml+"</root>";
+            XmlDocument dom = new XmlDocument();
+            dom.LoadXml(xml);
+            dom.Save(this._commentFile);
+        }
 
         // 分类统计显示前面的多少行
         int _topCount = 5;
@@ -150,13 +188,19 @@ namespace DigitalPlatform.ChargingAnalysis
             //string times,
             string startDate,
             string endDate,
-            out ChargingAnalysisReport report,
+            out BorrowAnalysisReport report,
             out string strError)
         {
             strError = "";
             long lRet = 0;
 
-            report = new ChargingAnalysisReport();
+            report = new BorrowAnalysisReport();
+
+            // 先把本地存储的馆长评语设置到对象上
+            if (this._commentHT[patronBarcode] != null)
+            {
+                report.comment = (string)this._commentHT[patronBarcode];
+            }
 
             // 注意这里范围只用于显示，显示的时候就不带日期了，要不显示的很长。
             // 实际检索时要带了时间。
@@ -709,7 +753,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
         // 导出xml
-        private int OutputXml(ChargingAnalysisReport report,
+        private int OutputXml(BorrowAnalysisReport report,
             out string xml,
             out string error)
         {
@@ -723,11 +767,18 @@ namespace DigitalPlatform.ChargingAnalysis
 
             // 删除borrows节点，后面会输出清洗后在借
             XmlNode borrowsNode = dom.DocumentElement.SelectSingleNode("borrows");
-            dom.DocumentElement.RemoveChild(borrowsNode);
+            if (borrowsNode != null)
+                dom.DocumentElement.RemoveChild(borrowsNode);
 
             // 删除borrowHistory节点，后面会输出清洗后在借
             XmlNode borrowHistoryNode = dom.DocumentElement.SelectSingleNode("borrowHistory");
-            dom.DocumentElement.RemoveChild(borrowHistoryNode);
+            if (borrowHistoryNode != null)
+                dom.DocumentElement.RemoveChild(borrowHistoryNode);
+
+            //outofReservations
+            XmlNode outofReservationsNode = dom.DocumentElement.SelectSingleNode("outofReservations");
+            if (outofReservationsNode != null)
+                dom.DocumentElement.RemoveChild(outofReservationsNode);
 
             // 拼出新的xml
             patronXml =  "<patron>"+dom.DocumentElement.InnerXml+"</patron>";
@@ -779,7 +830,7 @@ namespace DigitalPlatform.ChargingAnalysis
             //借阅汇总信息
             string borrowInfo = "<borrowInfo firstBorrowDate='"+ firstBorrowDate+"' totalBorrowedCount='"+totalBorrowedCount+"'/>";
 
-            /*
+            
             //=====
             // 按分类统计数量
             string clcXml = "";
@@ -787,26 +838,19 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 int nCount = 0;
 
-                // 其它
+                // 其它的数量，当配置了仅显示前几行时，超过这几行的归到其它里
                 int restCount = 0;
 
                 // 循环输出每笔借阅记录
                 foreach (GroupItem one in report.classGroups)
                 {
-
                     if (nCount >= this._topCount)
                     {
                         restCount += one.items.Count;
                         continue;
                     }
 
-                    string temp = "<tr>"
-                        + "<td>" + one.name + "</td>"
-                        + "<td>" + one.caption + "</td>"
-                        + "<td>" + one.items.Count + "</td>"
-                        + "</tr>";
-
-                    clcTable += temp;
+                    clcXml += "<clcItem name='"+ one.name + "' caption='"+ one.caption + "' count='"+ one.items.Count + "'/>";
 
                     // 数量加1
                     nCount++;
@@ -815,20 +859,50 @@ namespace DigitalPlatform.ChargingAnalysis
                 // 补一行其它
                 if (restCount > 0)
                 {
-                    clcTable += "<tr>"
-                        + "<td colspan='2'>其它</td>"
-                        + "<td>" + restCount + "</td>"
-                        + "</tr>";
+                    clcXml += "<clcItem name='其它' caption='' count='" + restCount + "'/>";
                 }
 
-                string titleTR = "<tr class='title'><td>分类</td><td>分类名称</td><td>数量</td></tr>";
-
-                clcTable = "<table class='statisTable'>" + titleTR + clcTable + "</table>";
+                clcXml = "<clcGroup>"+clcXml+"</clcGroup>";
             }
-            html = html.Replace("%clcTable%", clcTable);
-            */
+
+            //======
+            // 按年份统计数量
+            string yearXml = "";
+            if (report.yearGroups != null && report.yearGroups.Count > 0)
+            {
+                foreach (GroupItem one in report.yearGroups)
+                {
+                    yearXml += "<yearItem name='"+one.name+"'  count='" + one.items.Count + "'/>";
+                }
+                yearXml = "<yearGroup>" + yearXml + "</yearGroup>";
+            }
+
+            // 按季度统计数量
+            string quarterXml = "";
+            if (report.quarterGroups != null && report.quarterGroups.Count > 0)
+            {
+                foreach (GroupItem one in report.quarterGroups)
+                {
+                    quarterXml += "<quarterItem name='" + one.name + "'  count='" + one.items.Count + "'/>";
+                }
+                quarterXml = "<quarterGroup>" + quarterXml + "</quarterGroup>";
+            }
+
+            // 按月统计数量
+            string monthXml = "";
+            if (report.monthGroups != null && report.monthGroups.Count > 0)
+            {
+                foreach (GroupItem one in report.monthGroups)
+                {
+                    monthXml += "<monthItem name='" + one.name + "'  count='" + one.items.Count + "'/>";
+
+                }
+                monthXml = "<monthGroup>" + monthXml + "</monthGroup>";
+            }
 
 
+            //借阅汇总信息
+            string commentXml = "<comment title='"+report.commentTitle+"'>"+report.comment+"</comment>";
 
 
             // 汇总xml
@@ -837,7 +911,12 @@ namespace DigitalPlatform.ChargingAnalysis
                 +borrowInfo
                 +borrowsXml
                 +historyXml
-                +"</root>";
+                +clcXml
+                +yearXml
+                +quarterXml
+                +monthXml
+                + commentXml
+                + "</root>";
 
 
             // 以缩进格式显示
@@ -851,7 +930,7 @@ namespace DigitalPlatform.ChargingAnalysis
         // 输出报表
         // style:html/excel/xml
         // fileName:目标文件名
-        public int OutputReport(ChargingAnalysisReport report,
+        public int OutputReport(BorrowAnalysisReport report,
             string style,
             out string content,
             out string error)
@@ -896,7 +975,7 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
-        private int OutputHtml(ChargingAnalysisReport report,
+        private int OutputHtml(BorrowAnalysisReport report,
             out string html,
             out string error)
         {
@@ -1135,7 +1214,7 @@ namespace DigitalPlatform.ChargingAnalysis
     }
 
 
-    public class ChargingAnalysisReport
+    public class BorrowAnalysisReport
     {
 
         // 时间范围
@@ -1159,7 +1238,10 @@ namespace DigitalPlatform.ChargingAnalysis
         public List<GroupItem> quarterGroups;// 按季度统计
         public List<GroupItem> monthGroups;// 按月统计类统计
 
+        // 根据规则算出来的称号
+        internal string commentTitle;
 
+        // 馆长评号
         public string comment { get; set; }
 
     }

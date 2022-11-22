@@ -117,7 +117,7 @@ namespace dp2mini
             });
         }
 
-        public ChargingAnalysisReport _report = null;
+        public BorrowAnalysisReport _report = null;
 
         /// <summary>
         /// 检索做事的函数
@@ -165,10 +165,10 @@ namespace dp2mini
                     goto ERROR1;
 
                 // 输出报表
-                string html = "";
+                string xml = "";
                 nRet= BorrowAnalysisService.Instance.OutputReport(this._report,
-                    "html",
-                    out html,
+                    "xml",
+                    out xml,
                     out strError);
                 if (nRet == -1)
                     goto ERROR1;
@@ -177,19 +177,11 @@ namespace dp2mini
                 // 把html显示在界面上
                 this.Invoke((Action)(() =>
                 {
+                    string temp = "<div>" + HttpUtility.HtmlEncode(xml) + "</div>";
+                    SetHtmlString(this.webBrowser1, temp);
 
-                    SetHtmlString(this.webBrowser1, html);
-
-                    //this.textBox_result.Text = result;
-
-                    //// 借书统计
-                    //this.StatisBorrow();
-
-                    //// 还书统计
-                    //this.StatisReturn();
-
-                    //// 借还统计
-                    //this.StatisBorrowAndReturn();
+                    // 把馆长评估提出来，显示在输入框中
+                    this.textBox_comment.Text = this._report.comment;
 
                 }
                 ));
@@ -1099,7 +1091,8 @@ namespace dp2mini
 
             // 设置评语
             string comment = this.textBox_comment.Text.Trim();
-            this._report.comment = comment;
+            BorrowAnalysisService.Instance.SetComment(this._report, comment);
+            //this._report.comment = comment;
 
             // 重新生成报表
             string html = "";
