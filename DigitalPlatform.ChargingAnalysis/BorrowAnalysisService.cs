@@ -48,6 +48,8 @@ namespace DigitalPlatform.ChargingAnalysis
         string _commentFile = "";
         Hashtable _commentHT = new Hashtable();
 
+        List<RoleItem> _roles = new List<RoleItem>();
+
         // todo要改为有返回出错信息
         // chargingAnalysisDataDir：阅读分析的数据目录，里面有html配置文件
         public int Init(string dataDir,
@@ -90,6 +92,39 @@ namespace DigitalPlatform.ChargingAnalysis
                     string patronBarcode = DomUtil.GetAttr(node, "patronBarcode");
                     string comment = DomUtil.GetNodeText(node);
                     _commentHT[patronBarcode] = comment;
+                }
+            }
+
+            // 阅读称号 titleRole.xml
+            string titleRoleFile = Path.Combine(this._dataDir, "titleRole.xml");
+            if (File.Exists(titleRoleFile) == true)
+            {
+                XmlDocument dom = new XmlDocument();
+                dom.Load(titleRoleFile);
+
+                XmlNodeList list = dom.DocumentElement.SelectNodes("role");
+                if (list.Count > 0)
+                {
+                    foreach (XmlNode node in list)
+                    {
+
+                        RoleItem item = new RoleItem();
+                        item.title = DomUtil.GetAttr(node, "title");
+                        string borrowCount = DomUtil.GetAttr(node, "borrowCount");
+                        try
+                        {
+                            item.borrowCount = Convert.ToInt32(borrowCount);
+                        }
+                        catch (Exception ex)
+                        {
+                            strError = "阅读称号配置文件titleRole.xml中borrowCount属性必须是数字。"+ex.Message;
+                            return -1;
+                        }
+                        _roles.Add(item);
+                    }
+
+                    // 按借阅量倒序排序。
+                    this._roles=this._roles.OrderByDescending(x => x.borrowCount).ToList();
                 }
             }
 
@@ -154,6 +189,21 @@ namespace DigitalPlatform.ChargingAnalysis
 
         #endregion
 
+
+        public string GetCommentTitle(int borrowCount)
+        {
+            if (this._roles == null || this._roles.Count == 0)
+                return "";
+
+            foreach (RoleItem item in this._roles)
+            {
+                if (borrowCount >= item.borrowCount)
+                    return item.title;
+            }
+
+            return "";
+        }
+
         public void SetComment(BorrowAnalysisReport report, string comment)
         { 
             // 设到内存对象
@@ -201,6 +251,7 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 report.comment = (string)this._commentHT[patronBarcode];
             }
+
 
             // 注意这里范围只用于显示，显示的时候就不带日期了，要不显示的很长。
             // 实际检索时要带了时间。
@@ -327,6 +378,13 @@ namespace DigitalPlatform.ChargingAnalysis
                     {
                         // todo 抛出异常？暂时不处理
                     }
+                }
+
+
+                // 计算阅读称号
+                if (report.borrowedItems != null && report.borrowedItems.Count > 0)
+                {
+                    report.commentTitle = this.GetCommentTitle(report.borrowedItems.Count);
                 }
 
                 // 按中图法聚合，todo是按分类排序，还是按数量排序？目前先按分类排序。后面看用户反馈。
@@ -901,7 +959,7 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
 
-            //借阅汇总信息
+            //评语信息
             string commentXml = "<comment title='"+report.commentTitle+"'>"+report.comment+"</comment>";
 
 
@@ -1340,5 +1398,13 @@ namespace DigitalPlatform.ChargingAnalysis
         public int totalCount { get; set; }
 
         public List<BorrowedItem> items { get; set; }
+    }
+
+    public class RoleItem
+    {
+        internal int borrowCount;
+
+        internal string title { get; set; }
+
     }
 }

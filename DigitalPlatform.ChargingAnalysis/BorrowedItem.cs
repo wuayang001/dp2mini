@@ -202,22 +202,22 @@ namespace DigitalPlatform.ChargingAnalysis
                 returnYear = this.ReturnDate.Year;
             }
 
-            return "<borrowItem ItemBarcode='" + ItemBarcode + "' "
-                + " Title='" + Title + "' "
+            return "<borrowItem itemBarcode='" + ItemBarcode + "' "
+                + " title='" + Title + "' "
 
-                + " BorrowTime='" + borrowTime + "' "
-                //+ " BorrowDate='" + borrowDate + "' "
-                //+ " BorrowMonth='" + borrowMonth + "' "
-                //+ " BorrowYear='" + borrowYear + "' "
+                + " borrowTime='" + borrowTime + "' "
+                //+ " borrowDate='" + borrowDate + "' "
+                //+ " borrowMonth='" + borrowMonth + "' "
+                //+ " borrowYear='" + borrowYear + "' "
 
-                + " ReturnTime='" + returnTime + "' "
-                //+ " ReturnDate='" + returnDate + "' "
-                //+ " ReturnMonth='" + returnMonth + "' "
-                //+ " ReturnYear='" + returnYear + "' "
+                + " returnTime='" + returnTime + "' "
+                //+ " returnDate='" + returnDate + "' "
+                //+ " returnMonth='" + returnMonth + "' "
+                //+ " returnYear='" + returnYear + "' "
 
-                + " AccessNo='" + AccessNo + "' "
-                //+ " BigClass='" + BigClass + "' "
-                + " Location='" + Location + "' "
+                + " accessNo='" + AccessNo + "' "
+                //+ " bigClass='" + BigClass + "' "
+                + " location='" + Location + "' "
                 + "/>";
             
 
