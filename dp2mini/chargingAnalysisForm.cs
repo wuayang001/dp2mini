@@ -38,7 +38,7 @@ namespace dp2mini
         CancellationTokenSource _cancel = new CancellationTokenSource();
 
 
-        
+
 
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace dp2mini
             string password = this._mainForm.Setting.Password;
             string parameters = "type=worker,client=dp2mini|" + ClientInfo.ClientVersion;//Program.ClientVersion;
             string strError = "";
-            int nRet =BorrowAnalysisService.Instance.Init(chargingAnalysisDataDir,
+            int nRet = BorrowAnalysisService.Instance.Init(chargingAnalysisDataDir,
                 serverUrl, userName, password, parameters,
                 out strError);
             if (nRet == -1)
@@ -155,7 +155,7 @@ namespace dp2mini
                 //string times = startDate + "~" + endDate;
 
                 // 创建数据
-                int nRet =BorrowAnalysisService.Instance.Build(token,
+                int nRet = BorrowAnalysisService.Instance.Build(token,
                     patronBarcode,
                     startDate,
                     endDate,
@@ -166,7 +166,7 @@ namespace dp2mini
 
                 // 输出报表
                 string xml = "";
-                nRet= BorrowAnalysisService.Instance.OutputReport(this._report,
+                nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
                     "xml",
                     out xml,
                     out strError);
@@ -302,7 +302,7 @@ namespace dp2mini
         {
             // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
             var list = this._borrowAndReturnItems.GroupBy(
-                x => new {  x.readerBarcode, x.readerName, x.dept },
+                x => new { x.readerBarcode, x.readerName, x.dept },
                 (key, item_list) => new BorrowGroup
                 {
                     //location = key.location,
@@ -340,7 +340,7 @@ namespace dp2mini
         // 用于做借还聚合的类
         List<BorrowLogItem> _borrowAndReturnItems = new List<BorrowLogItem>();
 
-        public int LoadLog(OperLogItem logItem,out string error)
+        public int LoadLog(OperLogItem logItem, out string error)
         {
             error = "";
 
@@ -623,7 +623,7 @@ namespace dp2mini
             this.BeginInvoke(d, new object[] { sender });
         }
 
- 
+
 
         // 把列表中的全部记录导出excel
         private void button_toExcel_Click(object sender, EventArgs e)
@@ -776,7 +776,7 @@ namespace dp2mini
             int nRet = 0;
 
             // 返回的借书日志对象
-             borrowLog = new BorrowLogItem();
+            borrowLog = new BorrowLogItem();
 
             XmlNode root = dom.DocumentElement;
 
@@ -789,7 +789,7 @@ namespace dp2mini
             XmlNode node = null;
 
             // 获取读者信息
-            string strReaderXml= DomUtil.GetElementText(root, "readerRecord", out node);
+            string strReaderXml = DomUtil.GetElementText(root, "readerRecord", out node);
             if (node != null)
             {
                 XmlDocument reader_dom = new XmlDocument();
@@ -807,7 +807,7 @@ namespace dp2mini
                 //string strState = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "state");
                 borrowLog.readerType = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "readerType");
                 //string strCardNumber = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "cardNumber");
-               // string strComment = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "comment");
+                // string strComment = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "comment");
                 //string strCreateDate = GetRfc1123DisplayString(DomUtil.GetElementInnerText(reader_dom.DocumentElement, "createDate"));
                 //string strExpireDate = GetRfc1123DisplayString(DomUtil.GetElementInnerText(reader_dom.DocumentElement, "expireDate"));
                 borrowLog.readerName = DomUtil.GetElementInnerText(reader_dom.DocumentElement, "name");
@@ -834,9 +834,9 @@ namespace dp2mini
                 }
 
                 //string strBarcode = DomUtil.GetElementInnerText(item_dom.DocumentElement, "barcode");
-               // string strState = DomUtil.GetElementInnerText(item_dom.DocumentElement, "state");
+                // string strState = DomUtil.GetElementInnerText(item_dom.DocumentElement, "state");
                 borrowLog.bookType = DomUtil.GetElementInnerText(item_dom.DocumentElement, "bookType");
-               // string strPublishTime = DomUtil.GetElementInnerText(item_dom.DocumentElement, "publishTime");
+                // string strPublishTime = DomUtil.GetElementInnerText(item_dom.DocumentElement, "publishTime");
                 borrowLog.location = DomUtil.GetElementInnerText(item_dom.DocumentElement, "location");
                 //string strShelfNo = DomUtil.GetElementInnerText(item_dom.DocumentElement, "shelftNo");
             }
@@ -872,8 +872,8 @@ namespace dp2mini
         // 还书统计 点列头排序
         private void listView_returnStatis_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-        //    int nClickColumn = e.Column;
-        //    SortCol(this.listView_returnStatis, SortColumns_borrowStatis, nClickColumn);
+            //    int nClickColumn = e.Column;
+            //    SortCol(this.listView_returnStatis, SortColumns_borrowStatis, nClickColumn);
         }
 
         // 点击列头排序
@@ -1055,10 +1055,10 @@ namespace dp2mini
             if (dlg.ShowDialog() != DialogResult.OK)
                 return;
 
-            string fileName=dlg.FileName;
+            string fileName = dlg.FileName;
 
             // StreamWriter当文件不存在时，会自动创建一个新文件。
-            using (StreamWriter writer = new StreamWriter(fileName,false,Encoding.UTF8))
+            using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
             {
                 // 写到打印文件
                 writer.Write(xml);
@@ -1072,9 +1072,9 @@ namespace dp2mini
             string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd") + " 00:00";
             DateTime day1 = DateTimeUtil.ParseFreeTimeString(startDate);
 
-          //DateTime qd=   day1.AddMonths(0 - ((day1.Month - 1) % 3));
-          //  int q = qd.Month / 3 + 1;
-          //  string text = qd.ToString("yyyy-MM")+";"+ qd.ToString("yyyy") + "第"+q+"季度";
+            //DateTime qd=   day1.AddMonths(0 - ((day1.Month - 1) % 3));
+            //  int q = qd.Month / 3 + 1;
+            //  string text = qd.ToString("yyyy-MM")+";"+ qd.ToString("yyyy") + "第"+q+"季度";
             MessageBox.Show(this, DateTimeUtil.GetQuarter(day1));
         }
 
@@ -1083,7 +1083,7 @@ namespace dp2mini
             //ChargingAnalysisService.Instance._pa
 
             if (this._report == null
-                || this._report.built==false)
+                || this._report.built == false)
             {
                 MessageBox.Show(this, "请先创建报表。");
                 return;
@@ -1108,6 +1108,101 @@ namespace dp2mini
             }
             SetHtmlString(this.webBrowser1, html);
 
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            using (OpenFileDialog dlg = new OpenFileDialog())
+            {
+                dlg.Title = "请指定读者证条码号文件";
+                dlg.FileName = "";
+                dlg.Filter = "读者证条码号文件 （*.txt|*.txt|All files(*.*)|*.*";
+                dlg.RestoreDirectory = true;
+                if (dlg.ShowDialog() != DialogResult.OK)
+                    return;
+
+                this.textBox_patronBarcodeFile.Text = dlg.FileName;
+            }
+
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //时间范围
+            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
+            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
+            string patronBarcodeFile = this.textBox_patronBarcodeFile.Text.Trim();
+            if (string.IsNullOrEmpty(patronBarcodeFile) == true
+                || File.Exists(patronBarcodeFile)==false)
+            {
+                MessageBox.Show(this, "读者证条码号不存在。");
+                return;
+            }
+
+            List<string> patronBarcodeList = new List<string>();
+            using (StreamReader reader = new StreamReader(patronBarcodeFile))//, Encoding.UTF8))
+            {
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string temp = line.Trim();
+                    if (string.IsNullOrEmpty(temp) == false)
+                    {
+                        patronBarcodeList.Add(line);
+                    }
+                }
+            }
+
+            FileInfo fileInfo = new FileInfo(patronBarcodeFile);
+            string dir = fileInfo.Directory.FullName+"\\output";
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+
+
+            string strError = "";
+            // 批量生成
+            foreach (string patronBarcode in patronBarcodeList)
+            {
+                // 创建数据
+                int nRet = BorrowAnalysisService.Instance.Build(this._cancel.Token,
+                    patronBarcode,
+                    startDate,
+                    endDate,
+                    out this._report,
+                    out strError);
+                if (nRet == -1)
+                    goto ERROR1;
+
+                // 输出报表
+                string xml = "";
+                nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+                    "xml",
+                    out xml,
+                    out strError);
+                if (nRet == -1)
+                    goto ERROR1;
+
+                string fileName =dir+"\\"+patronBarcode+".xml";
+
+                // StreamWriter当文件不存在时，会自动创建一个新文件。
+                using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
+                {
+                    // 写到打印文件
+                    writer.Write(xml);
+                }
+
+
+            }
+
+            MessageBox.Show(this, "批量生成借阅报表完成。");
+            return;
+
+
+        ERROR1:
+            MessageBox.Show(this, "出错："+strError);
+            return;
         }
     }
 

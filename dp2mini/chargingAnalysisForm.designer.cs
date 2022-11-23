@@ -93,6 +93,10 @@
             this.label6 = new System.Windows.Forms.Label();
             this.textBox_comment = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.textBox_patronBarcodeFile = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -487,7 +491,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.Location = new System.Drawing.Point(16, 91);
+            this.label5.Location = new System.Drawing.Point(17, 94);
             this.label5.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(163, 30);
@@ -498,7 +502,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(25, 282);
+            this.label6.Location = new System.Drawing.Point(16, 261);
             this.label6.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(553, 30);
@@ -508,10 +512,10 @@
             // textBox_comment
             // 
             this.textBox_comment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_comment.Location = new System.Drawing.Point(19, 324);
+            this.textBox_comment.Location = new System.Drawing.Point(22, 303);
             this.textBox_comment.Multiline = true;
             this.textBox_comment.Name = "textBox_comment";
-            this.textBox_comment.Size = new System.Drawing.Size(732, 401);
+            this.textBox_comment.Size = new System.Drawing.Size(749, 240);
             this.textBox_comment.TabIndex = 26;
             // 
             // button2
@@ -526,11 +530,58 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // textBox_patronBarcodeFile
+            // 
+            this.textBox_patronBarcodeFile.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_patronBarcodeFile.Location = new System.Drawing.Point(19, 598);
+            this.textBox_patronBarcodeFile.Name = "textBox_patronBarcodeFile";
+            this.textBox_patronBarcodeFile.Size = new System.Drawing.Size(653, 42);
+            this.textBox_patronBarcodeFile.TabIndex = 28;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(16, 556);
+            this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(223, 30);
+            this.label3.TabIndex = 29;
+            this.label3.Text = "证条码号文件：";
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button3.Location = new System.Drawing.Point(682, 588);
+            this.button3.Margin = new System.Windows.Forms.Padding(7);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(82, 57);
+            this.button3.TabIndex = 30;
+            this.button3.Text = "...";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button4.Location = new System.Drawing.Point(16, 650);
+            this.button4.Margin = new System.Windows.Forms.Padding(7);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(252, 57);
+            this.button4.TabIndex = 31;
+            this.button4.Text = "批量生成报表";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1144, 815);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.textBox_patronBarcodeFile);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox_comment);
             this.Controls.Add(this.label6);
@@ -622,5 +673,9 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox_comment;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox textBox_patronBarcodeFile;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
     }
 }
