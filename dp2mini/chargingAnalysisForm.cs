@@ -178,7 +178,7 @@ namespace dp2mini
                 this.Invoke((Action)(() =>
                 {
                     string temp = "<div>" + HttpUtility.HtmlEncode(xml) + "</div>";
-                    SetHtmlString(this.webBrowser1, temp);
+                    //SetHtmlString(this.webBrowser1, temp);
 
                     // 把馆长评估提出来，显示在输入框中
                     this.textBox_comment.Text = this._report.comment;
@@ -514,7 +514,7 @@ namespace dp2mini
         /// <param name="bEnable"></param>
         void EnableControls(bool bEnable)
         {
-            this.button_search.Enabled = bEnable;
+            //this.button_search.Enabled = bEnable;
             this.button_stop.Enabled = !(bEnable);
 
             //this.button_toExcel.Enabled = bEnable;
@@ -1106,7 +1106,7 @@ namespace dp2mini
                 MessageBox.Show(this, strError);
                 return;
             }
-            SetHtmlString(this.webBrowser1, html);
+            //SetHtmlString(this.webBrowser1, html);
 
         }
 
@@ -1300,7 +1300,46 @@ namespace dp2mini
 
             this.textBox_outputDir.Text = dir;
 
+            this.ShowFiles();
         }
+
+
+        private void ShowFiles()
+        {
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+                return;
+
+            this.listView_files.Items.Clear();
+
+            string[] fiels = Directory.GetFiles(dir, "*.xml");
+            foreach (string file in fiels)
+            {
+                XmlDocument dom = new XmlDocument();
+                dom.Load(file);
+                XmlNode root = dom.DocumentElement;
+
+                //patron/barcode取内容
+                string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+
+                //borrowInfo 取 totalBorrowedCount 属性
+                string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
+                int totalCount = Convert.ToInt32(totalBorrowedCount);
+
+                string paiming = DomUtil.GetAttr(root, "borrowInfo", "paiming");
+
+                ListViewItem item = new ListViewItem(file);
+                item.SubItems.Add(barcode);
+                item.SubItems.Add(totalBorrowedCount);
+                item.SubItems.Add(paiming);
+
+                this.listView_files.Items.Add(item);
+            }
+
+        }
+
+
+
     }
 
 
