@@ -350,7 +350,7 @@
     <Compile Include="TransferStatisForm.designer.cs">
       <DependentUpon>TransferStatisForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="xml\DomUtil.cs" />
+    <Content Include="xml\DomUtil.txt" />
     <EmbeddedResource Include="MarcForm.resx">
       <DependentUpon>MarcForm.cs</DependentUpon>
     </EmbeddedResource>

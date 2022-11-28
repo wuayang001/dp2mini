@@ -97,6 +97,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
+            this.button_paiming = new System.Windows.Forms.Button();
+            this.textBox_outputDir = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.button_selectDir = new System.Windows.Forms.Button();
             this.contextMenuStrip_statis.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -126,7 +130,7 @@
             // button_stop
             // 
             this.button_stop.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_stop.Location = new System.Drawing.Point(294, 741);
+            this.button_stop.Location = new System.Drawing.Point(300, 817);
             this.button_stop.Margin = new System.Windows.Forms.Padding(7);
             this.button_stop.Name = "button_stop";
             this.button_stop.Size = new System.Drawing.Size(138, 57);
@@ -460,7 +464,7 @@
             this.webBrowser1.Location = new System.Drawing.Point(774, 27);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(317, 771);
+            this.webBrowser1.Size = new System.Drawing.Size(279, 923);
             this.webBrowser1.TabIndex = 21;
             // 
             // button_download
@@ -477,7 +481,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(446, 741);
+            this.button1.Location = new System.Drawing.Point(452, 817);
             this.button1.Margin = new System.Windows.Forms.Padding(7);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(191, 57);
@@ -521,7 +525,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(18, 741);
+            this.button2.Location = new System.Drawing.Point(24, 817);
             this.button2.Margin = new System.Windows.Forms.Padding(7);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(194, 57);
@@ -533,9 +537,9 @@
             // textBox_patronBarcodeFile
             // 
             this.textBox_patronBarcodeFile.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_patronBarcodeFile.Location = new System.Drawing.Point(19, 598);
+            this.textBox_patronBarcodeFile.Location = new System.Drawing.Point(219, 553);
             this.textBox_patronBarcodeFile.Name = "textBox_patronBarcodeFile";
-            this.textBox_patronBarcodeFile.Size = new System.Drawing.Size(653, 42);
+            this.textBox_patronBarcodeFile.Size = new System.Drawing.Size(464, 42);
             this.textBox_patronBarcodeFile.TabIndex = 28;
             // 
             // label3
@@ -552,7 +556,7 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button3.Location = new System.Drawing.Point(682, 588);
+            this.button3.Location = new System.Drawing.Point(689, 553);
             this.button3.Margin = new System.Windows.Forms.Padding(7);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(82, 57);
@@ -564,7 +568,7 @@
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button4.Location = new System.Drawing.Point(16, 650);
+            this.button4.Location = new System.Drawing.Point(24, 663);
             this.button4.Margin = new System.Windows.Forms.Padding(7);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(252, 57);
@@ -573,11 +577,56 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
+            // button_paiming
+            // 
+            this.button_paiming.Location = new System.Drawing.Point(306, 659);
+            this.button_paiming.Name = "button_paiming";
+            this.button_paiming.Size = new System.Drawing.Size(132, 56);
+            this.button_paiming.TabIndex = 32;
+            this.button_paiming.Text = "排名";
+            this.button_paiming.UseVisualStyleBackColor = true;
+            this.button_paiming.Click += new System.EventHandler(this.button_paiming_Click);
+            // 
+            // textBox_outputDir
+            // 
+            this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_outputDir.Location = new System.Drawing.Point(219, 611);
+            this.textBox_outputDir.Name = "textBox_outputDir";
+            this.textBox_outputDir.Size = new System.Drawing.Size(464, 42);
+            this.textBox_outputDir.TabIndex = 33;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(16, 614);
+            this.label7.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(223, 30);
+            this.label7.TabIndex = 34;
+            this.label7.Text = "报表输出目录：";
+            // 
+            // button_selectDir
+            // 
+            this.button_selectDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_selectDir.Location = new System.Drawing.Point(693, 611);
+            this.button_selectDir.Margin = new System.Windows.Forms.Padding(7);
+            this.button_selectDir.Name = "button_selectDir";
+            this.button_selectDir.Size = new System.Drawing.Size(82, 57);
+            this.button_selectDir.TabIndex = 35;
+            this.button_selectDir.Text = "...";
+            this.button_selectDir.UseVisualStyleBackColor = true;
+            this.button_selectDir.Click += new System.EventHandler(this.button_selectDir_Click);
+            // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1144, 815);
+            this.ClientSize = new System.Drawing.Size(1106, 967);
+            this.Controls.Add(this.button_selectDir);
+            this.Controls.Add(this.textBox_outputDir);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.button_paiming);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.textBox_patronBarcodeFile);
@@ -677,5 +726,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button_paiming;
+        private System.Windows.Forms.TextBox textBox_outputDir;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button button_selectDir;
     }
 }

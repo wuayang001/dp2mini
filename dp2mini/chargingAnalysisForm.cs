@@ -1141,6 +1141,16 @@ namespace dp2mini
                 return;
             }
 
+            string dir =this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未设置报表输出目录。");
+                return ;
+            }
+            if (Directory.Exists(dir) == false)  // 如果目录不存在，则创建一个新目录
+                Directory.CreateDirectory(dir);
+
+
             List<string> patronBarcodeList = new List<string>();
             using (StreamReader reader = new StreamReader(patronBarcodeFile))//, Encoding.UTF8))
             {
@@ -1155,10 +1165,6 @@ namespace dp2mini
                 }
             }
 
-            FileInfo fileInfo = new FileInfo(patronBarcodeFile);
-            string dir = fileInfo.Directory.FullName+"\\output";
-            if (Directory.Exists(dir) == false)
-                Directory.CreateDirectory(dir);
 
 
             string strError = "";
@@ -1203,6 +1209,97 @@ namespace dp2mini
         ERROR1:
             MessageBox.Show(this, "出错："+strError);
             return;
+        }
+
+        private void button_paiming_Click(object sender, EventArgs e)
+        {
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未设置报表输出目录。");
+                return;
+            }
+
+            string temp = "";
+
+            List<paiMingItem> paiMingList = new List<paiMingItem>();
+
+           string[] fiels= Directory.GetFiles(dir, "*.xml");
+            foreach (string file in fiels)
+            {
+                temp+=file.Trim()+"\r\n";
+
+                XmlDocument dom = new XmlDocument();
+                dom.Load(file);
+                XmlNode root = dom.DocumentElement;
+
+                //patron/barcode取内容
+                string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+
+                //borrowInfo 取 totalBorrowedCount 属性
+                string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
+                int totalCount = Convert.ToInt32(totalBorrowedCount);
+
+                paiMingList.Add(new paiMingItem(barcode,totalCount,file,dom));
+            }
+
+            // 按总量倒序排
+            List<paiMingItem> sortedList= paiMingList.OrderByDescending(x => x.totalBorrowedCount).ToList();
+
+
+            // 写回xml
+            for (int i = 0; i < sortedList.Count; i++)
+            {
+                int paiming = i + 1;
+
+                paiMingItem item = sortedList[i];
+                //string fileName = dir + "\\" + item.PatronBarcode + ".xml";
+
+                XmlNode borrowInfoNode = item.dom.DocumentElement.SelectSingleNode("borrowInfo");
+
+                DomUtil.SetAttr(borrowInfoNode, "paiming", paiming.ToString());
+
+                item.dom.Save(item.fileName);
+
+            }
+
+
+            MessageBox.Show(this, temp);
+        }
+
+        class paiMingItem
+        {
+            public paiMingItem(string barcode, int count,string fileName, XmlDocument dom)
+            {
+                this.PatronBarcode = barcode;
+                this.totalBorrowedCount=count;
+                this.fileName = fileName;
+                this.dom = dom;
+            }
+
+            public string PatronBarcode;
+            public int totalBorrowedCount;
+
+            public string fileName;
+            public XmlDocument dom;
+        }
+
+        private void button_selectDir_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            DialogResult result = dlg.ShowDialog();
+            
+            if (result != DialogResult.OK || string.IsNullOrEmpty(dlg.SelectedPath)==true)
+            {
+                //MessageBox.Show(this, "取消");
+                return;
+            }
+
+            string dir = dlg.SelectedPath;
+            //MessageBox.Show(this, dir);
+
+            this.textBox_outputDir.Text = dir;
+
         }
     }
 
