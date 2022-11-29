@@ -88,8 +88,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.textBox_comment = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.textBox_patronBarcodeFile = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button_paiming = new System.Windows.Forms.Button();
@@ -97,28 +95,40 @@
             this.label7 = new System.Windows.Forms.Label();
             this.button_selectDir = new System.Windows.Forms.Button();
             this.listView_files = new System.Windows.Forms.ListView();
+            this.columnHeader40 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader37 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader38 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader39 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader40 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader41 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader42 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.contextMenuStrip_analysis = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ToolStripMenuItem_createhtml = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.contextMenuStrip_statis.SuspendLayout();
+            this.contextMenuStrip_analysis.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // button_stop
             // 
             this.button_stop.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_stop.Location = new System.Drawing.Point(236, 888);
+            this.button_stop.Location = new System.Drawing.Point(593, 237);
             this.button_stop.Margin = new System.Windows.Forms.Padding(7);
             this.button_stop.Name = "button_stop";
-            this.button_stop.Size = new System.Drawing.Size(138, 57);
+            this.button_stop.Size = new System.Drawing.Size(138, 64);
             this.button_stop.TabIndex = 3;
             this.button_stop.Text = "停止";
             this.button_stop.UseVisualStyleBackColor = true;
+            this.button_stop.Click += new System.EventHandler(this.button_stop_Click_1);
             // 
             // dateTimePicker_start
             // 
             this.dateTimePicker_start.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.dateTimePicker_start.Location = new System.Drawing.Point(463, 180);
+            this.dateTimePicker_start.Location = new System.Drawing.Point(464, 120);
             this.dateTimePicker_start.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.dateTimePicker_start.Name = "dateTimePicker_start";
             this.dateTimePicker_start.Size = new System.Drawing.Size(267, 42);
@@ -127,7 +137,7 @@
             // dateTimePicker_end
             // 
             this.dateTimePicker_end.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.dateTimePicker_end.Location = new System.Drawing.Point(785, 180);
+            this.dateTimePicker_end.Location = new System.Drawing.Point(786, 120);
             this.dateTimePicker_end.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.dateTimePicker_end.Name = "dateTimePicker_end";
             this.dateTimePicker_end.Size = new System.Drawing.Size(267, 42);
@@ -137,7 +147,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(734, 186);
+            this.label2.Location = new System.Drawing.Point(735, 126);
             this.label2.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(43, 30);
@@ -158,7 +168,7 @@
             "最近 31 天",
             "最近 365 天",
             "最近 10 年"});
-            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(222, 182);
+            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(223, 122);
             this.comboBox_quickSetFilenames.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.comboBox_quickSetFilenames.Name = "comboBox_quickSetFilenames";
             this.comboBox_quickSetFilenames.Size = new System.Drawing.Size(230, 38);
@@ -416,7 +426,7 @@
             // textBox_patronBarcode
             // 
             this.textBox_patronBarcode.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_patronBarcode.Location = new System.Drawing.Point(222, 75);
+            this.textBox_patronBarcode.Location = new System.Drawing.Point(223, 15);
             this.textBox_patronBarcode.Multiline = true;
             this.textBox_patronBarcode.Name = "textBox_patronBarcode";
             this.textBox_patronBarcode.Size = new System.Drawing.Size(552, 95);
@@ -427,7 +437,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(19, 87);
+            this.label4.Location = new System.Drawing.Point(20, 27);
             this.label4.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(163, 30);
@@ -438,7 +448,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.Location = new System.Drawing.Point(19, 185);
+            this.label5.Location = new System.Drawing.Point(20, 125);
             this.label5.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(163, 30);
@@ -447,9 +457,10 @@
             // 
             // label6
             // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(23, 715);
+            this.label6.Location = new System.Drawing.Point(20, 705);
             this.label6.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(553, 30);
@@ -458,17 +469,19 @@
             // 
             // textBox_comment
             // 
+            this.textBox_comment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.textBox_comment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_comment.Location = new System.Drawing.Point(28, 749);
+            this.textBox_comment.Location = new System.Drawing.Point(25, 747);
             this.textBox_comment.Multiline = true;
             this.textBox_comment.Name = "textBox_comment";
-            this.textBox_comment.Size = new System.Drawing.Size(913, 137);
+            this.textBox_comment.Size = new System.Drawing.Size(824, 130);
             this.textBox_comment.TabIndex = 26;
             // 
             // button2
             // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(28, 888);
+            this.button2.Location = new System.Drawing.Point(859, 747);
             this.button2.Margin = new System.Windows.Forms.Padding(7);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(194, 57);
@@ -477,52 +490,34 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // textBox_patronBarcodeFile
-            // 
-            this.textBox_patronBarcodeFile.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_patronBarcodeFile.Location = new System.Drawing.Point(222, 22);
-            this.textBox_patronBarcodeFile.Name = "textBox_patronBarcodeFile";
-            this.textBox_patronBarcodeFile.Size = new System.Drawing.Size(464, 42);
-            this.textBox_patronBarcodeFile.TabIndex = 28;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(16, 28);
-            this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(223, 30);
-            this.label3.TabIndex = 29;
-            this.label3.Text = "证条码号文件：";
-            // 
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button3.Location = new System.Drawing.Point(692, 20);
+            this.button3.Location = new System.Drawing.Point(785, 15);
             this.button3.Margin = new System.Windows.Forms.Padding(7);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(82, 47);
+            this.button3.Size = new System.Drawing.Size(278, 61);
             this.button3.TabIndex = 30;
-            this.button3.Text = "...";
+            this.button3.Text = "选择条码号文件...";
+            this.button3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button4.Location = new System.Drawing.Point(24, 297);
+            this.button4.Location = new System.Drawing.Point(25, 237);
             this.button4.Margin = new System.Windows.Forms.Padding(7);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(338, 64);
+            this.button4.Size = new System.Drawing.Size(290, 64);
             this.button4.TabIndex = 31;
-            this.button4.Text = "批量生成借阅报表xml";
+            this.button4.Text = "生成借阅报表xml";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button_paiming
             // 
-            this.button_paiming.Location = new System.Drawing.Point(375, 297);
+            this.button_paiming.Location = new System.Drawing.Point(326, 237);
             this.button_paiming.Name = "button_paiming";
             this.button_paiming.Size = new System.Drawing.Size(247, 64);
             this.button_paiming.TabIndex = 32;
@@ -533,7 +528,7 @@
             // textBox_outputDir
             // 
             this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_outputDir.Location = new System.Drawing.Point(222, 237);
+            this.textBox_outputDir.Location = new System.Drawing.Point(223, 177);
             this.textBox_outputDir.Name = "textBox_outputDir";
             this.textBox_outputDir.Size = new System.Drawing.Size(466, 42);
             this.textBox_outputDir.TabIndex = 33;
@@ -542,7 +537,7 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(19, 242);
+            this.label7.Location = new System.Drawing.Point(20, 182);
             this.label7.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(223, 30);
@@ -552,7 +547,7 @@
             // button_selectDir
             // 
             this.button_selectDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_selectDir.Location = new System.Drawing.Point(694, 235);
+            this.button_selectDir.Location = new System.Drawing.Point(695, 175);
             this.button_selectDir.Margin = new System.Windows.Forms.Padding(7);
             this.button_selectDir.Name = "button_selectDir";
             this.button_selectDir.Size = new System.Drawing.Size(83, 47);
@@ -563,75 +558,140 @@
             // 
             // listView_files
             // 
-            this.listView_files.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.listView_files.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView_files.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader40,
             this.columnHeader37,
             this.columnHeader38,
-            this.columnHeader39});
+            this.columnHeader39,
+            this.columnHeader41,
+            this.columnHeader42});
+            this.listView_files.ContextMenuStrip = this.contextMenuStrip_analysis;
             this.listView_files.FullRowSelect = true;
+            this.listView_files.GridLines = true;
             this.listView_files.HideSelection = false;
-            this.listView_files.Location = new System.Drawing.Point(28, 381);
+            this.listView_files.Location = new System.Drawing.Point(25, 320);
             this.listView_files.MultiSelect = false;
             this.listView_files.Name = "listView_files";
-            this.listView_files.Size = new System.Drawing.Size(1201, 302);
+            this.listView_files.Size = new System.Drawing.Size(1028, 364);
             this.listView_files.TabIndex = 36;
             this.listView_files.UseCompatibleStateImageBehavior = false;
             this.listView_files.View = System.Windows.Forms.View.Details;
+            this.listView_files.SelectedIndexChanged += new System.EventHandler(this.listView_files_SelectedIndexChanged);
+            // 
+            // columnHeader40
+            // 
+            this.columnHeader40.Text = "xml文件名";
+            this.columnHeader40.Width = 151;
             // 
             // columnHeader37
             // 
-            this.columnHeader37.Text = "patronBarcode";
-            this.columnHeader37.Width = 296;
+            this.columnHeader37.Text = "证条码号";
+            this.columnHeader37.Width = 180;
             // 
             // columnHeader38
             // 
             this.columnHeader38.Text = "借阅量";
-            this.columnHeader38.Width = 179;
+            this.columnHeader38.Width = 125;
             // 
             // columnHeader39
             // 
             this.columnHeader39.Text = "排名";
-            this.columnHeader39.Width = 215;
+            this.columnHeader39.Width = 98;
             // 
-            // columnHeader40
+            // columnHeader41
             // 
-            this.columnHeader40.Text = "文件名";
-            this.columnHeader40.Width = 191;
+            this.columnHeader41.Text = "阅读评语";
+            this.columnHeader41.Width = 222;
+            // 
+            // columnHeader42
+            // 
+            this.columnHeader42.Text = "html文件名";
+            this.columnHeader42.Width = 196;
+            // 
+            // contextMenuStrip_analysis
+            // 
+            this.contextMenuStrip_analysis.ImageScalingSize = new System.Drawing.Size(40, 40);
+            this.contextMenuStrip_analysis.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuItem_createhtml});
+            this.contextMenuStrip_analysis.Name = "contextMenuStrip_analysis";
+            this.contextMenuStrip_analysis.Size = new System.Drawing.Size(361, 105);
+            this.contextMenuStrip_analysis.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip_analysis_Opening);
+            // 
+            // ToolStripMenuItem_createhtml
+            // 
+            this.ToolStripMenuItem_createhtml.Name = "ToolStripMenuItem_createhtml";
+            this.ToolStripMenuItem_createhtml.Size = new System.Drawing.Size(360, 46);
+            this.ToolStripMenuItem_createhtml.Text = "生成html";
+            this.ToolStripMenuItem_createhtml.Click += new System.EventHandler(this.ToolStripMenuItem_createhtml_Click);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.splitContainer1.Location = new System.Drawing.Point(12, 22);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.label4);
+            this.splitContainer1.Panel1.Controls.Add(this.listView_files);
+            this.splitContainer1.Panel1.Controls.Add(this.label5);
+            this.splitContainer1.Panel1.Controls.Add(this.button_selectDir);
+            this.splitContainer1.Panel1.Controls.Add(this.label2);
+            this.splitContainer1.Panel1.Controls.Add(this.textBox_outputDir);
+            this.splitContainer1.Panel1.Controls.Add(this.button_stop);
+            this.splitContainer1.Panel1.Controls.Add(this.label7);
+            this.splitContainer1.Panel1.Controls.Add(this.dateTimePicker_start);
+            this.splitContainer1.Panel1.Controls.Add(this.button_paiming);
+            this.splitContainer1.Panel1.Controls.Add(this.dateTimePicker_end);
+            this.splitContainer1.Panel1.Controls.Add(this.button4);
+            this.splitContainer1.Panel1.Controls.Add(this.comboBox_quickSetFilenames);
+            this.splitContainer1.Panel1.Controls.Add(this.button3);
+            this.splitContainer1.Panel1.Controls.Add(this.textBox_patronBarcode);
+            this.splitContainer1.Panel1.Controls.Add(this.label6);
+            this.splitContainer1.Panel1.Controls.Add(this.textBox_comment);
+            this.splitContainer1.Panel1.Controls.Add(this.button2);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Info;
+            this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
+            this.splitContainer1.Size = new System.Drawing.Size(1401, 907);
+            this.splitContainer1.SplitterDistance = 1071;
+            this.splitContainer1.TabIndex = 37;
+            // 
+            // webBrowser1
+            // 
+            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser1.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.Size = new System.Drawing.Size(326, 907);
+            this.webBrowser1.TabIndex = 0;
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1275, 967);
-            this.Controls.Add(this.listView_files);
-            this.Controls.Add(this.button_selectDir);
-            this.Controls.Add(this.textBox_outputDir);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.button_paiming);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.textBox_patronBarcodeFile);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox_comment);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.textBox_patronBarcode);
-            this.Controls.Add(this.comboBox_quickSetFilenames);
-            this.Controls.Add(this.dateTimePicker_end);
-            this.Controls.Add(this.dateTimePicker_start);
-            this.Controls.Add(this.button_stop);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(1445, 962);
+            this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(7);
             this.Name = "chargingAnalysisForm";
             this.Text = "日志查询与统计";
             this.Load += new System.EventHandler(this.PrepForm_Load);
             this.contextMenuStrip_statis.ResumeLayout(false);
+            this.contextMenuStrip_analysis.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -695,8 +755,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox_comment;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TextBox textBox_patronBarcodeFile;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button_paiming;
@@ -708,5 +766,11 @@
         private System.Windows.Forms.ColumnHeader columnHeader38;
         private System.Windows.Forms.ColumnHeader columnHeader39;
         private System.Windows.Forms.ColumnHeader columnHeader40;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.ColumnHeader columnHeader41;
+        private System.Windows.Forms.ColumnHeader columnHeader42;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip_analysis;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_createhtml;
+        private System.Windows.Forms.WebBrowser webBrowser1;
     }
 }

@@ -26,6 +26,7 @@ using System.Linq;
 using DigitalPlatform.ChargingAnalysis;
 using DigitalPlatform.CirculationClient;
 using System.Web;
+using xml2html;
 
 namespace dp2mini
 {
@@ -117,7 +118,7 @@ namespace dp2mini
             });
         }
 
-        public BorrowAnalysisReport _report = null;
+        //public BorrowAnalysisReport _report = null;
 
         /// <summary>
         /// 检索做事的函数
@@ -154,37 +155,37 @@ namespace dp2mini
                 //
                 //string times = startDate + "~" + endDate;
 
-                // 创建数据
-                int nRet = BorrowAnalysisService.Instance.Build(token,
-                    patronBarcode,
-                    startDate,
-                    endDate,
-                    out this._report,
-                    out strError);
-                if (nRet == -1)
-                    goto ERROR1;
+                //// 创建数据
+                //int nRet = BorrowAnalysisService.Instance.Build(token,
+                //    patronBarcode,
+                //    startDate,
+                //    endDate,
+                //    out this._report,
+                //    out strError);
+                //if (nRet == -1)
+                //    goto ERROR1;
 
-                // 输出报表
-                string xml = "";
-                nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-                    "xml",
-                    out xml,
-                    out strError);
-                if (nRet == -1)
-                    goto ERROR1;
+                //// 输出报表
+                //string xml = "";
+                //nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+                //    "xml",
+                //    out xml,
+                //    out strError);
+                //if (nRet == -1)
+                //    goto ERROR1;
 
 
-                // 把html显示在界面上
-                this.Invoke((Action)(() =>
-                {
-                    string temp = "<div>" + HttpUtility.HtmlEncode(xml) + "</div>";
-                    //SetHtmlString(this.webBrowser1, temp);
+                //// 把html显示在界面上
+                //this.Invoke((Action)(() =>
+                //{
+                //    string temp = "<div>" + HttpUtility.HtmlEncode(xml) + "</div>";
+                //    //SetHtmlString(this.webBrowser1, temp);
 
-                    // 把馆长评估提出来，显示在输入框中
-                    this.textBox_comment.Text = this._report.comment;
+                //    // 把馆长评估提出来，显示在输入框中
+                //    this.textBox_comment.Text = this._report.comment;
 
-                }
-                ));
+                //}
+                //));
 
                 return;
             }
@@ -226,228 +227,6 @@ namespace dp2mini
         static void SetTextString(WebBrowser webBrowser, string strText)
         {
             SetHtmlString(webBrowser, "<pre>" + HttpUtility.HtmlEncode(strText) + "</pre>");
-        }
-
-        // 对借书日志进行聚合
-        public void StatisBorrow()
-        {
-            /*
-            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
-            var list = this._borrowItems.GroupBy(
-                x => new { x.location, x.readerBarcode, x.readerName,x.dept },
-                (key, item_list) => new BorrowGroup
-                {
-                    location = key.location,
-                    readerBarcode = key.readerBarcode,
-                    readerName = key.readerName,
-                    dept = key.dept,
-                    Items = new List<BorrowLogItem>(item_list)
-                }).OrderByDescending(o=>o.Items.Count).OrderBy(o => o.location).ToList();
-
-
-            foreach (BorrowGroup group in list)
-            {
-                ListViewItem viewItem = new ListViewItem(group.location, 0);
-                this.listView_borrowStatis.Items.Add(viewItem);
-
-                viewItem.SubItems.Add(group.readerBarcode);
-                viewItem.SubItems.Add(group.readerName);
-                viewItem.SubItems.Add(group.dept);
-                viewItem.SubItems.Add(group.Items.Count.ToString());
-            }
-
-            //if (this._borrowItems.Count > 0)
-            //{
-            //    // 按证条码号排序
-            //    SortCol(this.listView_borrowStatis, this.SortColumns_borrowStatis, 3);
-
-            //    SortCol(this.listView_borrowStatis, this.SortColumns_borrowStatis, 0);
-            //}
-            */
-        }
-
-        // 对还书日志进行聚合
-        public void StatisReturn()
-        {
-            /*
-            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
-            var list = this._returnItems.GroupBy(
-                x => new { x.location, x.readerBarcode, x.readerName,x.dept },
-                (key, item_list) => new BorrowGroup
-                {
-                    location = key.location,
-                    readerBarcode = key.readerBarcode,
-                    readerName = key.readerName,
-                    dept=key.dept,
-                    Items = new List<BorrowLogItem>(item_list)
-                }).OrderByDescending(o => o.Items.Count).OrderBy(o => o.location).ToList();
-
-
-            foreach (BorrowGroup group in list)
-            {
-                ListViewItem viewItem = new ListViewItem(group.location, 0);
-                this.listView_returnStatis.Items.Add(viewItem);
-
-                viewItem.SubItems.Add(group.readerBarcode);
-                viewItem.SubItems.Add(group.readerName);
-                viewItem.SubItems.Add(group.dept);
-                viewItem.SubItems.Add(group.Items.Count.ToString());
-            }
-            */
-        }
-
-
-        // 对借书和还书日志进行聚合
-        public void GroupByClass()
-        {
-            // 让用户选择需要统计的范围。根据批次号、目标位置来进行选择
-            var list = this._borrowAndReturnItems.GroupBy(
-                x => new { x.readerBarcode, x.readerName, x.dept },
-                (key, item_list) => new BorrowGroup
-                {
-                    //location = key.location,
-
-                    readerBarcode = key.readerBarcode,
-                    readerName = key.readerName,
-                    dept = key.dept,
-                    Items = new List<BorrowLogItem>(item_list)
-                }).OrderByDescending(o => o.Items.Count).OrderBy(o => o.location).ToList();
-
-
-            foreach (BorrowGroup group in list)
-            {
-                ListViewItem viewItem = new ListViewItem(group.readerBarcode, 0);
-                //this.listView_borrowAndReurn_statis.Items.Add(viewItem);
-
-                //viewItem.SubItems.Add(group.readerBarcode);
-                viewItem.SubItems.Add(group.readerName);
-                viewItem.SubItems.Add(group.dept);
-                viewItem.SubItems.Add(group.Items.Count.ToString());
-            }
-        }
-
-
-
-        // 日志记录hastable,方便点一条，在右侧看到详细信息
-        public Hashtable _logItems = new Hashtable();
-
-        // 用于做借书聚合的类
-        List<BorrowLogItem> _borrowItems = new List<BorrowLogItem>();
-
-        // 用于做还书聚合的类
-        List<BorrowLogItem> _returnItems = new List<BorrowLogItem>();
-
-        // 用于做借还聚合的类
-        List<BorrowLogItem> _borrowAndReturnItems = new List<BorrowLogItem>();
-
-        public int LoadLog(OperLogItem logItem, out string error)
-        {
-            error = "";
-
-            /*
-
-            //"<operation>setEntity</operation><libraryCode></libraryCode><action>new</action>
-            //<style>outofrangeAsError</style><record recPath=\"中文图书实体/1\">&lt;root&gt;&lt;parent&gt;1&lt;/parent&gt;&lt;location&gt;流通库&lt;/location&gt;&lt;price&gt;CNY28.80&lt;/price&gt;&lt;bookType&gt;普通&lt;/bookType&gt;&lt;accessNo&gt;I563.85/H022&lt;/accessNo&gt;&lt;barcode&gt;B001&lt;/barcode&gt;&lt;refID&gt;b0067871-f39d-4c7e-aacf-750855ebfde0&lt;/refID&gt;&lt;operations&gt;&lt;operation name=\"create\" time=\"Wed, 07 Apr 2021 12:26:49 +0800\" operator=\"supervisor\" /&gt;&lt;/operations&gt;&lt;/root&gt;</record>
-            // <operator>supervisor</operator><operTime>Wed, 07 Apr 2021 12:26:49 +0800</operTime><clientAddress via=\"net.pipe://localhost/dp2library/xe\">localhost</clientAddress>
-            //<version>1.08</version>"
-            string xml = logItem.Xml;
-            XmlDocument dom = new XmlDocument();
-            dom.LoadXml(xml);
-            XmlNode root = dom.DocumentElement;
-
-            // 取出馆代码
-            string libraryCode = DomUtil.GetElementInnerText(root, "libraryCode");
-
-            // 操作类型 operation/action
-            string operation = DomUtil.GetElementText(root, "operation");
-            string action = DomUtil.GetElementText(root, "action");
-            string operType= operation+"/"+ action;
-
-            // 操作者
-            string operator1 = DomUtil.GetElementInnerText(root, "operator");
-
-            // 操作时间
-            string operTime = DomUtil.GetElementInnerText(root, "operTime");
-            string strOperTime = GetRfc1123DisplayString(operTime);
-
-
-            // 给总表中加记录
-            {
-                //文件名
-                //序号
-                //馆代码
-                //操作类型
-                //操作者
-                //操作时间
-                //耗时
-                ListViewItem viewItem = new ListViewItem(logItem.Date, 0);
-                this.listView_results.Items.Add(viewItem);
-                viewItem.SubItems.Add(logItem.Index.ToString());
-                viewItem.SubItems.Add(libraryCode);
-                viewItem.SubItems.Add(operType);
-                viewItem.SubItems.Add(operator1);
-                viewItem.SubItems.Add(strOperTime);
-            }
-
-            // 加到hashtable里，方便点击单独看详细信息
-            string key = logItem.Date + "-" + logItem.Index;
-            _logItems[key] = logItem;
-
-
-            // 如果是borrow加到借书表中，发现borrow和return的格式一致
-            if (operation == "borrow" || operation=="return")
-            {
-                ListViewItem viewItem = new ListViewItem(logItem.Date, 0);
-
-                // 根据操作类型，加到不同的表格
-                if (operation == "borrow")
-                    this.listView_log_borrow.Items.Add(viewItem);
-                else
-                    this.listView_return.Items.Add(viewItem);
-                
-                
-                viewItem.SubItems.Add(logItem.Index.ToString());
-                viewItem.SubItems.Add(libraryCode);
-
-                int nRet = GetBorrowInfo(dom, out BorrowLogItem borrowLog, out string strError);
-                if (nRet == -1)
-                {
-                    string info = "获取借书详细信息出错" + strError;
-                    viewItem.SubItems.Add(info);
-                    viewItem.SubItems.Add("");
-                    viewItem.SubItems.Add("");
-                    viewItem.SubItems.Add("");
-                    viewItem.SubItems.Add("");
-                }
-                else
-                {
-                    // 馆藏地
-                    // 证条码号
-                    // 姓名
-                    // 册条码号
-                    viewItem.SubItems.Add(borrowLog.location);
-                    viewItem.SubItems.Add(borrowLog.readerBarcode);
-                    viewItem.SubItems.Add(borrowLog.readerName);
-                    viewItem.SubItems.Add(borrowLog.dept);
-                    viewItem.SubItems.Add(borrowLog.itemBarcode);
-
-                    // 根据类型判断，加到对应的内存集中
-                    if (operation == "borrow")
-                        this._borrowItems.Add(borrowLog);
-                    else
-                        this._returnItems.Add(borrowLog);
-
-                    // 借还都算
-                    _borrowAndReturnItems.Add(borrowLog);
-                }
-
-
-                viewItem.SubItems.Add(operator1);
-                viewItem.SubItems.Add(strOperTime);
-
-            }
-            */
-            return 0;
         }
 
         /// <summary>
@@ -623,134 +402,6 @@ namespace dp2mini
             this.BeginInvoke(d, new object[] { sender });
         }
 
-
-
-        // 把列表中的全部记录导出excel
-        private void button_toExcel_Click(object sender, EventArgs e)
-        {
-            /*
-            // 先选择导出哪些表
-            SelectSheetForm dlg = new SelectSheetForm(this);
-            dlg.StartPosition = FormStartPosition.CenterScreen;
-            DialogResult result= dlg.ShowDialog(this);
-            if (result == DialogResult.Cancel)
-            {
-                MessageBox.Show(this, "用户放弃导出");
-                return;
-            }
-
-            if (result == DialogResult.OK)
-            {
-                if (dlg.OutputTables == null || dlg.OutputTables.Count == 0)
-                {
-                    MessageBox.Show(this, "用户未选择要导出的表。");
-                    return;
-                }
-
-                string strError = "";
-                List<SheetItem> sheets = new List<SheetItem>();  // 准备要导出表的集合
-
-                bool bHasData = false;
-
-                foreach (string tabName in dlg.OutputTables)
-                {
-                    ListView temp = null;
-                    if (tabName == "日志总表")
-                        temp = this.listView_results;
-                    else if (tabName == "借书日志")
-                        temp = this.listView_log_borrow;
-                    else if (tabName == "借书统计")
-                        temp = this.listView_borrowStatis;
-                    else if (tabName == "还书日志")
-                        temp = this.listView_return;
-                    else if (tabName == "还书统计")
-                        temp = this.listView_returnStatis;
-                    else if (tabName == "借还统计")
-                        temp = this.listView_borrowAndReurn_statis;
-                    else
-                        continue;  // 不认识的表
-
-                    SheetItem sheet = new SheetItem();
-                    sheet.sheetName = tabName;
-                    sheet.items = new List<ListViewItem>();
-                    foreach (ListViewItem item in temp.Items)
-                    {
-                        sheet.items.Add(item);
-
-                        if (bHasData == false)
-                            bHasData = true;
-                    }
-                    sheets.Add(sheet);  // 加到集合里
-                }
-
-
-                // 如果所有表中都没有数据，提示用户说没有数据，请先查询
-                if (bHasData == false)
-                {
-                    MessageBox.Show(this, "您要导出的列表中均没有数据，请先查询，在下方列表看到数据后，再导出。");
-                    return;
-                }
-
-
-
-                // return:
-                //      -1  出错
-                //      0   放弃或中断
-                //      1   成功
-                int nRet = ClosedXmlUtil.ExportToExcel(null, sheets, out strError);
-                if (nRet == -1)
-                {
-                    MessageBox.Show(this, "导出excel出错:" + strError);
-                    return;
-                }
-            }
-            */
-        }
-
-        private void listView_results_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            /*
-            // 先把xml置空
-            this.textBox_xml.Text = "";
-
-            if (this.listView_results.SelectedItems.Count == 0)
-                return;
-
-            ListViewItem item = this.listView_results.SelectedItems[0];
-
-            string key = item.SubItems[0].Text + "-" + item.SubItems[1].Text;
-
-            OperLogItem logItem = (OperLogItem)this._logItems[key];
-            if (logItem == null)
-                return;
-
-            //this.textBox_xml.Text = logItem.Xml;
-
-            string xml = logItem.Xml;
-            XmlDocument dom = new XmlDocument();
-            dom.LoadXml(xml);
-
-            // 把这几个节点处理为容易看的格式，原来是作为node的text的
-            ToViewString(dom, "record");
-            ToViewString(dom, "oldRecord");
-            ToViewString(dom, "readerRecord");
-            ToViewString(dom, "itemRecord");
-
-            string strError = "";
-            string strXml = "";
-            int nRet = DomUtil.GetIndentXml(dom.OuterXml,
-                true,
-                out strXml,
-                out strError);
-            if (nRet == -1)
-            {
-                MessageBox.Show(this, strError);
-                return;
-            }
-
-            this.textBox_xml.Text = strXml;
-            */
-        }
 
 
         public void ToViewString(XmlDocument dom, string nodeName)
@@ -1020,49 +671,48 @@ namespace dp2mini
         // 把html下载到本地
         private void button_download_Click(object sender, EventArgs e)
         {
-            // 输出报表
-            //string html = ChargingAnalysisService.Instance.OutputReport("", "");
-
-            // 输出报表
-            string xml = "";
-            string strError = "";
-            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-                "xml",
-                out xml,
-                out strError);
-            if (nRet == -1)
-            {
-                MessageBox.Show(this, strError);
-                return;
-            }
-
-            // 把html保存到文件
-            // 询问文件名
-            SaveFileDialog dlg = new SaveFileDialog
-            {
-                Title = "请指定文件名",
-                CreatePrompt = false,
-                OverwritePrompt = true,
-                // dlg.FileName = this.ExportExcelFilename;
-                // dlg.InitialDirectory = Environment.CurrentDirectory;
-                Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
 
 
-                RestoreDirectory = true
-            };
+            //// 输出报表
+            //string xml = "";
+            //string strError = "";
+            //int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+            //    "xml",
+            //    out xml,
+            //    out strError);
+            //if (nRet == -1)
+            //{
+            //    MessageBox.Show(this, strError);
+            //    return;
+            //}
 
-            // 如果在询问文件名对话框，点了取消，退不处理，返回0，
-            if (dlg.ShowDialog() != DialogResult.OK)
-                return;
+            //// 把html保存到文件
+            //// 询问文件名
+            //SaveFileDialog dlg = new SaveFileDialog
+            //{
+            //    Title = "请指定文件名",
+            //    CreatePrompt = false,
+            //    OverwritePrompt = true,
+            //    // dlg.FileName = this.ExportExcelFilename;
+            //    // dlg.InitialDirectory = Environment.CurrentDirectory;
+            //    Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
 
-            string fileName = dlg.FileName;
 
-            // StreamWriter当文件不存在时，会自动创建一个新文件。
-            using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
-            {
-                // 写到打印文件
-                writer.Write(xml);
-            }
+            //    RestoreDirectory = true
+            //};
+
+            //// 如果在询问文件名对话框，点了取消，退不处理，返回0，
+            //if (dlg.ShowDialog() != DialogResult.OK)
+            //    return;
+
+            //string fileName = dlg.FileName;
+
+            //// StreamWriter当文件不存在时，会自动创建一个新文件。
+            //using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
+            //{
+            //    // 写到打印文件
+            //    writer.Write(xml);
+            //}
 
         }
 
@@ -1080,6 +730,30 @@ namespace dp2mini
 
         private void button2_Click(object sender, EventArgs e)
         {
+            // 设置评语
+            string comment = this.textBox_comment.Text.Trim();
+
+            if (this.listView_files.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "请先从列表中选择要修改评语的读者记录。");
+                return;
+            }
+
+            string file = this.listView_files.SelectedItems[0].Text;
+
+            XmlDocument dom = new XmlDocument();
+            dom.Load(file);
+            XmlNode root = dom.DocumentElement;
+
+            // 设到dom
+             DomUtil.SetElementText(root, "comment",comment);
+
+            // 保存到文件
+            dom.Save(file);
+
+            MessageBox.Show(this, "评语保存成功。");
+
+            /*
             //ChargingAnalysisService.Instance._pa
 
             if (this._report == null
@@ -1107,12 +781,12 @@ namespace dp2mini
                 return;
             }
             //SetHtmlString(this.webBrowser1, html);
-
+            */
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-
+            string fileName = "";
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
                 dlg.Title = "请指定读者证条码号文件";
@@ -1122,7 +796,15 @@ namespace dp2mini
                 if (dlg.ShowDialog() != DialogResult.OK)
                     return;
 
-                this.textBox_patronBarcodeFile.Text = dlg.FileName;
+
+               fileName= dlg.FileName;
+            }
+
+
+            // 取出条码号文件的内容，放在条码框里
+            using (StreamReader reader = new StreamReader(fileName))//, Encoding.UTF8))
+            {
+                this.textBox_patronBarcode.Text = reader.ReadToEnd().Trim();
             }
 
 
@@ -1133,14 +815,8 @@ namespace dp2mini
             //时间范围
             string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
             string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
-            string patronBarcodeFile = this.textBox_patronBarcodeFile.Text.Trim();
-            if (string.IsNullOrEmpty(patronBarcodeFile) == true
-                || File.Exists(patronBarcodeFile)==false)
-            {
-                MessageBox.Show(this, "读者证条码号不存在。");
-                return;
-            }
-
+            
+            // 输出目录
             string dir =this.textBox_outputDir.Text.Trim();
             if (string.IsNullOrEmpty(dir) == true)
             {
@@ -1151,39 +827,41 @@ namespace dp2mini
                 Directory.CreateDirectory(dir);
 
 
-            List<string> patronBarcodeList = new List<string>();
-            using (StreamReader reader = new StreamReader(patronBarcodeFile))//, Encoding.UTF8))
+            // 证条码号，可能多个
+            string patronBarcodes = this.textBox_patronBarcode.Text.Trim();
+            if (string.IsNullOrEmpty(patronBarcodes) == true)
             {
-                string line = "";
-                while ((line = reader.ReadLine()) != null)
-                {
-                    string temp = line.Trim();
-                    if (string.IsNullOrEmpty(temp) == false)
-                    {
-                        patronBarcodeList.Add(line);
-                    }
-                }
+                MessageBox.Show(this, "请先输入读者证条码号。");
+                return;
             }
 
+            this.listView_files.Items.Clear(); 
+            Application.DoEvents();
+
+            // 拆分证条码号，每个号码一行
+            patronBarcodes = patronBarcodes.Replace("\r\n","\n");
+            string[] patronBarcodeList = patronBarcodes.Split(new char[] { '\n' });
 
 
             string strError = "";
-            // 批量生成
+            // 循环每个证条码，生成报表
             foreach (string patronBarcode in patronBarcodeList)
             {
-                // 创建数据
-                int nRet = BorrowAnalysisService.Instance.Build(this._cancel.Token,
+                 BorrowAnalysisReport report = null;
+
+        // 创建数据
+        int nRet = BorrowAnalysisService.Instance.Build(this._cancel.Token,
                     patronBarcode,
                     startDate,
                     endDate,
-                    out this._report,
+                    out report,
                     out strError);
                 if (nRet == -1)
                     goto ERROR1;
 
                 // 输出报表
                 string xml = "";
-                nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+                nRet = BorrowAnalysisService.Instance.OutputReport(report,
                     "xml",
                     out xml,
                     out strError);
@@ -1201,6 +879,9 @@ namespace dp2mini
 
 
             }
+
+            // 在list显示最新的文件
+            this.ShowFiles();
 
             MessageBox.Show(this, "批量生成借阅报表完成。");
             return;
@@ -1227,7 +908,7 @@ namespace dp2mini
            string[] fiels= Directory.GetFiles(dir, "*.xml");
             foreach (string file in fiels)
             {
-                temp+=file.Trim()+"\r\n";
+                //temp+=file.Trim()+"\r\n";
 
                 XmlDocument dom = new XmlDocument();
                 dom.Load(file);
@@ -1263,8 +944,10 @@ namespace dp2mini
 
             }
 
+            // 在list显示最新的文件
+            this.ShowFiles();
 
-            MessageBox.Show(this, temp);
+            MessageBox.Show(this, "排名处理完成。");
         }
 
         class paiMingItem
@@ -1306,40 +989,170 @@ namespace dp2mini
 
         private void ShowFiles()
         {
-            string dir = this.textBox_outputDir.Text.Trim();
-            if (string.IsNullOrEmpty(dir) == true)
-                return;
-
-            this.listView_files.Items.Clear();
-
-            string[] fiels = Directory.GetFiles(dir, "*.xml");
-            foreach (string file in fiels)
+            try
             {
+                string dir = this.textBox_outputDir.Text.Trim();
+                if (string.IsNullOrEmpty(dir) == true)
+                    return;
+
+                this.listView_files.Items.Clear();
+
+                string[] fiels = Directory.GetFiles(dir, "*.xml");
+                foreach (string file in fiels)
+                {
+                    XmlDocument dom = new XmlDocument();
+                    dom.Load(file);
+                    XmlNode root = dom.DocumentElement;
+
+                    //patron/barcode取内容
+                    string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+
+                    //borrowInfo 取 totalBorrowedCount 属性
+                    string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
+                    int totalCount = Convert.ToInt32(totalBorrowedCount);
+
+                    string paiming = DomUtil.GetAttr(root, "borrowInfo", "paiming");
+
+                    //comment 取 title 属性
+                    string title = DomUtil.GetAttr(root, "comment", "title");
+
+                    ListViewItem item = new ListViewItem(file);
+                    item.SubItems.Add(barcode);
+                    item.SubItems.Add(totalBorrowedCount);
+                    item.SubItems.Add(paiming);
+                    item.SubItems.Add(title);
+
+                    // 如果对应的html存在，则显示，到时点击第一行时，显示对应
+                    int nIndex = file.LastIndexOf('.');
+                    string left = file.Substring(0, nIndex);
+                    string htmlFile = left + ".html";
+                    if (File.Exists(htmlFile) == true)
+                    {
+                        item.SubItems.Add(htmlFile);
+                    }
+
+
+                    this.listView_files.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message);
+                return;
+            }
+        }
+
+        private void listView_files_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.listView_files.SelectedItems.Count > 0)
+            {
+                ListViewItem item = this.listView_files.SelectedItems[0];
+
+                //MessageBox.Show(this, item.Text);
+
+                string file = item.Text;
+
                 XmlDocument dom = new XmlDocument();
                 dom.Load(file);
                 XmlNode root = dom.DocumentElement;
 
-                //patron/barcode取内容
-                string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+                //从馆员评语显示在输入框
+                string comment = DomUtil.GetElementText(root, "comment");
+                this.textBox_comment.Text = comment;
 
-                //borrowInfo 取 totalBorrowedCount 属性
-                string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
-                int totalCount = Convert.ToInt32(totalBorrowedCount);
 
-                string paiming = DomUtil.GetAttr(root, "borrowInfo", "paiming");
+                // 如果存在html文件，显示出来
+                if (item.SubItems.Count >= 6)
+                {
+                    string htmlFile = item.SubItems[5].Text;
+                    this.showHtml(htmlFile);
+                }
+                else
+                {
+                    SetHtmlString(this.webBrowser1, "");
 
-                ListViewItem item = new ListViewItem(file);
-                item.SubItems.Add(barcode);
-                item.SubItems.Add(totalBorrowedCount);
-                item.SubItems.Add(paiming);
+                }
 
-                this.listView_files.Items.Add(item);
             }
+        }
+
+        public void showHtml(string htmlFile)
+        {
+            string content = "";
+            using (StreamReader reader = new StreamReader(htmlFile))//, Encoding.UTF8))
+            {
+                content = reader.ReadToEnd().Trim();
+            }
+
+            SetHtmlString(this.webBrowser1, content);
+
+            //MessageBox.Show(this, htmlFile);
+
+            ////webBrowser1.Navigate(@".\Documentation\index.html");
+            ////this.webBrowser1.Url = new Uri(String.Format("file:///{0}/my_html.html", curDir));
+            //this.webBrowser1.Navigate(htmlFile);
+            ////this.webBrowser1.
+            //this.webBrowser1.Document.Encoding = "utf-8";
+        }
+
+        private void button_stop_Click_1(object sender, EventArgs e)
+        {
+            // 停止
+            this._cancel.Cancel();
+        }
+
+        private void contextMenuStrip_analysis_Opening(object sender, CancelEventArgs e)
+        {
 
         }
 
+        private void ToolStripMenuItem_createhtml_Click(object sender, EventArgs e)
+        {
+            if (this.listView_files.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "尚未选择记录行");
+                return;
+            }
+
+            ListViewItem item = this.listView_files.SelectedItems[0];
+
+            // 先得到xml文件
+            string xmlFile = item.Text;
+
+            // 如果对应的html存在，则显示，到时点击第一行时，显示对应
+            int nIndex = xmlFile.LastIndexOf('.');
+            string left = xmlFile.Substring(0, nIndex);
+            string htmlFile = left + ".html";
+            //if (File.Exists(htmlFile) == true)
+            //{
+            //    item.SubItems.Add(htmlFile);
+            //}
+
+            try
+            {
+                // 调接口将xml转为html
+                ConvertHelper.Convert(xmlFile, htmlFile);
+                // 显示出来 
+                this.showHtml(htmlFile);
+
+                // 加到命令行中
+                item.SubItems.Add(htmlFile);
+
+            }
+            catch (Exception ex)
+            {
+
+                if (File.Exists(htmlFile) == true)
+                { 
+                    File.Delete(htmlFile);                
+                }
+
+                string error = ex.Message;
+                SetHtmlString(this.webBrowser1,"<b>"+error+"</b>");
+            }
 
 
+        }
     }
 
 

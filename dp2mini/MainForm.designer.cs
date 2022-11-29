@@ -64,7 +64,7 @@
             this.menuStrip_main.Location = new System.Drawing.Point(0, 0);
             this.menuStrip_main.Name = "menuStrip_main";
             this.menuStrip_main.Padding = new System.Windows.Forms.Padding(11, 3, 0, 3);
-            this.menuStrip_main.Size = new System.Drawing.Size(1283, 60);
+            this.menuStrip_main.Size = new System.Drawing.Size(1283, 49);
             this.menuStrip_main.TabIndex = 1;
             this.menuStrip_main.Text = "menuStrip_main";
             // 
@@ -74,7 +74,7 @@
             this.toolStripMenuItem_prep,
             this.备书单管理ToolStripMenuItem});
             this.toolStripMenuItem_file.Name = "toolStripMenuItem_file";
-            this.toolStripMenuItem_file.Size = new System.Drawing.Size(137, 54);
+            this.toolStripMenuItem_file.Size = new System.Drawing.Size(137, 43);
             this.toolStripMenuItem_file.Text = "文件(&F)";
             // 
             // toolStripMenuItem_prep
@@ -100,7 +100,7 @@
             this.ToolStripMenuItem_openProgramFolder,
             this.巡检ToolStripMenuItem});
             this.toolStripMenuItem_help.Name = "toolStripMenuItem_help";
-            this.toolStripMenuItem_help.Size = new System.Drawing.Size(144, 54);
+            this.toolStripMenuItem_help.Size = new System.Drawing.Size(144, 43);
             this.toolStripMenuItem_help.Text = "帮助(&H)";
             // 
             // toolStripMenuItem_setting
@@ -182,12 +182,12 @@
             this.toolStripButton_prep,
             this.toolStripButton_note,
             this.toolStripLabel_transferStatis,
-            this.toolStripLabel_marc,
-            this.toolStripButton_chargingAnalysis});
-            this.toolStrip_main.Location = new System.Drawing.Point(0, 60);
+            this.toolStripButton_chargingAnalysis,
+            this.toolStripLabel_marc});
+            this.toolStrip_main.Location = new System.Drawing.Point(0, 49);
             this.toolStrip_main.Name = "toolStrip_main";
             this.toolStrip_main.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
-            this.toolStrip_main.Size = new System.Drawing.Size(1283, 62);
+            this.toolStrip_main.Size = new System.Drawing.Size(1283, 50);
             this.toolStrip_main.TabIndex = 5;
             this.toolStrip_main.Text = "toolStrip1";
             // 
@@ -197,7 +197,7 @@
             this.toolStripButton_prep.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_prep.Image")));
             this.toolStripButton_prep.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton_prep.Name = "toolStripButton_prep";
-            this.toolStripButton_prep.Size = new System.Drawing.Size(201, 55);
+            this.toolStripButton_prep.Size = new System.Drawing.Size(201, 43);
             this.toolStripButton_prep.Text = "预约到书查询";
             this.toolStripButton_prep.Click += new System.EventHandler(this.toolStripButton_prep_Click);
             // 
@@ -207,21 +207,21 @@
             this.toolStripButton_note.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_note.Image")));
             this.toolStripButton_note.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton_note.Name = "toolStripButton_note";
-            this.toolStripButton_note.Size = new System.Drawing.Size(171, 55);
+            this.toolStripButton_note.Size = new System.Drawing.Size(171, 43);
             this.toolStripButton_note.Text = "备书单管理";
             this.toolStripButton_note.Click += new System.EventHandler(this.toolStripButton_note_Click);
             // 
             // toolStripLabel_transferStatis
             // 
             this.toolStripLabel_transferStatis.Name = "toolStripLabel_transferStatis";
-            this.toolStripLabel_transferStatis.Size = new System.Drawing.Size(227, 55);
+            this.toolStripLabel_transferStatis.Size = new System.Drawing.Size(227, 43);
             this.toolStripLabel_transferStatis.Text = "日志查询与统计";
             this.toolStripLabel_transferStatis.Click += new System.EventHandler(this.toolStripLabel_transferStatis_Click);
             // 
             // toolStripLabel_marc
             // 
             this.toolStripLabel_marc.Name = "toolStripLabel_marc";
-            this.toolStripLabel_marc.Size = new System.Drawing.Size(227, 55);
+            this.toolStripLabel_marc.Size = new System.Drawing.Size(227, 43);
             this.toolStripLabel_marc.Text = "MARC文件处理";
             this.toolStripLabel_marc.Visible = false;
             this.toolStripLabel_marc.Click += new System.EventHandler(this.toolStripLabel_marc_Click);
@@ -232,7 +232,7 @@
             this.toolStripButton_chargingAnalysis.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_chargingAnalysis.Image")));
             this.toolStripButton_chargingAnalysis.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton_chargingAnalysis.Name = "toolStripButton_chargingAnalysis";
-            this.toolStripButton_chargingAnalysis.Size = new System.Drawing.Size(141, 55);
+            this.toolStripButton_chargingAnalysis.Size = new System.Drawing.Size(141, 43);
             this.toolStripButton_chargingAnalysis.Text = "阅读分析";
             this.toolStripButton_chargingAnalysis.Click += new System.EventHandler(this.toolStripButton_chargingAnalysis_Click);
             // 

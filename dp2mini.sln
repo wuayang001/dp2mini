@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestMarc", "UnitTestMar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalPlatform.BorrowAnalysis", "DigitalPlatform.ChargingAnalysis\DigitalPlatform.BorrowAnalysis.csproj", "{5BE6C455-9D9A-4255-B650-9E0231F3581A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlTagger", "HtmlTagger\HtmlTagger.csproj", "{5BC48136-E9F9-4718-AB64-C4CA879E753C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{5BE6C455-9D9A-4255-B650-9E0231F3581A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BE6C455-9D9A-4255-B650-9E0231F3581A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BE6C455-9D9A-4255-B650-9E0231F3581A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
