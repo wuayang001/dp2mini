@@ -28,9 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox_info = new System.Windows.Forms.TextBox();
             this.button_close = new System.Windows.Forms.Button();
+            this.textBox_info = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
+            // 
+            // button_close
+            // 
+            this.button_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_close.Location = new System.Drawing.Point(548, 377);
+            this.button_close.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.button_close.Name = "button_close";
+            this.button_close.Size = new System.Drawing.Size(133, 41);
+            this.button_close.TabIndex = 1;
+            this.button_close.Text = "关闭";
+            this.button_close.UseVisualStyleBackColor = true;
+            this.button_close.Click += new System.EventHandler(this.button_close_Click);
             // 
             // textBox_info
             // 
@@ -47,21 +59,9 @@
             this.textBox_info.Size = new System.Drawing.Size(666, 356);
             this.textBox_info.TabIndex = 0;
             // 
-            // button_close
-            // 
-            this.button_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_close.Location = new System.Drawing.Point(548, 377);
-            this.button_close.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.button_close.Name = "button_close";
-            this.button_close.Size = new System.Drawing.Size(133, 41);
-            this.button_close.TabIndex = 1;
-            this.button_close.Text = "关闭";
-            this.button_close.UseVisualStyleBackColor = true;
-            this.button_close.Click += new System.EventHandler(this.button_close_Click);
-            // 
             // textForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 33F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(696, 432);
             this.Controls.Add(this.button_close);
@@ -76,8 +76,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox textBox_info;
         private System.Windows.Forms.Button button_close;
+        private System.Windows.Forms.TextBox textBox_info;
     }
 }

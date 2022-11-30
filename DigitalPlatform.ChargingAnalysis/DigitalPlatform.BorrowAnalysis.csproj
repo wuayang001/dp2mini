@@ -62,6 +62,7 @@
     <Compile Include="BorrowedItem.cs" />
     <Compile Include="BorrowAnalysisService.cs" />
     <Compile Include="ConvertHelper.cs" />
+    <Compile Include="paiMingItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

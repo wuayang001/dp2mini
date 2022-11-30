@@ -235,6 +235,12 @@
       <DependentUpon>MarcForm.cs</DependentUpon>
     </Compile>
     <Content Include="rest\DataStructure.cs.txt" />
+    <Compile Include="createReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="createReport.designer.cs">
+      <DependentUpon>createReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="toolForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -353,6 +359,9 @@
     <Content Include="xml\DomUtil.txt" />
     <EmbeddedResource Include="MarcForm.resx">
       <DependentUpon>MarcForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="createReport.resx">
+      <DependentUpon>createReport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="toolForm.resx">
       <DependentUpon>toolForm.cs</DependentUpon>
