@@ -886,7 +886,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 totalBorrowedCount = list.Count.ToString();
             }
             //借阅汇总信息
-            string borrowInfo = "<borrowInfo firstBorrowDate='"+ firstBorrowDate+"' totalBorrowedCount='"+totalBorrowedCount+"'/>";
+            string borrowInfo = "<borrowInfo firstBorrowDate='"+ firstBorrowDate+"' totalBorrowedCount='"+totalBorrowedCount+ "'  timeRange='"+ report.times+ "'  title='" + report.commentTitle + "'/>";
 
             
             //=====
@@ -960,7 +960,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
             //评语信息
-            string commentXml = "<comment title='"+report.commentTitle+"'>"+report.comment+"</comment>";
+            string commentXml = "<comment>"+report.comment+"</comment>";
 
 
             // 汇总xml

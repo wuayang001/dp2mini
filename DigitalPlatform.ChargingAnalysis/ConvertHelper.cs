@@ -6,17 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using DigitalPlatform;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace xml2html
 {
     public class ConvertHelper
     {
+
         //  xml转html todo
-        public static void Convert(string source_filename,
-                  string target_filename)
+        public static void Convert(
+            string source_filename, // 源文件名
+                  string target_filename) //目标文件名
+
         {
             XmlDocument dom = new XmlDocument();
-            dom.Load(source_filename);
+            dom.Load(source_filename);  //打开源文件
 
             using (var sw = new StreamWriter(target_filename,
                false,  // append
@@ -27,7 +31,7 @@ namespace xml2html
 
                 sw.WriteLine(style_TheDebitBooks.ToString());
                 //标题
-                var H1_TheDebitBooks = new HtmlTagger("H1")
+                var H1_TheDebitBooks = new HtmlTagger("H1")  //添加一个H1标签
                     .AddCssClass("bookReview")
                    .SetInnerText("读者借阅报告");
 
@@ -56,6 +60,23 @@ namespace xml2html
                     .SetInnerText("读者基本信息");
                 sw.WriteLine(H2_readersInformation.ToString());
                 var table_readersInformation = new HtmlTagger("table").AddCssClass("readersInformationTable");
+                void getLabel(string a, string b, string c)
+                {
+                    var tr = HtmlTagger.Create("tr")
+                  .AddChild(HtmlTagger.Create("td", a))
+                   .AddCssClass(b)
+                  .AddChild(HtmlTagger.Create("td", c));
+                    table_readersInformation.AddChild(tr);
+                };
+                getLabel("证条码号", "code", barcode);
+                getLabel("姓名", "name", Name);
+                getLabel("电话", "tel", tel);
+                getLabel("读者类型", "readerType", readerType);
+                getLabel("refID", "refID", refID);
+                getLabel("图书馆代码", "libraryCode", libraryCode);
+                getLabel("可借总册数", "borrowNum", borrowNum);
+                getLabel("当前还可借", "returnBookNum", returnBookNum);
+                /*
                 var tr_code = HtmlTagger.Create("tr")
                     .AddChild(HtmlTagger.Create("td", "证条码号"))
                      .AddCssClass("code")
@@ -67,6 +88,7 @@ namespace xml2html
                    .AddCssClass("name")
                   .AddChild(HtmlTagger.Create("td", Name));
                 table_readersInformation.AddChild(tr_name);
+
 
                 var tr_tel = HtmlTagger.Create("tr")
                  .AddChild(HtmlTagger.Create("td", "电话"))
@@ -100,16 +122,16 @@ namespace xml2html
 
                 var tr_returnBookNum = HtmlTagger.Create("tr")
                  .AddChild(HtmlTagger.Create("td", "当前还可借"))
-                  .AddCssClass("libraryCode")
+                  .AddCssClass("returnBookNum")
                  .AddChild(HtmlTagger.Create("td", returnBookNum));
                 table_readersInformation.AddChild(tr_returnBookNum);
-
+                */
                 sw.WriteLine(table_readersInformation.ToString());
 
                 //第一次借书时间
-                var borrowInfo_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@firstBorrowDate=\"2022/07/21\"]");
+                var borrowInfo_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@firstBorrowDate]");
                 var borrowInfotime = borrowInfo_node.Attributes["firstBorrowDate"].Value;
-                var borrowInfos_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@totalBorrowedCount=\"11\"]");
+                var borrowInfos_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@totalBorrowedCount]");
                 var totalBorrowedCount = borrowInfos_node.Attributes["totalBorrowedCount"].Value;
                 var p_borrowInfo = new HtmlTagger("p")
                     .AddCssClass("borrowInfo")
@@ -217,7 +239,6 @@ namespace xml2html
                 }
                 div_CLC.AddChild(table_CLC);
                 div_overall.AddChild(div_CLC);
-
 
                 //按年份统计
 

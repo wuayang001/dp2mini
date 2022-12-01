@@ -247,72 +247,12 @@ namespace dp2mini
         }
 
 
-
-
-
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            // 设置评语
-            string comment = this.textBox_comment.Text.Trim();
-
-            if (this.listView_files.SelectedItems.Count == 0)
-            {
-                MessageBox.Show(this, "请先从列表中选择要修改评语的读者记录。");
-                return;
-            }
-
-            string file = this.listView_files.SelectedItems[0].Text;
-
-            XmlDocument dom = new XmlDocument();
-            dom.Load(file);
-            XmlNode root = dom.DocumentElement;
-
-            // 设到dom
-             DomUtil.SetElementText(root, "comment",comment);
-
-            // 保存到文件
-            dom.Save(file);
-
-            MessageBox.Show(this, "评语保存成功。");
-
-            /*
-            //ChargingAnalysisService.Instance._pa
-
-            if (this._report == null
-                || this._report.built == false)
-            {
-                MessageBox.Show(this, "请先创建报表。");
-                return;
-            }
-
-            // 设置评语
-            string comment = this.textBox_comment.Text.Trim();
-            BorrowAnalysisService.Instance.SetComment(this._report, comment);
-            //this._report.comment = comment;
-
-            // 重新生成报表
-            string html = "";
-            string strError = "";
-            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-                "html",
-                out html,
-                out strError);
-            if (nRet == -1)
-            {
-                MessageBox.Show(this, strError);
-                return;
-            }
-            //SetHtmlString(this.webBrowser1, html);
-            */
-        }
-
-
-
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
             DialogResult result = dlg.ShowDialog();
+
+            // todo记住上次选择的目录
             
             if (result != DialogResult.OK || string.IsNullOrEmpty(dlg.SelectedPath)==true)
             {
@@ -340,40 +280,50 @@ namespace dp2mini
                 this.listView_files.Items.Clear();
 
                 string[] fiels = Directory.GetFiles(dir, "*.xml");
-                foreach (string file in fiels)
+                foreach (string xmlFile in fiels)
                 {
                     XmlDocument dom = new XmlDocument();
-                    dom.Load(file);
+                    dom.Load(xmlFile);
                     XmlNode root = dom.DocumentElement;
 
-                    //patron/barcode取内容
-                    string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+                    //证条码号 patron/barcode 
+                    string barcode = DomUtil.GetElementText(root, "patron/barcode");
 
-                    //borrowInfo 取 totalBorrowedCount 属性
+                    //姓名 patron/name 
+                    string name = DomUtil.GetElementText(root, "patron/name");
+
+                    // 班级/部门  patron/department
+                    string department = DomUtil.GetElementText(root, "patron/department");
+
+                    //借阅量 borrowInfo/@totalBorrowedCount 属性
                     string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
-                    int totalCount = Convert.ToInt32(totalBorrowedCount);
 
+                    // 排名 borrowInfo/@paiming 属性
                     string paiming = DomUtil.GetAttr(root, "borrowInfo", "paiming");
 
-                    //comment 取 title 属性
-                    string title = DomUtil.GetAttr(root, "comment", "title");
+                    // 荣誉称号 borrowInfo/@ title 属性
+                    string title = DomUtil.GetAttr(root, "borrowInfo", "title");
 
-                    ListViewItem item = new ListViewItem(file);
-                    item.SubItems.Add(barcode);
+                    // 馆长评语
+                    string comment = DomUtil.GetElementText(root, "comment");
+
+                    ListViewItem item = new ListViewItem(barcode);
+                    item.SubItems.Add(name);
+                    item.SubItems.Add(department);
                     item.SubItems.Add(totalBorrowedCount);
                     item.SubItems.Add(paiming);
                     item.SubItems.Add(title);
+                    item.SubItems.Add(comment);
+                    item.SubItems.Add(xmlFile);
 
                     // 如果对应的html存在，则显示，到时点击第一行时，显示对应
-                    int nIndex = file.LastIndexOf('.');
-                    string left = file.Substring(0, nIndex);
-                    string htmlFile = left + ".html";
+                    string htmlFile = dir+"\\"+barcode + ".html";
                     if (File.Exists(htmlFile) == true)
                     {
                         item.SubItems.Add(htmlFile);
                     }
 
-
+                    // 加到列表集合中
                     this.listView_files.Items.Add(item);
                 }
             }
@@ -384,35 +334,43 @@ namespace dp2mini
             }
         }
 
+        public string Dir
+        {
+            get
+            {
+                return this.textBox_outputDir.Text.Trim();
+            }
+        }
+
         private void listView_files_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.listView_files.SelectedItems.Count > 0)
             {
                 ListViewItem item = this.listView_files.SelectedItems[0];
 
-                //MessageBox.Show(this, item.Text);
+                // 2022/11/30 注释掉，因为listview本身显示了comment
+                //string barcode = item.Text;
+                //string xmlFile = this.Dir + "\\" + barcode + ".xml";
+                //XmlDocument dom = new XmlDocument();
+                //dom.Load(xmlFile);
+                //XmlNode root = dom.DocumentElement;
+                //string comment = DomUtil.GetElementText(root, "comment");
 
-                string file = item.Text;
-
-                XmlDocument dom = new XmlDocument();
-                dom.Load(file);
-                XmlNode root = dom.DocumentElement;
 
                 //从馆员评语显示在输入框
-                string comment = DomUtil.GetElementText(root, "comment");
+                string comment = item.SubItems[6].Text;
                 this.textBox_comment.Text = comment;
 
 
                 // 如果存在html文件，显示出来
-                if (item.SubItems.Count >= 6)
+                if (item.SubItems.Count >= 9)
                 {
-                    string htmlFile = item.SubItems[5].Text;
+                    string htmlFile = item.SubItems[8].Text;
                     this.showHtml(htmlFile);
                 }
                 else
                 {
                     SetHtmlString(this.webBrowser1, "");
-
                 }
 
             }
@@ -453,6 +411,147 @@ namespace dp2mini
         private void button_createReport_Click(object sender, EventArgs e)
         {
 
+            // 输出目录
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未设置报表输出目录。");
+                return;
+            }
+            // 如果目录不存在，则创建一个新目录
+            if (Directory.Exists(dir) == false)  
+                Directory.CreateDirectory(dir);
+
+            // 如果目录不是空目录，提醒。
+            DirectoryInfo dirInfo = new DirectoryInfo(dir);
+            if (dirInfo.GetFiles().Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+            {
+                MessageBox.Show(this, "创建报表时，报表目录必须为空。");
+                return;
+            }
+
+
+
+            createReport dlg = new createReport();
+            dlg.StartPosition = FormStartPosition.CenterScreen;
+            dlg.OutputDir = dir;
+            dlg.ShowDialog(this);
+
+            // 重新显示一下文件列表
+            this.ShowFiles();
+        }
+
+
+        // 把html下载到本地
+        private void button_download_Click(object sender, EventArgs e)
+        {
+
+            //// 输出报表
+            //string xml = "";
+            //string strError = "";
+            //int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+            //    "xml",
+            //    out xml,
+            //    out strError);
+            //if (nRet == -1)
+            //{
+            //    MessageBox.Show(this, strError);
+            //    return;
+            //}
+
+            //// 把html保存到文件
+            //// 询问文件名
+            //SaveFileDialog dlg = new SaveFileDialog
+            //{
+            //    Title = "请指定文件名",
+            //    CreatePrompt = false,
+            //    OverwritePrompt = true,
+            //    // dlg.FileName = this.ExportExcelFilename;
+            //    // dlg.InitialDirectory = Environment.CurrentDirectory;
+            //    Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
+
+
+            //    RestoreDirectory = true
+            //};
+
+            //// 如果在询问文件名对话框，点了取消，退不处理，返回0，
+            //if (dlg.ShowDialog() != DialogResult.OK)
+            //    return;
+
+            //string fileName = dlg.FileName;
+
+            //// StreamWriter当文件不存在时，会自动创建一个新文件。
+            //using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
+            //{
+            //    // 写到打印文件
+            //    writer.Write(xml);
+            //}
+
+        }
+
+        private void button_setComment_Click(object sender, EventArgs e)
+        {
+            // 设置评语
+            string comment = this.textBox_comment.Text.Trim();
+
+            if (this.listView_files.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "请先从列表中选择要修改评语的读者记录。");
+                return;
+            }
+
+            string barcode = this.listView_files.SelectedItems[0].Text;
+
+            string xmlFile = this.Dir + "\\" + barcode + ".xml";
+            string htmlFile = this.Dir + "\\" + barcode + ".html";
+
+            XmlDocument dom = new XmlDocument();
+            dom.Load(xmlFile);
+            XmlNode root = dom.DocumentElement;
+
+            // 设到dom
+            DomUtil.SetElementText(root, "comment", comment);
+
+            // 保存到文件
+            dom.Save(xmlFile);
+
+            // 更新界面listview这一行里的评估
+            this.listView_files.SelectedItems[0].SubItems[6].Text = comment;
+
+            // 重新转出一个html
+            ConvertHelper.Convert(xmlFile, htmlFile);
+
+            MessageBox.Show(this, "评语保存成功。");
+
+            /*
+            //ChargingAnalysisService.Instance._pa
+
+            if (this._report == null
+                || this._report.built == false)
+            {
+                MessageBox.Show(this, "请先创建报表。");
+                return;
+            }
+
+            // 设置评语
+            string comment = this.textBox_comment.Text.Trim();
+            BorrowAnalysisService.Instance.SetComment(this._report, comment);
+            //this._report.comment = comment;
+
+            // 重新生成报表
+            string html = "";
+            string strError = "";
+            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
+                "html",
+                out html,
+                out strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, strError);
+                return;
+            }
+            //SetHtmlString(this.webBrowser1, html);
+            */
         }
     }
 

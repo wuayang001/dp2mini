@@ -14,20 +14,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using xml2html;
 
 namespace dp2mini
 {
     public partial class createReport : Form
     {
+        
         public createReport()
         {
             InitializeComponent();
         }
 
+        public string OutputDir {
+            get
+            {
+                return this.textBox_outputDir.Text;
+            }
+            set
+            {this.textBox_outputDir.Text = value;
+            }
+
+        }
+
+
         private void button_close_Click(object sender, EventArgs e)
         {
             this.Close();
         }
+
+
 
 
         private void createReport_Load(object sender, EventArgs e)
@@ -179,99 +195,38 @@ namespace dp2mini
         // xml2html
         private void button_xml2html_Click(object sender, EventArgs e)
         {
-            /*
-            if (this.listView_files.SelectedItems.Count == 0)
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
             {
-                MessageBox.Show(this, "尚未选择记录行");
+                MessageBox.Show(this, "尚未设置报表输出目录。");
                 return;
             }
 
-            ListViewItem item = this.listView_files.SelectedItems[0];
-
-            // 先得到xml文件
-            string xmlFile = item.Text;
-
-            // 如果对应的html存在，则显示，到时点击第一行时，显示对应
-            int nIndex = xmlFile.LastIndexOf('.');
-            string left = xmlFile.Substring(0, nIndex);
-            string htmlFile = left + ".html";
-            //if (File.Exists(htmlFile) == true)
-            //{
-            //    item.SubItems.Add(htmlFile);
-            //}
-
-            try
+            string[] fiels = Directory.GetFiles(dir, "*.xml");
+            foreach (string xmlFile in fiels)
             {
-                // 调接口将xml转为html
-                ConvertHelper.Convert(xmlFile, htmlFile);
-                // 显示出来 
-                this.showHtml(htmlFile);
+                // 如果对应的html存在，则显示，到时点击第一行时，显示对应
+                int nIndex = xmlFile.LastIndexOf('.');
+                string left = xmlFile.Substring(0, nIndex);
+                string htmlFile = left + ".html";
 
-                // 加到命令行中
-                item.SubItems.Add(htmlFile);
-
-            }
-            catch (Exception ex)
-            {
-
-                if (File.Exists(htmlFile) == true)
+                try
                 {
-                    File.Delete(htmlFile);
+                    // 调接口将xml转为html
+                    ConvertHelper.Convert(xmlFile, htmlFile);
                 }
+                catch (Exception ex)
+                {
 
-                string error = ex.Message;
-                SetHtmlString(this.webBrowser1, "<b>" + error + "</b>");
+                    string error = ex.Message;
+                    MessageBox.Show(this, error);
+                }
             }
-            */
+
+            MessageBox.Show(this, "xml转html完成");
         }
 
-        // 把html下载到本地
-        private void button_download_Click(object sender, EventArgs e)
-        {
 
-
-            //// 输出报表
-            //string xml = "";
-            //string strError = "";
-            //int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-            //    "xml",
-            //    out xml,
-            //    out strError);
-            //if (nRet == -1)
-            //{
-            //    MessageBox.Show(this, strError);
-            //    return;
-            //}
-
-            //// 把html保存到文件
-            //// 询问文件名
-            //SaveFileDialog dlg = new SaveFileDialog
-            //{
-            //    Title = "请指定文件名",
-            //    CreatePrompt = false,
-            //    OverwritePrompt = true,
-            //    // dlg.FileName = this.ExportExcelFilename;
-            //    // dlg.InitialDirectory = Environment.CurrentDirectory;
-            //    Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
-
-
-            //    RestoreDirectory = true
-            //};
-
-            //// 如果在询问文件名对话框，点了取消，退不处理，返回0，
-            //if (dlg.ShowDialog() != DialogResult.OK)
-            //    return;
-
-            //string fileName = dlg.FileName;
-
-            //// StreamWriter当文件不存在时，会自动创建一个新文件。
-            //using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
-            //{
-            //    // 写到打印文件
-            //    writer.Write(xml);
-            //}
-
-        }
 
         // 在证条码输入框回车时，自动发起创建阅读分析
         private void textBox_patronBarcode_KeyDown(object sender, KeyEventArgs e)
@@ -279,7 +234,7 @@ namespace dp2mini
             //if条件检测按下的是不是Enter键
             if (e.KeyCode == Keys.Enter)
             {
-                this.search();
+                this.Create();
             }
         }
 
@@ -290,6 +245,9 @@ namespace dp2mini
         }
 
         delegate void Delegate_QuickSetFilenames(Control control);
+
+
+        #region 快速设置时间
 
         void QuickSetFilenames(Control control)
         {
@@ -379,6 +337,9 @@ namespace dp2mini
             this.BeginInvoke(d, new object[] { sender });
         }
 
+        #endregion
+
+        // 选择证条码号文件
         private void button_selectBatcodeFile_Click(object sender, EventArgs e)
         {
             string fileName = "";
@@ -403,31 +364,8 @@ namespace dp2mini
             }
         }
 
-
-
-
-
-
-        /// <summary>
-        /// 获得 RFC 1123 时间字符串的显示格式字符串
-        /// </summary>
-        /// <param name="strRfc1123TimeString">时间字符串。RFC1123 格式</param>
-        /// <returns>显示格式</returns>
-        public static string GetRfc1123DisplayString(string strRfc1123TimeString)
-        {
-            if (string.IsNullOrEmpty(strRfc1123TimeString) == true)
-                return "";
-
-            try
-            {
-                return DateTimeUtil.Rfc1123DateTimeStringToLocal(strRfc1123TimeString, "G");// + " (" + strRfc1123TimeString + ")";
-            }
-            catch (Exception ex)
-            {
-                return "解析 RFC1123 时间字符串 '" + strRfc1123TimeString + "' 时出错: " + ex.Message;
-            }
-        }
-
+  
+        // 显示用长
         static string GetTimeString(XmlDocument dom)
         {
             XmlElement time = dom.DocumentElement.SelectSingleNode("time") as XmlElement;
@@ -478,8 +416,8 @@ namespace dp2mini
 
 
 
-
-        private void search()
+        // 一键生成
+        private void Create()
         {
             //时间范围
             string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");

@@ -79,20 +79,23 @@
             this.ToolStripMenuItem_download = new System.Windows.Forms.ToolStripMenuItem();
             this.label6 = new System.Windows.Forms.Label();
             this.textBox_comment = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.button_setComment = new System.Windows.Forms.Button();
             this.textBox_outputDir = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.button_selectDir = new System.Windows.Forms.Button();
             this.listView_files = new System.Windows.Forms.ListView();
-            this.columnHeader40 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader37 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader38 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader39 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader41 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader42 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_barcode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_department = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_count = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_paiming = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_title = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_comm = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_xml = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_html = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.button_createReport = new System.Windows.Forms.Button();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.contextMenuStrip_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -337,14 +340,14 @@
             // 全选ToolStripMenuItem
             // 
             this.全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
-            this.全选ToolStripMenuItem.Size = new System.Drawing.Size(330, 42);
+            this.全选ToolStripMenuItem.Size = new System.Drawing.Size(144, 42);
             this.全选ToolStripMenuItem.Text = "全选";
             this.全选ToolStripMenuItem.Click += new System.EventHandler(this.全选ToolStripMenuItem_Click);
             // 
             // ToolStripMenuItem_download
             // 
             this.ToolStripMenuItem_download.Name = "ToolStripMenuItem_download";
-            this.ToolStripMenuItem_download.Size = new System.Drawing.Size(330, 42);
+            this.ToolStripMenuItem_download.Size = new System.Drawing.Size(144, 42);
             this.ToolStripMenuItem_download.Text = "下载";
             this.ToolStripMenuItem_download.Click += new System.EventHandler(this.ToolStripMenuItem_huizong_Click);
             // 
@@ -370,24 +373,25 @@
             this.textBox_comment.Size = new System.Drawing.Size(769, 117);
             this.textBox_comment.TabIndex = 26;
             // 
-            // button2
+            // button_setComment
             // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button2.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(802, 672);
-            this.button2.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(181, 51);
-            this.button2.TabIndex = 27;
-            this.button2.Text = "提交评语";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button_setComment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_setComment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_setComment.Location = new System.Drawing.Point(802, 672);
+            this.button_setComment.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.button_setComment.Name = "button_setComment";
+            this.button_setComment.Size = new System.Drawing.Size(181, 51);
+            this.button_setComment.TabIndex = 27;
+            this.button_setComment.Text = "提交评语";
+            this.button_setComment.UseVisualStyleBackColor = true;
+            this.button_setComment.Click += new System.EventHandler(this.button_setComment_Click);
             // 
             // textBox_outputDir
             // 
             this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.textBox_outputDir.Location = new System.Drawing.Point(159, 18);
             this.textBox_outputDir.Name = "textBox_outputDir";
+            this.textBox_outputDir.ReadOnly = true;
             this.textBox_outputDir.Size = new System.Drawing.Size(495, 38);
             this.textBox_outputDir.TabIndex = 33;
             // 
@@ -420,12 +424,15 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView_files.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader40,
-            this.columnHeader37,
-            this.columnHeader38,
-            this.columnHeader39,
-            this.columnHeader41,
-            this.columnHeader42});
+            this.columnHeader_barcode,
+            this.columnHeader_name,
+            this.columnHeader_department,
+            this.columnHeader_count,
+            this.columnHeader_paiming,
+            this.columnHeader_title,
+            this.columnHeader_comm,
+            this.columnHeader_xml,
+            this.columnHeader_html});
             this.listView_files.ContextMenuStrip = this.contextMenuStrip_list;
             this.listView_files.FullRowSelect = true;
             this.listView_files.GridLines = true;
@@ -439,35 +446,50 @@
             this.listView_files.View = System.Windows.Forms.View.Details;
             this.listView_files.SelectedIndexChanged += new System.EventHandler(this.listView_files_SelectedIndexChanged);
             // 
-            // columnHeader40
+            // columnHeader_barcode
             // 
-            this.columnHeader40.Text = "xml文件名";
-            this.columnHeader40.Width = 151;
+            this.columnHeader_barcode.Text = "证条码号";
+            this.columnHeader_barcode.Width = 136;
             // 
-            // columnHeader37
+            // columnHeader_name
             // 
-            this.columnHeader37.Text = "证条码号";
-            this.columnHeader37.Width = 180;
+            this.columnHeader_name.Text = "姓名";
+            this.columnHeader_name.Width = 78;
             // 
-            // columnHeader38
+            // columnHeader_department
             // 
-            this.columnHeader38.Text = "借阅量";
-            this.columnHeader38.Width = 125;
+            this.columnHeader_department.Text = "班级/部门";
+            this.columnHeader_department.Width = 155;
             // 
-            // columnHeader39
+            // columnHeader_count
             // 
-            this.columnHeader39.Text = "排名";
-            this.columnHeader39.Width = 98;
+            this.columnHeader_count.Text = "借阅量";
+            this.columnHeader_count.Width = 106;
             // 
-            // columnHeader41
+            // columnHeader_paiming
             // 
-            this.columnHeader41.Text = "阅读评语";
-            this.columnHeader41.Width = 222;
+            this.columnHeader_paiming.Text = "排名";
+            this.columnHeader_paiming.Width = 71;
             // 
-            // columnHeader42
+            // columnHeader_title
             // 
-            this.columnHeader42.Text = "html文件名";
-            this.columnHeader42.Width = 196;
+            this.columnHeader_title.Text = "荣誉称号";
+            this.columnHeader_title.Width = 160;
+            // 
+            // columnHeader_comm
+            // 
+            this.columnHeader_comm.Text = "馆长评语";
+            this.columnHeader_comm.Width = 139;
+            // 
+            // columnHeader_xml
+            // 
+            this.columnHeader_xml.Text = "xml文件名";
+            this.columnHeader_xml.Width = 151;
+            // 
+            // columnHeader_html
+            // 
+            this.columnHeader_html.Text = "html文件名";
+            this.columnHeader_html.Width = 196;
             // 
             // splitContainer1
             // 
@@ -487,7 +509,7 @@
             this.splitContainer1.Panel1.Controls.Add(this.label7);
             this.splitContainer1.Panel1.Controls.Add(this.label6);
             this.splitContainer1.Panel1.Controls.Add(this.textBox_comment);
-            this.splitContainer1.Panel1.Controls.Add(this.button2);
+            this.splitContainer1.Panel1.Controls.Add(this.button_setComment);
             // 
             // splitContainer1.Panel2
             // 
@@ -497,18 +519,8 @@
             this.splitContainer1.SplitterDistance = 999;
             this.splitContainer1.TabIndex = 37;
             // 
-            // webBrowser1
-            // 
-            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.webBrowser1.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser1.MinimumSize = new System.Drawing.Size(19, 18);
-            this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(305, 816);
-            this.webBrowser1.TabIndex = 0;
-            // 
             // button_createReport
             // 
-            this.button_createReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button_createReport.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.button_createReport.Location = new System.Drawing.Point(775, 11);
             this.button_createReport.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
@@ -518,6 +530,15 @@
             this.button_createReport.Text = "创建报表";
             this.button_createReport.UseVisualStyleBackColor = true;
             this.button_createReport.Click += new System.EventHandler(this.button_createReport_Click);
+            // 
+            // webBrowser1
+            // 
+            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser1.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(19, 18);
+            this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.Size = new System.Drawing.Size(305, 816);
+            this.webBrowser1.TabIndex = 0;
             // 
             // chargingAnalysisForm
             // 
@@ -590,19 +611,22 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_download;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox_comment;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button_setComment;
         private System.Windows.Forms.TextBox textBox_outputDir;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button_selectDir;
         private System.Windows.Forms.ListView listView_files;
-        private System.Windows.Forms.ColumnHeader columnHeader37;
-        private System.Windows.Forms.ColumnHeader columnHeader38;
-        private System.Windows.Forms.ColumnHeader columnHeader39;
-        private System.Windows.Forms.ColumnHeader columnHeader40;
+        private System.Windows.Forms.ColumnHeader columnHeader_barcode;
+        private System.Windows.Forms.ColumnHeader columnHeader_count;
+        private System.Windows.Forms.ColumnHeader columnHeader_paiming;
+        private System.Windows.Forms.ColumnHeader columnHeader_xml;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.ColumnHeader columnHeader41;
-        private System.Windows.Forms.ColumnHeader columnHeader42;
+        private System.Windows.Forms.ColumnHeader columnHeader_title;
+        private System.Windows.Forms.ColumnHeader columnHeader_html;
         private System.Windows.Forms.WebBrowser webBrowser1;
         private System.Windows.Forms.Button button_createReport;
+        private System.Windows.Forms.ColumnHeader columnHeader_name;
+        private System.Windows.Forms.ColumnHeader columnHeader_comm;
+        private System.Windows.Forms.ColumnHeader columnHeader_department;
     }
 }
