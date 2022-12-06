@@ -209,16 +209,22 @@ namespace DigitalPlatform.ChargingAnalysis
             // 设到内存对象
             report.comment = comment;
 
-            // hashtable设置
-            this._commentHT[report.patron.barcode] = comment;
+            // 把评语写到文件里
+            this.SetComment2file(report.patron.barcode,comment);
+        }
+
+        public void SetComment2file(string barcode, string comment)
+        {
+            // 设到内存hashtable
+            this._commentHT[barcode] = comment;
 
             // 保存到文件里
             string xml = "";
             foreach (string key in this._commentHT.Keys)
             {
-                xml += "<comment patronBarcode='"+key+"'>"+ this._commentHT[key]+"</comment>";
+                xml += "<comment patronBarcode='" + key + "'>" + this._commentHT[key] + "</comment>";
             }
-            xml = "<root>"+xml+"</root>";
+            xml = "<root>" + xml + "</root>";
             XmlDocument dom = new XmlDocument();
             dom.LoadXml(xml);
             dom.Save(this._commentFile);

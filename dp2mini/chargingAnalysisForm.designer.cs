@@ -388,6 +388,7 @@
             // 
             // textBox_outputDir
             // 
+            this.textBox_outputDir.BackColor = System.Drawing.SystemColors.ControlLight;
             this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.textBox_outputDir.Location = new System.Drawing.Point(159, 18);
             this.textBox_outputDir.Name = "textBox_outputDir";
@@ -444,6 +445,7 @@
             this.listView_files.TabIndex = 36;
             this.listView_files.UseCompatibleStateImageBehavior = false;
             this.listView_files.View = System.Windows.Forms.View.Details;
+            this.listView_files.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_files_ColumnClick);
             this.listView_files.SelectedIndexChanged += new System.EventHandler(this.listView_files_SelectedIndexChanged);
             // 
             // columnHeader_barcode
@@ -542,13 +544,13 @@
             // 
             // chargingAnalysisForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 27F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1349, 866);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.Name = "chargingAnalysisForm";
-            this.Text = "日志查询与统计";
+            this.Text = "借阅报表";
             this.Load += new System.EventHandler(this.PrepForm_Load);
             this.contextMenuStrip_list.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);

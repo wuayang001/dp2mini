@@ -51,54 +51,89 @@ namespace dp2mini
 
         }
 
-        // 创建xml
-        private void button_createXml_Click(object sender, EventArgs e)
+        public int GetInput(out string patronBarcodes,
+            out string startDate,
+            out string endDate,
+            out string dir)
         {
-            //时间范围
-            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
-            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
 
+            //时间范围
+            startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
+            endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
+
+            patronBarcodes = "";
             // 输出目录
-            string dir = this.textBox_outputDir.Text.Trim();
+            dir = this.textBox_outputDir.Text.Trim();
             if (string.IsNullOrEmpty(dir) == true)
             {
                 MessageBox.Show(this, "尚未设置报表输出目录。");
-                return;
+                return -1;
             }
             if (Directory.Exists(dir) == false)  // 如果目录不存在，则创建一个新目录
                 Directory.CreateDirectory(dir);
 
 
             // 证条码号，可能多个
-            string patronBarcodes = this.textBox_patronBarcode.Text.Trim();
+            patronBarcodes = this.textBox_patronBarcode.Text.Trim();
             if (string.IsNullOrEmpty(patronBarcodes) == true)
             {
                 MessageBox.Show(this, "请先输入读者证条码号。");
-                return;
+                return -1;
             }
 
-           
+            // 拆分证条码号，每个号码一行
+            patronBarcodes = patronBarcodes.Replace("\r\n", "\n");
+            string[] patronBarcodeList = patronBarcodes.Split(new char[] { '\n' });
+            if (patronBarcodeList.Length == 0)
+            {
+                MessageBox.Show(this, "请先输入读者证条码号2。");
+                return -1;
+            }
+
+            return 0;
+        }
+
+
+
+        public int CreateXml(CancellationToken token,
+            string patronBarcodes,
+            string startDate,
+            string endDate,
+            string dir,
+            out string error)
+        {
+            error = "";
+            int nRet = 0;
 
             // 拆分证条码号，每个号码一行
             patronBarcodes = patronBarcodes.Replace("\r\n", "\n");
             string[] patronBarcodeList = patronBarcodes.Split(new char[] { '\n' });
 
+            this.SetProcess(0,patronBarcodeList.Length);
+            int index = 0;
 
             string strError = "";
             // 循环每个证条码，生成报表
             foreach (string patronBarcode in patronBarcodeList)
             {
+                index++;
+                this.SetProcessValue(index);
+
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+
                 BorrowAnalysisReport report = null;
 
                 // 创建数据
-                int nRet = BorrowAnalysisService.Instance.Build(this._cancel.Token,
-                            patronBarcode,
-                            startDate,
-                            endDate,
-                            out report,
-                            out strError);
+                nRet = BorrowAnalysisService.Instance.Build(token,
+                           patronBarcode,
+                           startDate,
+                           endDate,
+                           out report,
+                           out strError);
                 if (nRet == -1)
-                    goto ERROR1;
+                    return -1;
 
                 // 输出报表
                 string xml = "";
@@ -107,53 +142,82 @@ namespace dp2mini
                     out xml,
                     out strError);
                 if (nRet == -1)
-                    goto ERROR1;
+                    return -1;
 
                 string fileName = dir + "\\" + patronBarcode + ".xml";
-
                 // StreamWriter当文件不存在时，会自动创建一个新文件。
                 using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
                 {
                     // 写到打印文件
                     writer.Write(xml);
                 }
-
-
             }
 
-            // 在list显示最新的文件
-            //this.ShowFiles();
+            return 0;
+        }
+
+        // 创建xml
+        private void button_createXml_Click(object sender, EventArgs e)
+        {
+            // 获取界面输入参数
+            int nRet = this.GetInput(out string patronBarcodes,
+                out string startDate,
+                out string endDate,
+                out string outputDir);
+            if (nRet == -1)
+                return;
+
+
+            // 创建xml
+            nRet = this.CreateXml(this._cancel.Token,
+                patronBarcodes,
+                startDate,
+                endDate,
+                outputDir,
+                out string strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, "出错：" + strError);
+                return;
+            }
+           
+
+
 
             MessageBox.Show(this, "批量生成借阅报表完成。");
             return;
 
-
-        ERROR1:
-            MessageBox.Show(this, "出错：" + strError);
-            return;
         }
 
-        // 排名
-        private void button_paiming_Click(object sender, EventArgs e)
-        {
-            string dir = this.textBox_outputDir.Text.Trim();
-            if (string.IsNullOrEmpty(dir) == true)
-            {
-                MessageBox.Show(this, "尚未设置报表输出目录。");
-                return;
-            }
 
-            string temp = "";
+        public void PaiMing(CancellationToken token, string dir)
+        {
 
             List<paiMingItem> paiMingList = new List<paiMingItem>();
 
             string[] fiels = Directory.GetFiles(dir, "*.xml");
+
+            this.SetProcess(0, fiels.Length);
+            int index = 0;
+
             foreach (string file in fiels)
             {
-                //temp+=file.Trim()+"\r\n";
+                index++;
+                this.SetProcessValue(index);
+
+                // 停止
+                token.ThrowIfCancellationRequested();
 
                 XmlDocument dom = new XmlDocument();
-                dom.Load(file);
+                try
+                {
+                    dom.Load(file);
+                }
+                catch (Exception ex)
+                {
+                    //todo 怎么记录错误
+                    continue;
+                }
                 XmlNode root = dom.DocumentElement;
 
                 //patron/barcode取内容
@@ -173,6 +237,9 @@ namespace dp2mini
             // 写回xml
             for (int i = 0; i < sortedList.Count; i++)
             {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
                 int paiming = i + 1;
 
                 paiMingItem item = sortedList[i];
@@ -186,10 +253,62 @@ namespace dp2mini
 
             }
 
+            return;
+        }
+
+        // 排名
+        private void button_paiming_Click(object sender, EventArgs e)
+        {
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未设置报表输出目录。");
+                return;
+            }
+
+            this.PaiMing(this._cancel.Token, dir);
+
+
             // 在list显示最新的文件
             //this.ShowFiles();
 
             MessageBox.Show(this, "排名处理完成。");
+        }
+
+
+        public void Xml2Html(CancellationToken token, string dir)
+        {
+            string[] fiels = Directory.GetFiles(dir, "*.xml");
+
+            this.SetProcess(0, fiels.Length);
+            int index = 0;
+
+
+            foreach (string xmlFile in fiels)
+            {
+                index++;
+                this.SetProcessValue(index);
+
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                // 如果对应的html存在，则显示，到时点击第一行时，显示对应
+                int nIndex = xmlFile.LastIndexOf('.');
+                string left = xmlFile.Substring(0, nIndex);
+                string htmlFile = left + ".html";
+                try
+                {
+                    // 调接口将xml转为html
+                    ConvertHelper.Convert(xmlFile, htmlFile);
+                }
+                catch (Exception ex)
+                {
+
+                    string error = ex.Message;
+
+                    // todo这个错写在哪里？
+                }
+            }
         }
 
         // xml2html
@@ -202,26 +321,7 @@ namespace dp2mini
                 return;
             }
 
-            string[] fiels = Directory.GetFiles(dir, "*.xml");
-            foreach (string xmlFile in fiels)
-            {
-                // 如果对应的html存在，则显示，到时点击第一行时，显示对应
-                int nIndex = xmlFile.LastIndexOf('.');
-                string left = xmlFile.Substring(0, nIndex);
-                string htmlFile = left + ".html";
-
-                try
-                {
-                    // 调接口将xml转为html
-                    ConvertHelper.Convert(xmlFile, htmlFile);
-                }
-                catch (Exception ex)
-                {
-
-                    string error = ex.Message;
-                    MessageBox.Show(this, error);
-                }
-            }
+            this.Xml2Html(this._cancel.Token,dir);
 
             MessageBox.Show(this, "xml转html完成");
         }
@@ -410,7 +510,9 @@ namespace dp2mini
         /// <param name="bEnable"></param>
         void EnableControls(bool bEnable)
         {
-            //this.button_stop.Enabled = !(bEnable);
+            this.button_stop.Enabled = !(bEnable);
+
+            this.button_onekey.Enabled = bEnable;
         }
 
 
@@ -419,31 +521,9 @@ namespace dp2mini
         // 一键生成
         private void Create()
         {
-            //时间范围
-            string startDate = this.dateTimePicker_start.Value.ToString("yyyy/MM/dd");
-            string endDate = this.dateTimePicker_end.Value.ToString("yyyy/MM/dd");
-
-            // 读者证条码号
-            string patronBarcode = this.textBox_patronBarcode.Text.Trim();
-            if (string.IsNullOrEmpty(patronBarcode) == true)
-            {
-                MessageBox.Show(this, "请输入读者证条码号");
-                return;
-            }
 
 
-            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-            this._cancel.Dispose();
-            this._cancel = new CancellationTokenSource();
-
-            // 开一个新线程
-            Task.Run(() =>
-            {
-                doSearch(this._cancel.Token,
-                    patronBarcode,
-                    startDate,
-                    endDate);
-            });
+           
         }
 
         // mid父窗口
@@ -454,14 +534,36 @@ namespace dp2mini
 
         //public BorrowAnalysisReport _report = null;
 
+        public void SetProcess(int min, int max)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                this.progressBar1.Minimum = min;
+                this.progressBar1.Maximum = max;
+            }
+            ));
+        }
+
+        public void SetProcessValue(int value)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                this.progressBar1.Value = value;
+            }
+            ));
+        }
+
         /// <summary>
         /// 检索做事的函数
         /// </summary>
         /// <param name="token"></param>
-        private void doSearch(CancellationToken token,
+        private void OneKey(CancellationToken token,
             string patronBarcode,
             string startDate,
-            string endDate)
+            string endDate,
+            string outputDir)
         {
             string strError = "";
 
@@ -483,50 +585,35 @@ namespace dp2mini
             }
             ));
 
-            RestChannel channel = this._mainForm.GetChannel();
             try
             {
+
+                // 创建xml
+                int nRet = this.CreateXml(token,
+                    patronBarcode, 
+                    startDate,
+                    endDate,
+                    outputDir,
+                     out strError);
+                if (nRet == -1)
+                    goto ERROR1;
+
+
+                // 排名
+                this.PaiMing(token, outputDir);
+
+                // xml2html
+                this.Xml2Html(token, outputDir);
+
                 //
-                //string times = startDate + "~" + endDate;
-
-                //// 创建数据
-                //int nRet = BorrowAnalysisService.Instance.Build(token,
-                //    patronBarcode,
-                //    startDate,
-                //    endDate,
-                //    out this._report,
-                //    out strError);
-                //if (nRet == -1)
-                //    goto ERROR1;
-
-                //// 输出报表
-                //string xml = "";
-                //nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-                //    "xml",
-                //    out xml,
-                //    out strError);
-                //if (nRet == -1)
-                //    goto ERROR1;
-
-
-                //// 把html显示在界面上
-                //this.Invoke((Action)(() =>
-                //{
-                //    string temp = "<div>" + HttpUtility.HtmlEncode(xml) + "</div>";
-                //    //SetHtmlString(this.webBrowser1, temp);
-
-                //    // 把馆长评估提出来，显示在输入框中
-                //    this.textBox_comment.Text = this._report.comment;
-
-                //}
-                //));
+                this.Invoke((Action)(() =>
+                {
+                    MessageBox.Show("处理完成。");
+                }
+));
 
                 return;
-            }
-            catch (Exception ex)
-            {
-                strError = ex.Message;
-                goto ERROR1;
+
             }
             finally
             {
@@ -536,7 +623,6 @@ namespace dp2mini
                     EnableControls(true);
                     this.Cursor = oldCursor;
 
-                    this._mainForm.ReturnChannel(channel);
                 }
                 ));
             }
@@ -547,6 +633,47 @@ namespace dp2mini
                 MessageBox.Show(strError);
             }
             ));
+        }
+
+        private void 生成xml报表ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            button_createXml_Click(null, null);
+        }
+
+        private void 报表xml转htmlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            button_xml2html_Click(null,null);
+        }
+
+        private void 按借阅量排名ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            button_paiming_Click(null,null);
+        }
+
+        private void button_onekey_Click(object sender, EventArgs e)
+        {
+            // 获取界面输入参数
+            int nRet = this.GetInput(out string patronBarcodes,
+                out string startDate,
+                out string endDate,
+                out string dir);
+            if (nRet == -1)
+                return;
+
+
+            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+            this._cancel.Dispose();
+            this._cancel = new CancellationTokenSource();
+
+            // 开一个新线程
+            Task.Run(() =>
+            {
+                OneKey(this._cancel.Token,
+                    patronBarcodes,
+                    startDate,
+                    endDate,
+                    dir);
+            });
         }
     }
 }

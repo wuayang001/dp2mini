@@ -36,6 +36,7 @@ namespace dp2mini
         MainForm _mainForm = null;
 
 
+
         /// <summary>
         ///  构造函数
         /// </summary>
@@ -240,10 +241,8 @@ namespace dp2mini
                 {
                     item.Selected = true;
                 }
-
             }
             */
-
         }
 
 
@@ -261,10 +260,12 @@ namespace dp2mini
             }
 
             string dir = dlg.SelectedPath;
-            //MessageBox.Show(this, dir);
-
             this.textBox_outputDir.Text = dir;
 
+            // 把评语输入框清空。
+            this.textBox_comment.Text = "";
+
+            // 重新显示文件
             this.ShowFiles();
         }
 
@@ -424,7 +425,7 @@ namespace dp2mini
 
             // 如果目录不是空目录，提醒。
             DirectoryInfo dirInfo = new DirectoryInfo(dir);
-            if (dirInfo.GetFiles().Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+            if (dirInfo.GetFiles("*.xml").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
             {
                 MessageBox.Show(this, "创建报表时，报表目录必须为空。");
                 return;
@@ -435,7 +436,8 @@ namespace dp2mini
             createReport dlg = new createReport();
             dlg.StartPosition = FormStartPosition.CenterScreen;
             dlg.OutputDir = dir;
-            dlg.ShowDialog(this);
+            //dlg.ShowDialog(this);
+            DialogResult result = dlg.ShowDialog(this);
 
             // 重新显示一下文件列表
             this.ShowFiles();
@@ -521,37 +523,33 @@ namespace dp2mini
             // 重新转出一个html
             ConvertHelper.Convert(xmlFile, htmlFile);
 
+            // 保存到专门的评语文件
+            BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
+
+
             MessageBox.Show(this, "评语保存成功。");
 
-            /*
-            //ChargingAnalysisService.Instance._pa
+        }
+        // 用于排序
+        SortColumns SortColumns_report = new SortColumns();
+        private void listView_files_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+             TransferStatisForm.SortCol(this.listView_files, SortColumns_report, nClickColumn);
+        }
 
-            if (this._report == null
-                || this._report.built == false)
-            {
-                MessageBox.Show(this, "请先创建报表。");
-                return;
-            }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //createReport dlg = new createReport();
+            //dlg.StartPosition = FormStartPosition.CenterScreen;
+            //dlg.OutputDir = "";// dir;
+            ////dlg.ShowDialog(this);
+            //DialogResult result = dlg.ShowDialog(this);
 
-            // 设置评语
-            string comment = this.textBox_comment.Text.Trim();
-            BorrowAnalysisService.Instance.SetComment(this._report, comment);
-            //this._report.comment = comment;
-
-            // 重新生成报表
-            string html = "";
-            string strError = "";
-            int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-                "html",
-                out html,
-                out strError);
-            if (nRet == -1)
-            {
-                MessageBox.Show(this, strError);
-                return;
-            }
-            //SetHtmlString(this.webBrowser1, html);
-            */
+            textForm dlg = new textForm();
+            dlg.StartPosition = FormStartPosition.CenterScreen;
+            dlg.Info = "";// sb.ToString();
+            dlg.ShowDialog(this);
         }
     }
 

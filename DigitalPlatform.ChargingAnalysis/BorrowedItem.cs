@@ -80,15 +80,22 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
             // 从借书记录中获取信息
-            this.BorrowTimeOriginal = this.relatedItem.OperTime;
-            this.BorrowDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal));
-            //day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
-            //this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
-            //this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
-            //this.BorrowDay= day.ToString("yyyy/MM/dd");//
-            //this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
+            if (this.relatedItem != null)
+            {
+                this.BorrowTimeOriginal = this.relatedItem.OperTime;
+                this.BorrowDate = new DateItem(DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal));
+                //day = DateTimeUtil.ParseFreeTimeString(this.BorrowTimeOriginal);
+                //this.BorrowYear = day.ToString("yyyy");// DateTimeUtil.ToYearString(day);
+                //this.BorrowMonth = day.ToString("yyyy/MM");// DateTimeUtil.ToMonthString(day);
+                //this.BorrowDay= day.ToString("yyyy/MM/dd");//
+                //this.BorrowTime = day.ToString("yyyy-MM-dd HH:mm:ss"); //转换成统计的格式，方便排序
 
-            this.BorrowPeriod = this.relatedItem.Period;
+                this.BorrowPeriod = this.relatedItem.Period;
+            }
+            else
+            {
+                this.BorrowDate = new DateItem(new DateTime());
+            }
 
 
         }
@@ -203,7 +210,7 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
             return "<borrowItem itemBarcode='" + ItemBarcode + "' "
-                + " title='" + Title + "' "
+                + " title=\"" + Title + "\" "
 
                 + " borrowTime='" + borrowTime + "' "
                 //+ " borrowDate='" + borrowDate + "' "
