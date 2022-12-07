@@ -35,8 +35,6 @@ namespace dp2mini
         // mid父窗口
         MainForm _mainForm = null;
 
-
-
         /// <summary>
         ///  构造函数
         /// </summary>
@@ -87,181 +85,21 @@ namespace dp2mini
 
         }
 
-        // 评语模板列表第一行
-        public const string C_SelectComment = "请选择评语模板";
 
 
 
+        #region 报表目录
 
-
-
-
-
-
-
-
- 
-
-        #region 关于点列头排序
-
-        // 借书日志 点列头排序
-        private void listView_log_borrow_ColumnClick(object sender, ColumnClickEventArgs e)
+        // 报表目录
+        public string ReportDir
         {
-            //int nClickColumn = e.Column;
-            //SortCol(this.listView_log_borrow, SortColumns_borrow, nClickColumn);
-        }
-
-        // 借书统计 点列头排序
-        private void listView_borrowStatis_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            //int nClickColumn = e.Column;
-            //SortCol(this.listView_borrowStatis, SortColumns_borrowStatis, nClickColumn);
-        }
-
-        // 还书日志 点列头排序
-        private void listView_return_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            //int nClickColumn = e.Column;
-            //SortCol(this.listView_return, SortColumns_return, nClickColumn);
-        }
-
-        // 还书统计 点列头排序
-        private void listView_returnStatis_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            //    int nClickColumn = e.Column;
-            //    SortCol(this.listView_returnStatis, SortColumns_borrowStatis, nClickColumn);
-        }
-
-        // 点击列头排序
-        private void listView_results_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            //int nClickColumn = e.Column;
-            //SortCol(this.listView_results, SortColumns_all, nClickColumn);
-        }
-
-        private void listView_borrowAndReurn_statis_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            int nClickColumn = e.Column;
-            //SortCol(this.listView_borrowAndReurn_statis, SortColumns_borrowAndReturnStatis, nClickColumn);
-        }
-
-        SortColumns SortColumns_all = new SortColumns();
-        SortColumns SortColumns_borrow = new SortColumns();
-        SortColumns SortColumns_borrowStatis = new SortColumns();
-        SortColumns SortColumns_return = new SortColumns();
-        SortColumns SortColumns_returnStatis = new SortColumns();
-
-        SortColumns SortColumns_borrowAndReturnStatis = new SortColumns();
-
-        public static void SortCol(ListView myListView, SortColumns sortCol, int nClickColumn)
-        {
-            ColumnSortStyle sortStyle = ColumnSortStyle.LeftAlign;
-
-            // 第一列为记录路径，排序风格特殊
-            if (nClickColumn == 0)
-                sortStyle = ColumnSortStyle.RecPath;
-
-            sortCol.SetFirstColumn(nClickColumn,
-                sortStyle,
-                myListView.Columns,
-                true);
-
-            // 排序
-            myListView.ListViewItemSorter = new SortColumnsComparer(sortCol);
-
-            myListView.ListViewItemSorter = null;
-        }
-
-        #endregion
-
-        private void ToolStripMenuItem_huizong_Click(object sender, EventArgs e)
-        {
-            /*
-            string totalCountText = "";
-            ListView mylistview = null;
-            if (this.tabControl_table.SelectedTab.Text == "借书统计")
+            get
             {
-                mylistview = listView_borrowStatis;
-                totalCountText = "借书";
+                return this.textBox_outputDir.Text.Trim();
             }
-            else if (this.tabControl_table.SelectedTab.Text == "还书统计")
-            {
-                mylistview = this.listView_returnStatis;
-                totalCountText = "还书";
-            }
-
-            if (mylistview == null)
-                return;
-
-            if (mylistview.SelectedItems.Count == 0)
-            {
-                MessageBox.Show(this, "请先选中要汇总的行。");
-                return;
-            }
-
-            List<BorrowGroup> list = new List<BorrowGroup>();
-            foreach (ListViewItem item in mylistview.SelectedItems)
-            {
-                BorrowGroup group = new BorrowGroup();
-                group.location = item.SubItems[0].Text;
-                group.readerBarcode = item.SubItems[1].Text;
-                group.readerName = item.SubItems[2].Text;
-                group.count = Convert.ToInt32(item.SubItems[4].Text);
-                list.Add(group);
-            }
-
-            string text = "";
-
-            var groups = list.GroupBy(p => p.location);
-            foreach (var group in groups)
-            {
-                //Console.WriteLine(group.Key);
-
-                string location = group.Key;
-
-                int readerCount = 0;
-                int totalCount = 0;
-                foreach (var one in group)
-                {
-                    readerCount++;
-
-                    totalCount += one.count;
-
-                    //Console.WriteLine($"\t{person.Name},{person.Age}");
-                }
-
-                string line = location + "  读者数量:" + readerCount + "  "+totalCountText+"总量:" + totalCount;
-
-                if (text != "")
-                    text += "\r\n";
-                text += line;
-            }
-
-            MessageBox.Show(this, text);
-            */
         }
 
-        private void 全选ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            /*
-            if (this.tabControl_table.SelectedTab.Text == "借书统计")
-            {
-                foreach (ListViewItem item in this.listView_borrowStatis.Items)
-                {
-                    item.Selected = true;
-                }
-            }
-            else
-            {
-                foreach (ListViewItem item in this.listView_returnStatis.Items)
-                {
-                    item.Selected = true;
-                }
-            }
-            */
-        }
-
-
+        // 选择目录
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
@@ -280,12 +118,23 @@ namespace dp2mini
 
             // 把评语输入框清空。
             this.textBox_comment.Text = "";
+            this._startTime = DateTime.MinValue; //todo清掉最小时间
 
             // 重新显示文件
             this.ShowFiles();
         }
 
+        // 手工输入目录，按回车
+        private void textBox_outputDir_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if条件检测按下的是不是Enter键
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.ShowFiles();
+            }
+        }
 
+        // 显示目录中的文件
         private void ShowFiles()
         {
             try
@@ -327,6 +176,18 @@ namespace dp2mini
                     // 馆长评语
                     string comment = DomUtil.GetElementText(root, "comment");
 
+                    string timeInfo = "";
+                    XmlNode commentNode=root.SelectSingleNode("comment");
+                    if (commentNode != null)
+                    {
+                        string startTime = DomUtil.GetAttr(commentNode, "startTime");
+                        string endTime = DomUtil.GetAttr(commentNode, "endTime");
+                        string usedSeconds = DomUtil.GetAttr(commentNode, "usedSeconds");
+
+                        if (string.IsNullOrEmpty(usedSeconds) == false)
+                            timeInfo = usedSeconds;//startTime + "/" + endTime + "/" + usedSeconds;
+                    }
+
                     ListViewItem item = new ListViewItem(barcode);
                     item.SubItems.Add(name);
                     item.SubItems.Add(department);
@@ -336,12 +197,20 @@ namespace dp2mini
                     item.SubItems.Add(comment);
                     item.SubItems.Add(xmlFile);
 
+
                     // 如果对应的html存在，则显示，到时点击第一行时，显示对应
                     string htmlFile = dir + "\\" + barcode + ".html";
                     if (File.Exists(htmlFile) == true)
                     {
                         item.SubItems.Add(htmlFile);
                     }
+                    else
+                    {
+                        item.SubItems.Add("");
+                    }
+
+                    // 加一个评语时间
+                    item.SubItems.Add(timeInfo);  //9
 
                     // 加到列表集合中
                     this.listView_files.Items.Add(item);
@@ -354,32 +223,21 @@ namespace dp2mini
             }
         }
 
-        public string Dir
-        {
-            get
-            {
-                return this.textBox_outputDir.Text.Trim();
-            }
-        }
+        #endregion
 
+        #region 选行和显示html
+
+        // 选择其中一行
         private void listView_files_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.listView_files.SelectedItems.Count > 0)
             {
                 ListViewItem item = this.listView_files.SelectedItems[0];
 
-                // 2022/11/30 注释掉，因为listview本身显示了comment
-                //string barcode = item.Text;
-                //string xmlFile = this.Dir + "\\" + barcode + ".xml";
-                //XmlDocument dom = new XmlDocument();
-                //dom.Load(xmlFile);
-                //XmlNode root = dom.DocumentElement;
-                //string comment = DomUtil.GetElementText(root, "comment");
-
-
                 //从馆员评语显示在输入框
                 string comment = item.SubItems[6].Text;
-                this.textBox_comment.Text = comment;
+                //this.textBox_comment.Text = comment;
+                this.SetCommentForEdit(comment);
 
 
                 // 如果存在html文件，显示出来
@@ -396,6 +254,7 @@ namespace dp2mini
             }
         }
 
+        // 显示html文件
         public void showHtml(string htmlFile)
         {
             string content = "";
@@ -421,36 +280,190 @@ namespace dp2mini
         {
             webBrowser.DocumentText = strHtml;
         }
+        #endregion
 
-        // 设置文本
-        static void SetTextString(WebBrowser webBrowser, string strText)
+
+        #region 评语相关
+
+        // 评语模板列表第一行
+        public const string C_SelectComment = "请选择评语模板";
+
+        // 提交评语
+        private void button_setComment_Click(object sender, EventArgs e)
         {
-            SetHtmlString(webBrowser, "<pre>" + HttpUtility.HtmlEncode(strText) + "</pre>");
+            // 设置评语
+            string comment = this.textBox_comment.Text.Trim();
+
+            if (this.listView_files.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "请先从列表中选择要修改评语的读者记录。");
+                return;
+            }
+
+            this.SaveComment(comment);
+
+
+            MessageBox.Show(this, "评语保存成功。");
         }
 
+        // 提交评语
+        private void SaveComment(string comment)
+        {
+            if (this.listView_files.SelectedItems.Count == 0)
+                return;
+            
+            // 结束时间
+            DateTime endTime = DateTime.Now;
+
+            // 结束时间-开始时间=用时
+            double usedSeconds = (endTime - this._startTime).TotalSeconds;
+
+
+            // 支持多条一起编辑评语
+            foreach (ListViewItem item in this.listView_files.SelectedItems)
+            {
+                string barcode = item.Text;
+
+                string xmlFile = this.ReportDir + "\\" + barcode + ".xml";
+                string htmlFile = this.ReportDir + "\\" + barcode + ".html";
+
+                XmlDocument dom = new XmlDocument();
+                dom.Load(xmlFile);
+                XmlNode root = dom.DocumentElement;
+
+
+                // 评语中可以带着宏变量
+                //<comment>{patronName}，您在校期间读了{borrowCount}书。读万卷书，行万里路。</comment>
+                string patronName = item.SubItems[1].Text;
+                string borrowCount=item.SubItems[3].Text;
+                string thisComment =comment.Replace("{patronName}", patronName);
+                thisComment = thisComment.Replace("{borrowCount}", borrowCount);
+
+                // 设到dom
+                DomUtil.SetElementText(root, "comment", thisComment);
+
+
+
+                string strStartTime = DateTimeUtil.DateTimeToString(this._startTime);
+                string strEndTime = DateTimeUtil.DateTimeToString(endTime);
+                string strUsedSeconds = usedSeconds.ToString("#0.00");
+                string timeInfo = strUsedSeconds;//strStartTime + "/" + strEndTime + "/" + strUsedSeconds;
+
+
+                XmlNode commentNode = root.SelectSingleNode("comment");
+                DomUtil.SetAttr(commentNode, "startTime",strStartTime);
+                DomUtil.SetAttr(commentNode, "endTime",strEndTime );
+                DomUtil.SetAttr(commentNode, "usedSeconds",strUsedSeconds );
+
+
+
+                // 保存到文件
+                dom.Save(xmlFile);
+
+                // 更新界面listview这一行里的评估
+                item.SubItems[6].Text = thisComment;
+
+                item.SubItems[9].Text = timeInfo;
+
+
+                // 重新转出一个html
+                try
+                {
+                    ConvertHelper.Convert(xmlFile, htmlFile);
+                }
+                catch (Exception ex)
+                {
+                    //todo 这种情况如何处理
+                }
+
+                // 保存到专门的评语文件
+                BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
+            }
+
+            // 设为最小值
+            this._startTime = DateTime.MinValue;
+        }
+
+
+        // 选择评语
+        private void comboBox_comment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string comment = this.comboBox_comment.Text;
+            if (comment == C_SelectComment)
+                comment = "";
+
+            // 设到编辑框
+            this.SetCommentForEdit(comment);
+            
+
+            // 也同时保存一下评语,感觉直接保存，这样太快太自动了，还是让用户点一下提交评语为好。
+            // this.SaveComment(comment);
+
+        }
+        
+        // 评语开始时间
+        DateTime _startTime = DateTime.MinValue;
+        private void textBox_comment_Enter(object sender, EventArgs e)
+        {
+            //MessageBox.Show(this, "h");
+
+            // 记下时间
+            if (this._startTime == DateTime.MinValue)
+            {
+                this._startTime = DateTime.Now;
+            }
+        }
+
+        public void SetCommentForEdit(string comment)
+        {
+            // 设到编辑框
+            this.textBox_comment.Text = comment;
+
+            // 设一下开始时间
+            this._startTime = DateTime.Now;
+        }
+
+        #endregion
+
+        #region 点击表头排序
+
+        // 排序
+        SortColumns SortColumns_report = new SortColumns();
+        private void listView_files_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            int nClickColumn = e.Column;
+            TransferStatisForm.SortCol(this.listView_files, SortColumns_report, nClickColumn);
+        }
+
+        #endregion
+
+        #region 按钮事件
+
+        // 点创建报表按钮
         private void button_createReport_Click(object sender, EventArgs e)
         {
 
             // 输出目录
             string dir = this.textBox_outputDir.Text.Trim();
 
-            // 当设置的目录时，才进行目录是否合格，用户可能在此界面不选择，在创建报表界面才选择。
-            if (string.IsNullOrEmpty(dir) == false)
-            {
+            // 2022/12/7 没必要检查，因为进到里面，可以是做一些处理的事情，不一定是一键生成。
+            //// 当设置的目录时，才进行目录是否合格，用户可能在此界面不选择，在创建报表界面才选择。
+            //if (string.IsNullOrEmpty(dir) == false)
+            //{
 
-                // 如果目录不存在，则创建一个新目录
-                if (Directory.Exists(dir) == false)
-                    Directory.CreateDirectory(dir);
+            //    // 如果目录不存在，则创建一个新目录
+            //    if (Directory.Exists(dir) == false)
+            //        Directory.CreateDirectory(dir);
 
-                // 如果目录不是空目录，提醒。
-                DirectoryInfo dirInfo = new DirectoryInfo(dir);
-                if (dirInfo.GetFiles("*.xml").Length > 0
-                    || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
-                {
-                    MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表(xml/html文件)，创建报表时需要选择一个空目录。");
-                    return;
-                }
-            }
+            //    // 如果目录不是空目录，提醒。
+            //    DirectoryInfo dirInfo = new DirectoryInfo(dir);
+            //    if (dirInfo.GetFiles("*.xml").Length > 0
+            //        || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+            //    {
+            //        MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表(xml/html文件)，创建报表时需要选择一个空目录。");
+            //        return;
+            //    }
+            //}
 
 
             createReport dlg = new createReport();
@@ -467,7 +480,7 @@ namespace dp2mini
         }
 
 
-        // 把html下载到本地
+        // 另存
         private void button_download_Click(object sender, EventArgs e)
         {
 
@@ -514,140 +527,7 @@ namespace dp2mini
 
         }
 
-        private void button_setComment_Click(object sender, EventArgs e)
-        {
-
-
-            // 设置评语
-            string comment = this.textBox_comment.Text.Trim();
-
-            if (this.listView_files.SelectedItems.Count == 0)
-            {
-                MessageBox.Show(this, "请先从列表中选择要修改评语的读者记录。");
-                return;
-            }
-
-            this.SaveComment(comment);
-
-
-            MessageBox.Show(this, "评语保存成功。");
-        }
-
-
-        private void SaveComment(string comment)
-        {
-            if (this.listView_files.SelectedItems.Count == 0)
-                return;
-
-            DateTime endTimed = DateTime.Now;
-            double usedTime = (endTimed - writeStartTime).TotalSeconds;
-
-
-            // 支持多条一起编辑评语
-            foreach (ListViewItem item in this.listView_files.SelectedItems)
-            {
-
-                string barcode = item.Text;
-
-                string xmlFile = this.Dir + "\\" + barcode + ".xml";
-                string htmlFile = this.Dir + "\\" + barcode + ".html";
-
-                XmlDocument dom = new XmlDocument();
-                dom.Load(xmlFile);
-                XmlNode root = dom.DocumentElement;
-
-                // 设到dom
-                DomUtil.SetElementText(root, "comment", comment);
-
-                // 保存到文件
-                dom.Save(xmlFile);
-
-                // 更新界面listview这一行里的评估
-                item.SubItems[6].Text = comment;
-
-
-                // 重新转出一个html
-                try
-                {
-                    ConvertHelper.Convert(xmlFile, htmlFile);
-                }
-                catch (Exception ex)
-                {
-                    //todo 这种情况如何处理
-                }
-
-                // 保存到专门的评语文件
-                BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
-            }
-        }
-
-
-        // 用于排序
-        SortColumns SortColumns_report = new SortColumns();
-        private void listView_files_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            int nClickColumn = e.Column;
-             TransferStatisForm.SortCol(this.listView_files, SortColumns_report, nClickColumn);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //createReport dlg = new createReport();
-            //dlg.StartPosition = FormStartPosition.CenterScreen;
-            //dlg.OutputDir = "";// dir;
-            ////dlg.ShowDialog(this);
-            //DialogResult result = dlg.ShowDialog(this);
-
-            textForm dlg = new textForm();
-            dlg.StartPosition = FormStartPosition.CenterScreen;
-            dlg.Info = "";// sb.ToString();
-            dlg.ShowDialog(this);
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox_outputDir_KeyDown(object sender, KeyEventArgs e)
-        {
-            //if条件检测按下的是不是Enter键
-            if (e.KeyCode == Keys.Enter)
-            {
-                this.ShowFiles();
-            }
-        }
-
-        private void comboBox_comment_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string comment = this.comboBox_comment.Text;
-            if (comment == C_SelectComment)
-                comment = "";
-
-            // 设到编辑框
-            this.textBox_comment.Text = comment;
-
-            // 也同时保存一下评语,感觉直接保存，这样太快太自动了，还是让用户点一下提交评语为好。
-            // this.SaveComment(comment);
-
-        }
-        DateTime writeStartTime = DateTime.MinValue;
-
-        private void textBox_comment_Enter(object sender, EventArgs e)
-        {
-            //MessageBox.Show(this, "h");
-
-            // 记下时间
-            if (this.writeStartTime != DateTime.MinValue)
-            {
-                this.writeStartTime = DateTime.Now;
-            }
-        }
-
-        private void textBox_comment_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+        #endregion
     }
 
 

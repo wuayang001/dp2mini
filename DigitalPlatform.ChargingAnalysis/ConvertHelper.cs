@@ -37,16 +37,17 @@ namespace xml2html
                    .SetInnerText("读者借阅报告");
 
                 sw.WriteLine(H1_TheDebitBooks.ToString());
-                //读者基本信息
-                XmlNode root = dom.DocumentElement;
-                var barcode = DomUtil.GetElementText(root, "patron/barcode");
-                var patronName = DomUtil.GetElementText(root, "patron/name");
-                var tel = DomUtil.GetElementText(root, "patron/tel");
-                var readerType = DomUtil.GetElementText(root, "patron/readerType");
-                var refID = DomUtil.GetElementText(root, "patron/refID");
-                var libraryCode = DomUtil.GetElementText(root, "patron/libraryCode");
-                var borrowedNum = DomUtil.GetElementText(root, "patron/info/item[@name='可借总册数']");
-                var canBorrowNum = DomUtil.GetElementText(root, "patron/info/item[@name='当前还可借']");
+
+                //读者基本信息 2022/12/7 改为使用DomUtil里的函数，避免节点不存在抛异常。
+                XmlNode patronNode = dom.DocumentElement.SelectSingleNode("patron");
+                var barcode = DomUtil.GetElementText(patronNode, "barcode");
+                var patronName = DomUtil.GetElementText(patronNode, "name");
+                var tel = DomUtil.GetElementText(patronNode, "tel");
+                var readerType = DomUtil.GetElementText(patronNode, "readerType");
+                var refID = DomUtil.GetElementText(patronNode, "refID");
+                var libraryCode = DomUtil.GetElementText(patronNode, "libraryCode");
+                var borrowedNum = DomUtil.GetElementText(patronNode, "info/item[@name='可借总册数']");
+                var canBorrowNum = DomUtil.GetElementText(patronNode, "info/item[@name='当前还可借']");
 
                 //var barcode_node = dom.DocumentElement.SelectSingleNode("patron/barcode"); //证条码号
                 //var barcode =barcode_node.InnerText;

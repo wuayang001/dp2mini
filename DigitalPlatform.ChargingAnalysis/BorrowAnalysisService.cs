@@ -308,6 +308,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 report.borrowedItems = new List<BorrowedItem>();
 
 
+
                 // 获取读者信息
                 string[] results = null;
                 string strRecPath = "";
@@ -1074,6 +1075,14 @@ namespace DigitalPlatform.ChargingAnalysis
 
         }
 
+        // 显示用长
+        static string GetTimeString(XmlDocument dom)
+        {
+            XmlElement time = dom.DocumentElement.SelectSingleNode("time") as XmlElement;
+            if (time == null)
+                return "";
+            return time.GetAttribute("seconds") + " 秒; " + time.GetAttribute("start") + " - " + time.GetAttribute("end");
+        }
 
         private int OutputHtml(BorrowAnalysisReport report,
             out string html,

@@ -98,6 +98,7 @@
             this.comboBox_comment = new System.Windows.Forms.ComboBox();
             this.button_createReport = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.columnHeader_time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -344,14 +345,12 @@
             this.全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
             this.全选ToolStripMenuItem.Size = new System.Drawing.Size(144, 42);
             this.全选ToolStripMenuItem.Text = "全选";
-            this.全选ToolStripMenuItem.Click += new System.EventHandler(this.全选ToolStripMenuItem_Click);
             // 
             // ToolStripMenuItem_download
             // 
             this.ToolStripMenuItem_download.Name = "ToolStripMenuItem_download";
             this.ToolStripMenuItem_download.Size = new System.Drawing.Size(144, 42);
             this.ToolStripMenuItem_download.Text = "下载";
-            this.ToolStripMenuItem_download.Click += new System.EventHandler(this.ToolStripMenuItem_huizong_Click);
             // 
             // label6
             // 
@@ -361,7 +360,7 @@
             this.label6.Location = new System.Drawing.Point(20, 567);
             this.label6.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(175, 33);
+            this.label6.Size = new System.Drawing.Size(180, 33);
             this.label6.TabIndex = 25;
             this.label6.Text = "馆长评语：";
             // 
@@ -375,7 +374,6 @@
             this.textBox_comment.Name = "textBox_comment";
             this.textBox_comment.Size = new System.Drawing.Size(984, 90);
             this.textBox_comment.TabIndex = 26;
-            this.textBox_comment.TextChanged += new System.EventHandler(this.textBox_comment_TextChanged);
             this.textBox_comment.Enter += new System.EventHandler(this.textBox_comment_Enter);
             // 
             // button_setComment
@@ -407,7 +405,7 @@
             this.label7.Location = new System.Drawing.Point(18, 25);
             this.label7.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(175, 33);
+            this.label7.Size = new System.Drawing.Size(180, 33);
             this.label7.TabIndex = 34;
             this.label7.Text = "报表目录：";
             // 
@@ -437,7 +435,8 @@
             this.columnHeader_title,
             this.columnHeader_comm,
             this.columnHeader_xml,
-            this.columnHeader_html});
+            this.columnHeader_html,
+            this.columnHeader_time});
             this.listView_files.ContextMenuStrip = this.contextMenuStrip_list;
             this.listView_files.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.listView_files.FullRowSelect = true;
@@ -538,7 +537,6 @@
             this.label1.Size = new System.Drawing.Size(821, 29);
             this.label1.TabIndex = 39;
             this.label1.Text = "注:选择或修改了评语，请一定要提交评语才能兑现到报表中。";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // comboBox_comment
             // 
@@ -571,6 +569,10 @@
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.Size = new System.Drawing.Size(256, 783);
             this.webBrowser1.TabIndex = 0;
+            // 
+            // columnHeader_time
+            // 
+            this.columnHeader_time.Text = "写评语用时";
             // 
             // chargingAnalysisForm
             // 
@@ -662,5 +664,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader_department;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox_comment;
+        private System.Windows.Forms.ColumnHeader columnHeader_time;
     }
 }
