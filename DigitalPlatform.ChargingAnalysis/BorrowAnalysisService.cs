@@ -49,6 +49,7 @@ namespace DigitalPlatform.ChargingAnalysis
         Hashtable _commentHT = new Hashtable();
 
         List<RoleItem> _roles = new List<RoleItem>();
+        List<string> _commentTemplates=new List<string> ();
 
         // todo要改为有返回出错信息
         // chargingAnalysisDataDir：阅读分析的数据目录，里面有html配置文件
@@ -61,13 +62,13 @@ namespace DigitalPlatform.ChargingAnalysis
             // 阅读分析的数据目录
             this._dataDir = dataDir;
 
+            // 类号中英文对照文件
             string clcclassFile = Path.Combine(this._dataDir, "clcclass.txt");
             if (File.Exists(clcclassFile) == false)
             {
                 strError = "'" + clcclassFile + "'配置文件不存在，请联系系统管理员。";
                 return -1;
             }
-
             using (StreamReader reader = new StreamReader(clcclassFile))//, Encoding.UTF8))
             {
                 string line = "";
@@ -128,6 +129,22 @@ namespace DigitalPlatform.ChargingAnalysis
                 }
             }
 
+            // 评语模板commentTemplate.xml
+            string commentTemplateFile = Path.Combine(this._dataDir, "commentTemplate.xml");
+            if (File.Exists(commentTemplateFile) == true)
+            {
+                XmlDocument dom = new XmlDocument();
+                dom.Load(commentTemplateFile);
+
+                XmlNodeList list = dom.DocumentElement.SelectNodes("comment");
+                foreach (XmlNode node in list)
+                {
+                    string comment = node.InnerText.Trim();
+                    if (string.IsNullOrEmpty(comment)==false)
+                        this._commentTemplates.Add(comment);
+                }
+            }
+
             // 访问dp2服务器的地址和帐号
             this.dp2ServerUrl = serverUrl;
             this.dp2Username = userName;
@@ -137,6 +154,15 @@ namespace DigitalPlatform.ChargingAnalysis
             this._channelPool.BeforeLogin += channelPool_BeforeLogin;
 
             return 0;
+        }
+
+        // 评语模板 2022/12/7
+        public List<string> CommentTemplates
+        {
+            get
+            {
+                return this._commentTemplates;
+            }
         }
 
         #endregion
@@ -845,7 +871,7 @@ namespace DigitalPlatform.ChargingAnalysis
                 dom.DocumentElement.RemoveChild(outofReservationsNode);
 
             // 拼出新的xml
-            patronXml =  "<patron>"+dom.DocumentElement.InnerXml+"</patron>";
+            patronXml = "<patron>" + dom.DocumentElement.InnerXml + "</patron>";
 
             //======
             // 清洗后的在借
@@ -856,15 +882,15 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 // 类型，0表示在借未还的，1表示借阅历史中的
                 // 筛选在借图书，按借书时间倒序排
-                var borrowList = report.borrowedItems.Where(x=>x.Type == "0").OrderByDescending(x => x.BorrowDate.Time).ToList();
+                var borrowList = report.borrowedItems.Where(x => x.Type == "0").OrderByDescending(x => x.BorrowDate.Time).ToList();
                 if (borrowList.Count > 0)
                 {
                     string tempXml = "";
                     foreach (BorrowedItem one in borrowList)
                     {
-                        tempXml+= one.DumpXml();
+                        tempXml += one.DumpXml();
                     }
-                    borrowsXml = "<borrows count='"+borrowList.Count+"'>" +tempXml + "</borrows>";
+                    borrowsXml = "<borrows count='" + borrowList.Count + "'>" + tempXml + "</borrows>";
                 }
 
 
@@ -892,9 +918,9 @@ namespace DigitalPlatform.ChargingAnalysis
                 totalBorrowedCount = list.Count.ToString();
             }
             //借阅汇总信息
-            string borrowInfo = "<borrowInfo firstBorrowDate='"+ firstBorrowDate+"' totalBorrowedCount='"+totalBorrowedCount+ "'  timeRange='"+ report.times+ "'  title='" + report.commentTitle + "'/>";
+            string borrowInfo = "<borrowInfo firstBorrowDate='" + firstBorrowDate + "' totalBorrowedCount='" + totalBorrowedCount + "'  timeRange='" + report.times + "'  title='" + report.commentTitle + "'/>";
 
-            
+
             //=====
             // 按分类统计数量
             string clcXml = "";
@@ -914,7 +940,7 @@ namespace DigitalPlatform.ChargingAnalysis
                         continue;
                     }
 
-                    clcXml += "<clcItem name='"+ one.name + "' caption='"+ one.caption + "' count='"+ one.items.Count + "'/>";
+                    clcXml += "<clcItem name='" + one.name + "' caption='" + one.caption + "' count='" + one.items.Count + "'/>";
 
                     // 数量加1
                     nCount++;
@@ -926,7 +952,7 @@ namespace DigitalPlatform.ChargingAnalysis
                     clcXml += "<clcItem name='其它' caption='' count='" + restCount + "'/>";
                 }
 
-                clcXml = "<clcGroup>"+clcXml+"</clcGroup>";
+                clcXml = "<clcGroup>" + clcXml + "</clcGroup>";
             }
 
             //======
@@ -936,7 +962,7 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 foreach (GroupItem one in report.yearGroups)
                 {
-                    yearXml += "<yearItem name='"+one.name+"'  count='" + one.items.Count + "'/>";
+                    yearXml += "<yearItem name='" + one.name + "'  count='" + one.items.Count + "'/>";
                 }
                 yearXml = "<yearGroup>" + yearXml + "</yearGroup>";
             }
@@ -966,25 +992,35 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
             //评语信息
-            string commentXml = "<comment>"+report.comment+"</comment>";
+            string commentXml = "<comment>" + report.comment + "</comment>";
 
 
             // 汇总xml
             xml = "<root>"
-                +patronXml
-                +borrowInfo
-                +borrowsXml
-                +historyXml
-                +clcXml
-                +yearXml
-                +quarterXml
-                +monthXml
+                + patronXml
+                + borrowInfo
+                + borrowsXml
+                + historyXml
+                + clcXml
+                + yearXml
+                + quarterXml
+                + monthXml
                 + commentXml
                 + "</root>";
 
 
             // 以缩进格式显示
-            xml=DomUtil.GetIndentXml(xml);
+
+            string strOutXml = "";
+            int nRet = DomUtil.GetIndentXml(xml,
+                    false,
+                    out strOutXml,
+                    out error);
+            if (nRet == -1)
+                return -1;
+
+            // 返回的xml
+            xml = strOutXml;
 
 
             return 0;

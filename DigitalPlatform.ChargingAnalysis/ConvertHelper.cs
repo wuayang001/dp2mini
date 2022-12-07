@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DigitalPlatform;
 using System.Xml;
 using System.Xml.Linq;
+using DigitalPlatform.Xml;
 
 namespace xml2html
 {
@@ -37,22 +38,32 @@ namespace xml2html
 
                 sw.WriteLine(H1_TheDebitBooks.ToString());
                 //读者基本信息
-                var barcode_node = dom.DocumentElement.SelectSingleNode("patron/barcode"); //证条码号
-                var barcode = barcode_node.InnerText;
-                var name_node = dom.DocumentElement.SelectSingleNode("patron/name");   //名字
-                var Name = name_node.InnerText;
-                var tel_node = dom.DocumentElement.SelectSingleNode("patron/tel");  //电话
-                var tel = tel_node.InnerText;
-                var readerType_node = dom.DocumentElement.SelectSingleNode("patron/readerType");   //读者类型
-                var readerType = readerType_node.InnerText;
-                var refID_node = dom.DocumentElement.SelectSingleNode("patron/refID");  //refID
-                var refID = refID_node.InnerText;
-                var libraryCode_node = dom.DocumentElement.SelectSingleNode("patron/libraryCode");  //图书馆代码
-                var libraryCode = libraryCode_node.InnerText;
-                var borrowNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='可借总册数']"); //可借总册数
-                var borrowNum = borrowNum_node.Attributes["value"].Value;
-                var returnBookNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='当前还可借']"); //当前还可借
-                var returnBookNum = returnBookNum_node.Attributes["value"].Value;
+                XmlNode root = dom.DocumentElement;
+                var barcode = DomUtil.GetElementText(root, "patron/barcode");
+                var patronName = DomUtil.GetElementText(root, "patron/name");
+                var tel = DomUtil.GetElementText(root, "patron/tel");
+                var readerType = DomUtil.GetElementText(root, "patron/readerType");
+                var refID = DomUtil.GetElementText(root, "patron/refID");
+                var libraryCode = DomUtil.GetElementText(root, "patron/libraryCode");
+                var borrowedNum = DomUtil.GetElementText(root, "patron/info/item[@name='可借总册数']");
+                var canBorrowNum = DomUtil.GetElementText(root, "patron/info/item[@name='当前还可借']");
+
+                //var barcode_node = dom.DocumentElement.SelectSingleNode("patron/barcode"); //证条码号
+                //var barcode =barcode_node.InnerText;
+                //var name_node = dom.DocumentElement.SelectSingleNode("patron/name");   //名字
+                //var Name = name_node.InnerText;
+                //var tel_node = dom.DocumentElement.SelectSingleNode("patron/tel");  //电话
+                //var tel = tel_node.InnerText;
+                //var readerType_node = dom.DocumentElement.SelectSingleNode("patron/readerType");   //读者类型
+                //var readerType = readerType_node.InnerText;
+                //var refID_node = dom.DocumentElement.SelectSingleNode("patron/refID");  //refID
+                //var refID = refID_node.InnerText;
+                //var libraryCode_node = dom.DocumentElement.SelectSingleNode("patron/libraryCode");  //图书馆代码
+                //var libraryCode = libraryCode_node.InnerText;
+                //var borrowNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='可借总册数']"); //可借总册数
+                //var borrowNum = borrowNum_node.Attributes["value"].Value;
+                //var returnBookNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='当前还可借']"); //当前还可借
+                //var returnBookNum = returnBookNum_node.Attributes["value"].Value;
 
 
                 var H2_readersInformation = new HtmlTagger("H2")
@@ -69,13 +80,13 @@ namespace xml2html
                     table_readersInformation.AddChild(tr);
                 };
                 getLabel("证条码号", "code", barcode);
-                getLabel("姓名", "name", Name);
+                getLabel("姓名", "name", patronName);
                 getLabel("电话", "tel", tel);
                 getLabel("读者类型", "readerType", readerType);
                 getLabel("refID", "refID", refID);
                 getLabel("图书馆代码", "libraryCode", libraryCode);
-                getLabel("可借总册数", "borrowNum", borrowNum);
-                getLabel("当前还可借", "returnBookNum", returnBookNum);
+                getLabel("可借总册数", "borrowNum", borrowedNum);
+                getLabel("当前还可借", "returnBookNum", canBorrowNum);
                 /*
                 var tr_code = HtmlTagger.Create("tr")
                     .AddChild(HtmlTagger.Create("td", "证条码号"))

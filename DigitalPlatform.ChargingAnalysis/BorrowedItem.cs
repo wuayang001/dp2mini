@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml;
 
 namespace DigitalPlatform.ChargingAnalysis
@@ -210,7 +211,7 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
             return "<borrowItem itemBarcode='" + ItemBarcode + "' "
-                + " title=\"" + Title + "\" "
+                + " title=\"" + HttpUtility.HtmlEncode(Title) + "\" "
 
                 + " borrowTime='" + borrowTime + "' "
                 //+ " borrowDate='" + borrowDate + "' "
@@ -222,9 +223,9 @@ namespace DigitalPlatform.ChargingAnalysis
                 //+ " returnMonth='" + returnMonth + "' "
                 //+ " returnYear='" + returnYear + "' "
 
-                + " accessNo='" + AccessNo + "' "
+                + " accessNo='" + HttpUtility.HtmlEncode(AccessNo) + "' "
                 //+ " bigClass='" + BigClass + "' "
-                + " location='" + Location + "' "
+                + " location='" + HttpUtility.HtmlEncode(Location) + "' "
                 + "/>";
             
 

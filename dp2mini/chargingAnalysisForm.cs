@@ -72,7 +72,23 @@ namespace dp2mini
                 MessageBox.Show(this, strError);
                 return;
             }
+
+            //把评语模板列出来
+            if (BorrowAnalysisService.Instance.CommentTemplates != null
+                && BorrowAnalysisService.Instance.CommentTemplates.Count > 0)
+            {
+                this.comboBox_comment.Text = C_SelectComment;
+                this.comboBox_comment.Items.Add(C_SelectComment);
+                foreach (string comment in BorrowAnalysisService.Instance.CommentTemplates)
+                {
+                    this.comboBox_comment.Items.Add(comment);
+                }
+            }
+
         }
+
+        // 评语模板列表第一行
+        public const string C_SelectComment = "请选择评语模板";
 
 
 
@@ -280,6 +296,9 @@ namespace dp2mini
 
                 this.listView_files.Items.Clear();
 
+                if (Directory.Exists(dir) == false)
+                    return;
+
                 string[] fiels = Directory.GetFiles(dir, "*.xml");
                 foreach (string xmlFile in fiels)
                 {
@@ -318,7 +337,7 @@ namespace dp2mini
                     item.SubItems.Add(xmlFile);
 
                     // 如果对应的html存在，则显示，到时点击第一行时，显示对应
-                    string htmlFile = dir+"\\"+barcode + ".html";
+                    string htmlFile = dir + "\\" + barcode + ".html";
                     if (File.Exists(htmlFile) == true)
                     {
                         item.SubItems.Add(htmlFile);
@@ -414,23 +433,24 @@ namespace dp2mini
 
             // 输出目录
             string dir = this.textBox_outputDir.Text.Trim();
-            if (string.IsNullOrEmpty(dir) == true)
-            {
-                MessageBox.Show(this, "尚未设置报表输出目录。");
-                return;
-            }
-            // 如果目录不存在，则创建一个新目录
-            if (Directory.Exists(dir) == false)  
-                Directory.CreateDirectory(dir);
 
-            // 如果目录不是空目录，提醒。
-            DirectoryInfo dirInfo = new DirectoryInfo(dir);
-            if (dirInfo.GetFiles("*.xml").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+            // 当设置的目录时，才进行目录是否合格，用户可能在此界面不选择，在创建报表界面才选择。
+            if (string.IsNullOrEmpty(dir) == false)
             {
-                MessageBox.Show(this, "创建报表时，报表目录必须为空。");
-                return;
-            }
 
+                // 如果目录不存在，则创建一个新目录
+                if (Directory.Exists(dir) == false)
+                    Directory.CreateDirectory(dir);
+
+                // 如果目录不是空目录，提醒。
+                DirectoryInfo dirInfo = new DirectoryInfo(dir);
+                if (dirInfo.GetFiles("*.xml").Length > 0
+                    || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+                {
+                    MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表(xml/html文件)，创建报表时需要选择一个空目录。");
+                    return;
+                }
+            }
 
 
             createReport dlg = new createReport();
@@ -439,6 +459,9 @@ namespace dp2mini
             //dlg.ShowDialog(this);
             DialogResult result = dlg.ShowDialog(this);
 
+
+            // 需要重新显示报表，另外有可能目录都变了
+            this.textBox_outputDir.Text = dlg.OutputDir;
             // 重新显示一下文件列表
             this.ShowFiles();
         }
@@ -493,6 +516,8 @@ namespace dp2mini
 
         private void button_setComment_Click(object sender, EventArgs e)
         {
+
+
             // 设置评语
             string comment = this.textBox_comment.Text.Trim();
 
@@ -502,34 +527,61 @@ namespace dp2mini
                 return;
             }
 
-            string barcode = this.listView_files.SelectedItems[0].Text;
-
-            string xmlFile = this.Dir + "\\" + barcode + ".xml";
-            string htmlFile = this.Dir + "\\" + barcode + ".html";
-
-            XmlDocument dom = new XmlDocument();
-            dom.Load(xmlFile);
-            XmlNode root = dom.DocumentElement;
-
-            // 设到dom
-            DomUtil.SetElementText(root, "comment", comment);
-
-            // 保存到文件
-            dom.Save(xmlFile);
-
-            // 更新界面listview这一行里的评估
-            this.listView_files.SelectedItems[0].SubItems[6].Text = comment;
-
-            // 重新转出一个html
-            ConvertHelper.Convert(xmlFile, htmlFile);
-
-            // 保存到专门的评语文件
-            BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
+            this.SaveComment(comment);
 
 
             MessageBox.Show(this, "评语保存成功。");
-
         }
+
+
+        private void SaveComment(string comment)
+        {
+            if (this.listView_files.SelectedItems.Count == 0)
+                return;
+
+            DateTime endTimed = DateTime.Now;
+            double usedTime = (endTimed - writeStartTime).TotalSeconds;
+
+
+            // 支持多条一起编辑评语
+            foreach (ListViewItem item in this.listView_files.SelectedItems)
+            {
+
+                string barcode = item.Text;
+
+                string xmlFile = this.Dir + "\\" + barcode + ".xml";
+                string htmlFile = this.Dir + "\\" + barcode + ".html";
+
+                XmlDocument dom = new XmlDocument();
+                dom.Load(xmlFile);
+                XmlNode root = dom.DocumentElement;
+
+                // 设到dom
+                DomUtil.SetElementText(root, "comment", comment);
+
+                // 保存到文件
+                dom.Save(xmlFile);
+
+                // 更新界面listview这一行里的评估
+                item.SubItems[6].Text = comment;
+
+
+                // 重新转出一个html
+                try
+                {
+                    ConvertHelper.Convert(xmlFile, htmlFile);
+                }
+                catch (Exception ex)
+                {
+                    //todo 这种情况如何处理
+                }
+
+                // 保存到专门的评语文件
+                BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
+            }
+        }
+
+
         // 用于排序
         SortColumns SortColumns_report = new SortColumns();
         private void listView_files_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -550,6 +602,51 @@ namespace dp2mini
             dlg.StartPosition = FormStartPosition.CenterScreen;
             dlg.Info = "";// sb.ToString();
             dlg.ShowDialog(this);
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox_outputDir_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if条件检测按下的是不是Enter键
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.ShowFiles();
+            }
+        }
+
+        private void comboBox_comment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string comment = this.comboBox_comment.Text;
+            if (comment == C_SelectComment)
+                comment = "";
+
+            // 设到编辑框
+            this.textBox_comment.Text = comment;
+
+            // 也同时保存一下评语,感觉直接保存，这样太快太自动了，还是让用户点一下提交评语为好。
+            // this.SaveComment(comment);
+
+        }
+        DateTime writeStartTime = DateTime.MinValue;
+
+        private void textBox_comment_Enter(object sender, EventArgs e)
+        {
+            //MessageBox.Show(this, "h");
+
+            // 记下时间
+            if (this.writeStartTime != DateTime.MinValue)
+            {
+                this.writeStartTime = DateTime.Now;
+            }
+        }
+
+        private void textBox_comment_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

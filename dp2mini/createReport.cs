@@ -72,6 +72,15 @@ namespace dp2mini
             if (Directory.Exists(dir) == false)  // 如果目录不存在，则创建一个新目录
                 Directory.CreateDirectory(dir);
 
+            // 如果目录不是空目录，提醒。
+            DirectoryInfo dirInfo = new DirectoryInfo(dir);
+            if (dirInfo.GetFiles("*.xml").Length > 0
+                || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
+            {
+                MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表(xml/html文件)，创建报表时需要选择一个空目录。");
+                return -1;
+            }
+
 
             // 证条码号，可能多个
             patronBarcodes = this.textBox_patronBarcode.Text.Trim();
@@ -112,7 +121,9 @@ namespace dp2mini
             this.SetProcess(0,patronBarcodeList.Length);
             int index = 0;
 
-            string strError = "";
+            string errorlog = "";
+
+            //string strError = "";
             // 循环每个证条码，生成报表
             foreach (string patronBarcode in patronBarcodeList)
             {
@@ -122,34 +133,58 @@ namespace dp2mini
                 // 停止
                 token.ThrowIfCancellationRequested();
 
+                try
+                {
+                    BorrowAnalysisReport report = null;
 
-                BorrowAnalysisReport report = null;
+                    // 创建数据
+                    nRet = BorrowAnalysisService.Instance.Build(token,
+                               patronBarcode,
+                               startDate,
+                               endDate,
+                               out report,
+                               out error);
+                    if (nRet == -1)
+                        goto ERROR1;
 
-                // 创建数据
-                nRet = BorrowAnalysisService.Instance.Build(token,
-                           patronBarcode,
-                           startDate,
-                           endDate,
-                           out report,
-                           out strError);
-                if (nRet == -1)
-                    return -1;
+                    // 输出报表
+                    string xml = "";
+                    nRet = BorrowAnalysisService.Instance.OutputReport(report,
+                        "xml",
+                        out xml,
+                        out error);
+                    if (nRet == -1)
+                        goto ERROR1;
 
-                // 输出报表
-                string xml = "";
-                nRet = BorrowAnalysisService.Instance.OutputReport(report,
-                    "xml",
-                    out xml,
-                    out strError);
-                if (nRet == -1)
-                    return -1;
+                    string fileName = dir + "\\" + patronBarcode + ".xml";
+                    // StreamWriter当文件不存在时，会自动创建一个新文件。
+                    using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
+                    {
+                        // 写到打印文件
+                        writer.Write(xml);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    error = ex.Message;
+                    goto ERROR1;
+                }
 
-                string fileName = dir + "\\" + patronBarcode + ".xml";
+                continue;
+
+
+            ERROR1:
+                errorlog += patronBarcode + "\t" + error + "\r\n";
+            }
+
+            if (string.IsNullOrEmpty(errorlog) == false)
+            {
+                string fileName = dir + "\\error.txt";
                 // StreamWriter当文件不存在时，会自动创建一个新文件。
                 using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
                 {
                     // 写到打印文件
-                    writer.Write(xml);
+                    writer.Write(errorlog);
                 }
             }
 
@@ -202,9 +237,6 @@ namespace dp2mini
 
             foreach (string file in fiels)
             {
-                index++;
-                this.SetProcessValue(index);
-
                 // 停止
                 token.ThrowIfCancellationRequested();
 
@@ -251,6 +283,9 @@ namespace dp2mini
 
                 item.dom.Save(item.fileName);
 
+                // 更改进度条
+                index++;
+                this.SetProcessValue(index);
             }
 
             return;
@@ -286,8 +321,7 @@ namespace dp2mini
 
             foreach (string xmlFile in fiels)
             {
-                index++;
-                this.SetProcessValue(index);
+
 
                 // 停止
                 token.ThrowIfCancellationRequested();
@@ -308,6 +342,9 @@ namespace dp2mini
 
                     // todo这个错写在哪里？
                 }
+
+                index++;
+                this.SetProcessValue(index);
             }
         }
 
@@ -674,6 +711,27 @@ namespace dp2mini
                     endDate,
                     dir);
             });
+        }
+
+        private void button_close_Click_1(object sender, EventArgs e)
+        {
+            this.Close(); 
+        }
+
+        private void button_selectDir_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            DialogResult result = dlg.ShowDialog();
+
+            // todo记住上次选择的目录
+
+            if (result != DialogResult.OK || string.IsNullOrEmpty(dlg.SelectedPath) == true)
+            {
+                //MessageBox.Show(this, "取消");
+                return;
+            }
+
+            this.textBox_outputDir.Text = dlg.SelectedPath;
         }
     }
 }

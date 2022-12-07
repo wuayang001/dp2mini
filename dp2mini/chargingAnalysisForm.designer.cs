@@ -94,6 +94,8 @@
             this.columnHeader_xml = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_html = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboBox_comment = new System.Windows.Forms.ComboBox();
             this.button_createReport = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.contextMenuStrip_list.SuspendLayout();
@@ -355,32 +357,35 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label6.Location = new System.Drawing.Point(19, 634);
+            this.label6.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.Location = new System.Drawing.Point(20, 567);
             this.label6.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(498, 27);
+            this.label6.Size = new System.Drawing.Size(175, 33);
             this.label6.TabIndex = 25;
-            this.label6.Text = "馆长评语（注：编辑完不要忘记提交哦）";
+            this.label6.Text = "馆长评语：";
             // 
             // textBox_comment
             // 
-            this.textBox_comment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBox_comment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_comment.Location = new System.Drawing.Point(23, 672);
+            this.textBox_comment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_comment.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_comment.Location = new System.Drawing.Point(24, 617);
             this.textBox_comment.Multiline = true;
             this.textBox_comment.Name = "textBox_comment";
-            this.textBox_comment.Size = new System.Drawing.Size(769, 117);
+            this.textBox_comment.Size = new System.Drawing.Size(984, 90);
             this.textBox_comment.TabIndex = 26;
+            this.textBox_comment.TextChanged += new System.EventHandler(this.textBox_comment_TextChanged);
+            this.textBox_comment.Enter += new System.EventHandler(this.textBox_comment_Enter);
             // 
             // button_setComment
             // 
             this.button_setComment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button_setComment.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_setComment.Location = new System.Drawing.Point(802, 672);
+            this.button_setComment.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_setComment.Location = new System.Drawing.Point(23, 718);
             this.button_setComment.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_setComment.Name = "button_setComment";
-            this.button_setComment.Size = new System.Drawing.Size(181, 51);
+            this.button_setComment.Size = new System.Drawing.Size(185, 55);
             this.button_setComment.TabIndex = 27;
             this.button_setComment.Text = "提交评语";
             this.button_setComment.UseVisualStyleBackColor = true;
@@ -388,32 +393,31 @@
             // 
             // textBox_outputDir
             // 
-            this.textBox_outputDir.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_outputDir.Location = new System.Drawing.Point(159, 18);
+            this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_outputDir.Location = new System.Drawing.Point(180, 19);
             this.textBox_outputDir.Name = "textBox_outputDir";
-            this.textBox_outputDir.ReadOnly = true;
-            this.textBox_outputDir.Size = new System.Drawing.Size(495, 38);
+            this.textBox_outputDir.Size = new System.Drawing.Size(506, 44);
             this.textBox_outputDir.TabIndex = 33;
+            this.textBox_outputDir.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_outputDir_KeyDown);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(18, 23);
+            this.label7.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Location = new System.Drawing.Point(18, 25);
             this.label7.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(147, 27);
+            this.label7.Size = new System.Drawing.Size(175, 33);
             this.label7.TabIndex = 34;
             this.label7.Text = "报表目录：";
             // 
             // button_selectDir
             // 
-            this.button_selectDir.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_selectDir.Location = new System.Drawing.Point(664, 15);
+            this.button_selectDir.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_selectDir.Location = new System.Drawing.Point(696, 14);
             this.button_selectDir.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_selectDir.Name = "button_selectDir";
-            this.button_selectDir.Size = new System.Drawing.Size(77, 42);
+            this.button_selectDir.Size = new System.Drawing.Size(103, 55);
             this.button_selectDir.TabIndex = 35;
             this.button_selectDir.Text = "...";
             this.button_selectDir.UseVisualStyleBackColor = true;
@@ -435,13 +439,13 @@
             this.columnHeader_xml,
             this.columnHeader_html});
             this.listView_files.ContextMenuStrip = this.contextMenuStrip_list;
+            this.listView_files.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.listView_files.FullRowSelect = true;
             this.listView_files.GridLines = true;
             this.listView_files.HideSelection = false;
-            this.listView_files.Location = new System.Drawing.Point(23, 83);
-            this.listView_files.MultiSelect = false;
+            this.listView_files.Location = new System.Drawing.Point(23, 84);
             this.listView_files.Name = "listView_files";
-            this.listView_files.Size = new System.Drawing.Size(959, 533);
+            this.listView_files.Size = new System.Drawing.Size(985, 464);
             this.listView_files.TabIndex = 36;
             this.listView_files.UseCompatibleStateImageBehavior = false;
             this.listView_files.View = System.Windows.Forms.View.Details;
@@ -504,6 +508,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.label1);
+            this.splitContainer1.Panel1.Controls.Add(this.comboBox_comment);
             this.splitContainer1.Panel1.Controls.Add(this.button_createReport);
             this.splitContainer1.Panel1.Controls.Add(this.listView_files);
             this.splitContainer1.Panel1.Controls.Add(this.button_selectDir);
@@ -512,22 +518,46 @@
             this.splitContainer1.Panel1.Controls.Add(this.label6);
             this.splitContainer1.Panel1.Controls.Add(this.textBox_comment);
             this.splitContainer1.Panel1.Controls.Add(this.button_setComment);
+            this.splitContainer1.Panel1.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Info;
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
-            this.splitContainer1.Size = new System.Drawing.Size(1308, 816);
-            this.splitContainer1.SplitterDistance = 999;
+            this.splitContainer1.Size = new System.Drawing.Size(1285, 783);
+            this.splitContainer1.SplitterDistance = 1025;
             this.splitContainer1.TabIndex = 37;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label1.Font = new System.Drawing.Font("楷体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(206, 731);
+            this.label1.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(821, 29);
+            this.label1.TabIndex = 39;
+            this.label1.Text = "注:选择或修改了评语，请一定要提交评语才能兑现到报表中。";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // comboBox_comment
+            // 
+            this.comboBox_comment.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox_comment.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.comboBox_comment.FormattingEnabled = true;
+            this.comboBox_comment.Location = new System.Drawing.Point(180, 563);
+            this.comboBox_comment.Name = "comboBox_comment";
+            this.comboBox_comment.Size = new System.Drawing.Size(693, 41);
+            this.comboBox_comment.TabIndex = 38;
+            this.comboBox_comment.SelectedIndexChanged += new System.EventHandler(this.comboBox_comment_SelectedIndexChanged);
             // 
             // button_createReport
             // 
             this.button_createReport.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_createReport.Location = new System.Drawing.Point(775, 11);
+            this.button_createReport.Location = new System.Drawing.Point(804, 14);
             this.button_createReport.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_createReport.Name = "button_createReport";
-            this.button_createReport.Size = new System.Drawing.Size(192, 51);
+            this.button_createReport.Size = new System.Drawing.Size(178, 55);
             this.button_createReport.TabIndex = 37;
             this.button_createReport.Text = "创建报表";
             this.button_createReport.UseVisualStyleBackColor = true;
@@ -539,14 +569,14 @@
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(19, 18);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(305, 816);
+            this.webBrowser1.Size = new System.Drawing.Size(256, 783);
             this.webBrowser1.TabIndex = 0;
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1349, 866);
+            this.ClientSize = new System.Drawing.Size(1326, 833);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.Name = "chargingAnalysisForm";
@@ -630,5 +660,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader_name;
         private System.Windows.Forms.ColumnHeader columnHeader_comm;
         private System.Windows.Forms.ColumnHeader columnHeader_department;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBox_comment;
     }
 }

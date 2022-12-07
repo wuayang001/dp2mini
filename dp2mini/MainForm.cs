@@ -607,7 +607,10 @@ namespace dp2mini
                 form = Activator.CreateInstance<T>();
                 dynamic o = form;
                 o.MdiParent = this;
-                //o.WindowState = FormWindowState.Maximized;
+                if (form.GetType() == typeof(chargingAnalysisForm))
+                {
+                    o.WindowState = FormWindowState.Maximized;
+                }
 
                 {
                     try

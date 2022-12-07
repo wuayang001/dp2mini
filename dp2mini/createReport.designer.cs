@@ -46,6 +46,8 @@
             this.生成xml报表ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.按借阅量排名ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.报表xml转htmlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button_close = new System.Windows.Forms.Button();
+            this.button_selectDir = new System.Windows.Forms.Button();
             this.contextMenuStrip_report.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,7 +66,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.Location = new System.Drawing.Point(16, 331);
+            this.label5.Location = new System.Drawing.Point(16, 335);
             this.label5.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(180, 33);
@@ -75,7 +77,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(746, 331);
+            this.label2.Location = new System.Drawing.Point(746, 335);
             this.label2.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(48, 33);
@@ -85,17 +87,16 @@
             // textBox_outputDir
             // 
             this.textBox_outputDir.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox_outputDir.Location = new System.Drawing.Point(190, 32);
+            this.textBox_outputDir.Location = new System.Drawing.Point(190, 27);
             this.textBox_outputDir.Name = "textBox_outputDir";
-            this.textBox_outputDir.ReadOnly = true;
-            this.textBox_outputDir.Size = new System.Drawing.Size(886, 44);
+            this.textBox_outputDir.Size = new System.Drawing.Size(765, 44);
             this.textBox_outputDir.TabIndex = 44;
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.Location = new System.Drawing.Point(16, 38);
+            this.label7.Location = new System.Drawing.Point(16, 33);
             this.label7.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(180, 33);
@@ -105,7 +106,7 @@
             // dateTimePicker_start
             // 
             this.dateTimePicker_start.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.dateTimePicker_start.Location = new System.Drawing.Point(474, 325);
+            this.dateTimePicker_start.Location = new System.Drawing.Point(474, 329);
             this.dateTimePicker_start.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.dateTimePicker_start.Name = "dateTimePicker_start";
             this.dateTimePicker_start.Size = new System.Drawing.Size(260, 44);
@@ -114,7 +115,7 @@
             // dateTimePicker_end
             // 
             this.dateTimePicker_end.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.dateTimePicker_end.Location = new System.Drawing.Point(803, 325);
+            this.dateTimePicker_end.Location = new System.Drawing.Point(803, 329);
             this.dateTimePicker_end.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.dateTimePicker_end.Name = "dateTimePicker_end";
             this.dateTimePicker_end.Size = new System.Drawing.Size(273, 44);
@@ -134,7 +135,7 @@
             "最近 31 天",
             "最近 365 天",
             "最近 10 年"});
-            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(190, 327);
+            this.comboBox_quickSetFilenames.Location = new System.Drawing.Point(190, 331);
             this.comboBox_quickSetFilenames.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.comboBox_quickSetFilenames.Name = "comboBox_quickSetFilenames";
             this.comboBox_quickSetFilenames.Size = new System.Drawing.Size(253, 41);
@@ -166,18 +167,18 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(46, 624);
+            this.progressBar1.Location = new System.Drawing.Point(22, 608);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(1044, 58);
+            this.progressBar1.Size = new System.Drawing.Size(1054, 37);
             this.progressBar1.TabIndex = 47;
             // 
             // button_stop
             // 
             this.button_stop.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_stop.Location = new System.Drawing.Point(853, 469);
+            this.button_stop.Location = new System.Drawing.Point(954, 479);
             this.button_stop.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_stop.Name = "button_stop";
-            this.button_stop.Size = new System.Drawing.Size(138, 68);
+            this.button_stop.Size = new System.Drawing.Size(122, 58);
             this.button_stop.TabIndex = 49;
             this.button_stop.Text = "停止";
             this.button_stop.UseVisualStyleBackColor = true;
@@ -186,12 +187,12 @@
             // button_onekey
             // 
             this.button_onekey.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_onekey.Location = new System.Drawing.Point(190, 439);
+            this.button_onekey.Location = new System.Drawing.Point(22, 448);
             this.button_onekey.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_onekey.Name = "button_onekey";
-            this.button_onekey.Size = new System.Drawing.Size(649, 98);
+            this.button_onekey.Size = new System.Drawing.Size(918, 89);
             this.button_onekey.TabIndex = 52;
-            this.button_onekey.Text = "一键生成";
+            this.button_onekey.Text = "一键生成报表";
             this.button_onekey.UseVisualStyleBackColor = true;
             this.button_onekey.Click += new System.EventHandler(this.button_onekey_Click);
             // 
@@ -226,12 +227,38 @@
             this.报表xml转htmlToolStripMenuItem.Text = "报表xml转html";
             this.报表xml转htmlToolStripMenuItem.Click += new System.EventHandler(this.报表xml转htmlToolStripMenuItem_Click);
             // 
+            // button_close
+            // 
+            this.button_close.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_close.Location = new System.Drawing.Point(954, 675);
+            this.button_close.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.button_close.Name = "button_close";
+            this.button_close.Size = new System.Drawing.Size(122, 58);
+            this.button_close.TabIndex = 53;
+            this.button_close.Text = "关闭";
+            this.button_close.UseVisualStyleBackColor = true;
+            this.button_close.Click += new System.EventHandler(this.button_close_Click_1);
+            // 
+            // button_selectDir
+            // 
+            this.button_selectDir.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_selectDir.Location = new System.Drawing.Point(977, 20);
+            this.button_selectDir.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.button_selectDir.Name = "button_selectDir";
+            this.button_selectDir.Size = new System.Drawing.Size(99, 58);
+            this.button_selectDir.TabIndex = 54;
+            this.button_selectDir.Text = "...";
+            this.button_selectDir.UseVisualStyleBackColor = true;
+            this.button_selectDir.Click += new System.EventHandler(this.button_selectDir_Click);
+            // 
             // createReport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1122, 750);
+            this.ClientSize = new System.Drawing.Size(1122, 759);
             this.ContextMenuStrip = this.contextMenuStrip_report;
+            this.Controls.Add(this.button_selectDir);
+            this.Controls.Add(this.button_close);
             this.Controls.Add(this.button_onekey);
             this.Controls.Add(this.button_stop);
             this.Controls.Add(this.progressBar1);
@@ -248,7 +275,7 @@
             this.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "createReport";
-            this.Text = "生成报表";
+            this.Text = "创建报表";
             this.Load += new System.EventHandler(this.createReport_Load);
             this.contextMenuStrip_report.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -274,5 +301,7 @@
         private System.Windows.Forms.ToolStripMenuItem 生成xml报表ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 按借阅量排名ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 报表xml转htmlToolStripMenuItem;
+        private System.Windows.Forms.Button button_close;
+        private System.Windows.Forms.Button button_selectDir;
     }
 }
