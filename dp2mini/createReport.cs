@@ -111,6 +111,8 @@ namespace dp2mini
             int index = 0;
 
             string errorlog = "";
+            int errorCount = 0;
+            int successCount = 0;
 
             //string strError = "";
             // 循环每个证条码，生成报表
@@ -161,26 +163,34 @@ namespace dp2mini
                 }
 
                 this.SetProcessInfo("结束处理" + patronBarcode);
+                successCount++;  // 成功条数+1
 
                 continue;
 
 
             ERROR1:
                 errorlog += patronBarcode + "\t" + error + "\r\n";
+                errorCount++; // 失败条数+1
             }
 
+            string errorFileName = dir + "\\error.txt";
             if (string.IsNullOrEmpty(errorlog) == false)
             {
-                string fileName = dir + "\\error.txt";
                 // StreamWriter当文件不存在时，会自动创建一个新文件。
-                using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
+                using (StreamWriter writer = new StreamWriter(errorFileName, false, Encoding.UTF8))
                 {
                     // 写到打印文件
                     writer.Write(errorlog);
                 }
             }
+            error = "成功"+successCount+"条，失败"+errorCount+"条。";
+            if (errorCount > 0)
+            {
+                error += "出错信息详见：" + errorFileName;
+            }
 
-            return 0;
+
+            return 0; 
         }
 
         // 排名
@@ -619,7 +629,10 @@ namespace dp2mini
                 //
                 this.Invoke((Action)(() =>
                 {
-                    MessageBox.Show("处理完成。");
+                    if (string.IsNullOrEmpty(strError) == false)
+                        MessageBox.Show("生成报表完成。" + strError);
+                    else
+                        MessageBox.Show(this, "生成报表完成");
                 }
 ));
 

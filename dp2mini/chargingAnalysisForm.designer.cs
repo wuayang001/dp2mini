@@ -75,7 +75,6 @@
             this.columnHeader35 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader36 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_list = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.全选ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuItem_download = new System.Windows.Forms.ToolStripMenuItem();
             this.label6 = new System.Windows.Forms.Label();
             this.textBox_comment = new System.Windows.Forms.TextBox();
@@ -93,12 +92,12 @@
             this.columnHeader_comm = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_xml = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_html = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox_comment = new System.Windows.Forms.ComboBox();
             this.button_createReport = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
-            this.columnHeader_time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -335,22 +334,16 @@
             // 
             this.contextMenuStrip_list.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip_list.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.全选ToolStripMenuItem,
             this.ToolStripMenuItem_download});
             this.contextMenuStrip_list.Name = "contextMenuStrip_statis";
-            this.contextMenuStrip_list.Size = new System.Drawing.Size(145, 88);
-            // 
-            // 全选ToolStripMenuItem
-            // 
-            this.全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
-            this.全选ToolStripMenuItem.Size = new System.Drawing.Size(144, 42);
-            this.全选ToolStripMenuItem.Text = "全选";
+            this.contextMenuStrip_list.Size = new System.Drawing.Size(199, 46);
             // 
             // ToolStripMenuItem_download
             // 
             this.ToolStripMenuItem_download.Name = "ToolStripMenuItem_download";
-            this.ToolStripMenuItem_download.Size = new System.Drawing.Size(144, 42);
-            this.ToolStripMenuItem_download.Text = "下载";
+            this.ToolStripMenuItem_download.Size = new System.Drawing.Size(198, 42);
+            this.ToolStripMenuItem_download.Text = "另存报表";
+            this.ToolStripMenuItem_download.Click += new System.EventHandler(this.ToolStripMenuItem_download_Click);
             // 
             // label6
             // 
@@ -496,6 +489,10 @@
             this.columnHeader_html.Text = "html文件名";
             this.columnHeader_html.Width = 196;
             // 
+            // columnHeader_time
+            // 
+            this.columnHeader_time.Text = "写评语用时";
+            // 
             // splitContainer1
             // 
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -570,10 +567,6 @@
             this.webBrowser1.Size = new System.Drawing.Size(256, 783);
             this.webBrowser1.TabIndex = 0;
             // 
-            // columnHeader_time
-            // 
-            this.columnHeader_time.Text = "写评语用时";
-            // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
@@ -641,7 +634,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader35;
         private System.Windows.Forms.ColumnHeader columnHeader36;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_list;
-        private System.Windows.Forms.ToolStripMenuItem 全选ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_download;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox_comment;

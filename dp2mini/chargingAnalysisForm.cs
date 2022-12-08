@@ -83,6 +83,8 @@ namespace dp2mini
                 }
             }
 
+            // 把主窗口的状态条清一下。
+            this._mainForm.SetStatusMessage("");
         }
 
 
@@ -307,10 +309,11 @@ namespace dp2mini
         }
 
         // 提交评语
-        private void SaveComment(string comment)
+        private void SaveComment(string comment1)
         {
             if (this.listView_files.SelectedItems.Count == 0)
                 return;
+
             
             // 结束时间
             DateTime endTime = DateTime.Now;
@@ -322,6 +325,11 @@ namespace dp2mini
             // 支持多条一起编辑评语
             foreach (ListViewItem item in this.listView_files.SelectedItems)
             {
+                // 因为里面会替换宏变量，所以先将comment设到一个新变量上。
+                string thisComment = comment1;
+
+
+
                 string barcode = item.Text;
 
                 string xmlFile = this.ReportDir + "\\" + barcode + ".xml";
@@ -336,7 +344,7 @@ namespace dp2mini
                 //<comment>{patronName}，您在校期间读了{borrowCount}书。读万卷书，行万里路。</comment>
                 string patronName = item.SubItems[1].Text;
                 string borrowCount=item.SubItems[3].Text;
-                string thisComment =comment.Replace("{patronName}", patronName);
+                thisComment = thisComment.Replace("{patronName}", patronName);
                 thisComment = thisComment.Replace("{borrowCount}", borrowCount);
 
                 // 设到dom
@@ -377,7 +385,7 @@ namespace dp2mini
                 }
 
                 // 保存到专门的评语文件
-                BorrowAnalysisService.Instance.SetComment2file(barcode, comment);
+                BorrowAnalysisService.Instance.SetComment2file(barcode, thisComment);
             }
 
             // 设为最小值
@@ -432,8 +440,28 @@ namespace dp2mini
         private void listView_files_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             int nClickColumn = e.Column;
-            TransferStatisForm.SortCol(this.listView_files, SortColumns_report, nClickColumn);
+            chargingAnalysisForm.SortCol(this.listView_files, SortColumns_report, nClickColumn);
         }
+
+        public static void SortCol(ListView myListView, SortColumns sortCol, int nClickColumn)
+        {
+            ColumnSortStyle sortStyle = ColumnSortStyle.LeftAlign;
+
+            // 第3列借阅量，第4列排名，这两名是数值排序
+            if (nClickColumn == 3 || nClickColumn==4)
+                sortStyle = ColumnSortStyle.RightAlign;
+
+            sortCol.SetFirstColumn(nClickColumn,
+                sortStyle,
+                myListView.Columns,
+                true);
+
+            // 排序
+            myListView.ListViewItemSorter = new SortColumnsComparer(sortCol);
+
+            myListView.ListViewItemSorter = null;
+        }
+
 
         #endregion
 
@@ -497,37 +525,77 @@ namespace dp2mini
             //    return;
             //}
 
-            //// 把html保存到文件
-            //// 询问文件名
-            //SaveFileDialog dlg = new SaveFileDialog
-            //{
-            //    Title = "请指定文件名",
-            //    CreatePrompt = false,
-            //    OverwritePrompt = true,
-            //    // dlg.FileName = this.ExportExcelFilename;
-            //    // dlg.InitialDirectory = Environment.CurrentDirectory;
-            //    Filter = "xml文档 (*.xml)|*.xml|All files (*.*)|*.*",
-
-
-            //    RestoreDirectory = true
-            //};
-
-            //// 如果在询问文件名对话框，点了取消，退不处理，返回0，
-            //if (dlg.ShowDialog() != DialogResult.OK)
-            //    return;
-
-            //string fileName = dlg.FileName;
-
-            //// StreamWriter当文件不存在时，会自动创建一个新文件。
-            //using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8))
-            //{
-            //    // 写到打印文件
-            //    writer.Write(xml);
-            //}
+           
 
         }
 
         #endregion
+
+        private void ToolStripMenuItem_download_Click(object sender, EventArgs e)
+        {
+
+            // 先做到另存一个文件
+
+            if (this.listView_files.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(this, "请先选择另存的读者行");
+                return;
+            }
+
+
+            if (this.listView_files.SelectedItems.Count >1)
+            {
+                MessageBox.Show(this, "您选择了多条读者，请选择一个读者另存。");
+                return;
+            }
+
+            ListViewItem viewItem = this.listView_files.SelectedItems[0];
+
+            // 用于拼文件名
+            string barcode=viewItem.SubItems[0].Text;  
+            string name=viewItem.SubItems[1].Text;
+            string tempFileName = barcode + "_" + name + ".html";
+
+            // 源文件
+            string htmlFile= viewItem.SubItems[8].Text;
+
+            //把html保存到文件
+            //询问文件名
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                Title = "请指定读者报表文件名",
+                CreatePrompt = false,
+                OverwritePrompt = true,
+                FileName = tempFileName,
+
+                //InitialDirectory = Environment.CurrentDirectory,
+                Filter = "html文档 (*.html)|*.html|All files (*.*)|*.*",
+
+                RestoreDirectory = true
+            };
+
+            // 如果在询问文件名对话框，点了取消，退不处理，返回0，
+            if (dlg.ShowDialog() != DialogResult.OK)
+                return;
+
+            string targetFileName = dlg.FileName;
+
+            string html = "";
+            using (StreamReader reader = new StreamReader(htmlFile))//, Encoding.UTF8))
+            {
+                html = reader.ReadToEnd().Trim();
+            }
+
+            // StreamWriter当文件不存在时，会自动创建一个新文件。
+            using (StreamWriter writer = new StreamWriter(targetFileName, false, Encoding.UTF8))
+            {
+                // 写到打印文件
+                writer.Write(html);
+            }
+
+            // 打开文件
+            Process.Start(targetFileName);
+        }
     }
 
 
