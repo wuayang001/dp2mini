@@ -246,11 +246,18 @@ namespace dp2mini
                 if (item.SubItems.Count >= 9)
                 {
                     string htmlFile = item.SubItems[8].Text;
-                    this.showHtml(htmlFile);
+                    if (string.IsNullOrEmpty(htmlFile) == false || File.Exists(htmlFile) == true)
+                    {
+                        this.showHtml(htmlFile);
+                    }
+                    else
+                    {
+                        SetHtmlString(this.webBrowser1, "<div>读者报表尚未转成html格式，请联系管理员。</div>");
+                    }
                 }
                 else
                 {
-                    SetHtmlString(this.webBrowser1, "");
+                    SetHtmlString(this.webBrowser1, "<div>读者报表尚未转成html格式，请联系管理员。</div>");
                 }
 
             }

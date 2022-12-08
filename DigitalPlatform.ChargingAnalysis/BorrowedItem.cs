@@ -181,7 +181,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
 
-        // 类型，0表示在借未还的，1表示借阅历史中的，排序的时候，先按type排，再按借书时倒序排
+        // 类型，0表示在借未还的，1表示借阅历史中的。
         public string Type { get; set; }
 
         public string DumpXml()

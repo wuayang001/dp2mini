@@ -856,6 +856,8 @@ namespace DigitalPlatform.ChargingAnalysis
             XmlDocument dom = new XmlDocument();
             dom.LoadXml(patronXml);
 
+            //为了防止输出的xml文件过大，过滤到了borrows/reservations/overdues/borrowHistory/outofReservations/face元素
+
             // 删除borrows节点，后面会输出清洗后在借
             XmlNode borrowsNode = dom.DocumentElement.SelectSingleNode("borrows");
             if (borrowsNode != null)
