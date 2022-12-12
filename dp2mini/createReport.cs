@@ -428,7 +428,9 @@ namespace dp2mini
         {
             this.button_stop.Enabled = !(bEnable);
 
-            this.button_onekey.Enabled = bEnable;
+            this.button_plan.Enabled = bEnable;
+            this.textBox_outputDir.Enabled = bEnable;
+            //this.button_onekey.Enabled = bEnable;
         }
 
 
@@ -458,6 +460,23 @@ namespace dp2mini
             this.Invoke((Action)(() =>
             {
                 this.progressBar1.Value = value;
+            }
+            ));
+        }
+
+        public void SetProcess1(int min, int max,int value)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                if (min!=-1)
+                     this.progressBar1.Minimum = min;
+
+                if (max!=-1)    
+                    this.progressBar1.Maximum = max;
+
+                if (value!=-1)
+                    this.progressBar1.Value=value;
             }
             ));
         }
@@ -549,6 +568,11 @@ namespace dp2mini
             this._cancel.Cancel();
         }
 
+
+
+
+
+
         // 一键生成
         private void button_onekey_Click(object sender, EventArgs e)
         {
@@ -634,7 +658,7 @@ namespace dp2mini
                     else
                         MessageBox.Show(this, "生成报表完成");
                 }
-));
+                ));
 
                 return;
 
@@ -720,5 +744,236 @@ namespace dp2mini
         }
 
         #endregion
+
+        public void ShowInfo(string text)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                this.label_info.Text = text;
+            }
+            ));
+        }
+        private void button_plan_Click(object sender, EventArgs e)
+        {
+
+
+            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+            this._cancel.Dispose();
+            this._cancel = new CancellationTokenSource();
+
+            // 继续生成报表
+            if (this.button_plan.Text == "继续生成报表")
+            {
+                string dir = this.textBox_outputDir.Text.Trim();
+                if (Directory.Exists(dir) == false)
+                {
+                    MessageBox.Show(this, "报表目录不存在。");
+                    return;
+                }
+                // 开一个新线程
+                Task.Run(() =>
+                {
+                    ContinuePlan(this._cancel.Token, dir);
+                });
+            }
+            else
+            {
+                // 获取界面输入参数
+                int nRet = this.GetInput(out string patronBarcodes,
+                    out string startDate,
+                    out string endDate,
+                    out string dir);
+                if (nRet == -1)
+                    return;
+
+                // 开一个新线程
+                Task.Run(() =>
+                {
+                    StartPlan(this._cancel.Token,
+                        patronBarcodes,
+                        startDate,
+                        endDate,
+                        dir);
+                });
+            }
+
+
+        }
+
+
+        public void ContinuePlan(CancellationToken token, string dir)
+        {
+            // 记下原来的光标
+            Cursor oldCursor = Cursor.Current;
+
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                    // 设置按钮状态
+                    EnableControls(false);
+
+                    //清空界面数据
+                    this.ClearInfo();
+
+                    // 鼠标设为等待状态
+                    oldCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
+            }
+            ));
+
+            try
+            {
+
+
+
+                string planFile = dir + "\\plan.txt";
+
+                // 执行计划
+                BorrowAnalysisService.ExecutePlan(token,
+                        planFile,
+                        this.SetProcess1,
+                        this.ShowInfo);
+
+                //
+                this.Invoke((Action)(() =>
+                {
+                    MessageBox.Show(this, "生成报表完成");
+                }
+                    ));
+
+
+            }
+            finally
+            {
+
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
+
+                }));
+            }
+
+        }
+
+        private void StartPlan(CancellationToken token,
+            string patronBarcodes,
+            string startDate,
+            string endDate,
+            string dir)
+        {
+            string strError = "";
+
+            // 记下原来的光标
+            Cursor oldCursor = Cursor.Current;
+
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                // 设置按钮状态
+                EnableControls(false);
+
+                //清空界面数据
+                this.ClearInfo();
+
+                // 鼠标设为等待状态
+                oldCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
+            }
+            ));
+
+            try
+            {
+
+                // 生成计划文件
+                string planFile = BorrowAnalysisService.CreatePlan(this._cancel.Token,
+                    patronBarcodes,
+                    startDate,
+                    endDate,
+                    dir,
+                    this.ShowInfo);
+
+                // 执行计划
+                BorrowAnalysisService.ExecutePlan(this._cancel.Token,
+                        planFile,
+                        this.SetProcess1,
+                        this.ShowInfo);
+
+
+                this.Invoke((Action)(() =>
+                {
+                    MessageBox.Show(this, "生成报表完成");
+                }
+                ));
+
+            }
+            finally
+            {
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
+
+                }
+                ));
+            }
+
+
+        }
+
+        private void textBox_outputDir_TextChanged(object sender, EventArgs e)
+        {
+            // 如果里面有plan文件，则按计划生成
+            this.button_plan.Enabled = true;
+            this.button_stop.Enabled = true;
+
+            // 清空进度条和信息
+            this.progressBar1.Value = 0;
+            this.label_info.Text = "";
+
+            string dir = this.textBox_outputDir.Text.Trim();
+
+            string planFile = dir + "\\plan.txt";
+            if (File.Exists(planFile) == true)
+            {
+                // 条码输入框一类都不能再用了。
+                this.EnableCtrl(false);
+
+                // 检查xml中状态
+                XmlDocument dom = new XmlDocument();
+                dom.Load(planFile);
+                string state=DomUtil.GetAttr(dom.DocumentElement, "state");
+                if (state == BorrowAnalysisService.C_state_close)
+                {
+                    this.button_plan.Text = "此目录下的报表已生成完成";
+                    this.button_plan.Enabled = false;
+                }
+                else
+                {
+                    this.button_plan.Text = "继续生成报表";
+                }
+            }
+            else
+            {
+                this.EnableCtrl(true);
+                this.button_plan.Text = "开始生成报表";
+            }
+
+           
+        }
+
+        private void EnableCtrl(bool bEnable)
+        {
+            this.textBox_patronBarcode.Enabled = bEnable;
+            this.button_selectBatcodeFile.Enabled = bEnable;
+            this.comboBox_quickSetFilenames.Enabled = bEnable;
+            this.dateTimePicker_start.Enabled = bEnable;
+            this.dateTimePicker_end.Enabled = bEnable;
+
+            this.button_stop.Enabled = bEnable;
+        }
     }
 }

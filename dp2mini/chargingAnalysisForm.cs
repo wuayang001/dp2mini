@@ -170,7 +170,7 @@ namespace dp2mini
                     string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
 
                     // 排名 borrowInfo/@paiming 属性
-                    string paiming = DomUtil.GetAttr(root, "borrowInfo", "paiming");
+                    string paiMing = DomUtil.GetAttr(root, "borrowInfo", "paiMing");
 
                     // 荣誉称号 borrowInfo/@ title 属性
                     string title = DomUtil.GetAttr(root, "borrowInfo", "title");
@@ -194,7 +194,7 @@ namespace dp2mini
                     item.SubItems.Add(name);
                     item.SubItems.Add(department);
                     item.SubItems.Add(totalBorrowedCount);
-                    item.SubItems.Add(paiming);
+                    item.SubItems.Add(paiMing);
                     item.SubItems.Add(title);
                     item.SubItems.Add(comment);
                     item.SubItems.Add(xmlFile);

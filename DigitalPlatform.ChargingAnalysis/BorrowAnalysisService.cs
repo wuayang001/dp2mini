@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml;
+using xml2html;
 
 namespace DigitalPlatform.ChargingAnalysis
 {
@@ -214,6 +215,448 @@ namespace DigitalPlatform.ChargingAnalysis
 
 
         #endregion
+
+
+        // 定义委托协议
+        public delegate void ShowInfoDelegate(string text);
+
+        // 设置进度条
+        public delegate void SetProcessDelegate(int min,int max,int value);
+
+
+        // 任务名称
+        public const string C_task_createXml = "createXml";
+        public const string C_task_paiMing = "paiMing";
+        public const string C_task_writePaiMing = "writePaiMing";
+        public const string C_task_xml2html = "xml2html";
+
+        // 任务状态
+        public const string C_state_close = "close";
+        public const string C_state_error = "error";
+
+        // 返回生成的plan文件名
+        public static string CreatePlan(CancellationToken token, 
+            string patronBarcodes, 
+            string startDate,
+            string endDate,
+            string dir,
+            ShowInfoDelegate showInfo)
+        {
+            // 检查参数不能为空
+            if (string.IsNullOrEmpty(patronBarcodes) == true
+                || string.IsNullOrEmpty(startDate) == true
+                || string.IsNullOrEmpty(endDate) == true
+                || string.IsNullOrEmpty(dir) == true)
+            {
+                throw new Exception("传入的参数patronBarcodes/startDate/endDate/dir均不能为空。");
+            }
+
+
+            //this.SetProcessInfo("正在创建报表计划文件...");
+            showInfo("正在创建报表计划文件...");  //一个回调函数
+
+            string xml = "<root startDate='" + startDate + "' endDate='" + endDate + "' dir='" + dir + "' state=''>";
+
+            List<string> patronList = new List<string>();
+
+            // 拆分证条码号，每个号码一行
+            patronBarcodes = patronBarcodes.Replace("\r\n", "\n");
+            string[] tempList = patronBarcodes.Split(new char[] { '\n' });
+            // 循环每个证条码，把空行清除
+            foreach (string one in tempList)
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                string barcode = one.Trim();
+                if (string.IsNullOrEmpty(barcode) == false)
+                    patronList.Add(barcode);
+            }
+
+            // 生成createXml的任务
+            foreach (string barcode in patronList)
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                xml += "<task name='" + C_task_createXml + "' barcode='" + barcode + "' state=''/>";
+            }
+
+            // 总的paiMing任务
+            xml += "<task name='" + C_task_paiMing + "' state=''/>";
+
+            // 给读者xml写入排名任务writePaiMing
+            foreach (string barcode in patronList)
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                xml += "<task name='" + C_task_writePaiMing + "' barcode='" + barcode + "' state=''/>";
+            }
+
+            // xml2html任务
+            foreach (string barcode in patronList)
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                xml += "<task name='" + C_task_xml2html + "' barcode='" + barcode + "' state=''/>";
+            }
+
+            xml += "</root>";
+
+            // 把xml文件保存到输出目录里。
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
+
+            string planFile = dir + "\\plan.txt";
+            // StreamWriter当文件不存在时，会自动创建一个新文件。
+            using (StreamWriter writer = new StreamWriter(planFile, false, Encoding.UTF8))
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                // 写到打印文件
+                writer.Write(xml);
+            }
+
+            //this.SetProcessInfo("完成创建报表计划文件。");
+            showInfo("完成创建报表计划文件。");  //一个回调函数
+
+            return planFile;
+        }
+
+
+        public static void ExecutePlan(CancellationToken token,
+            string planFile,
+            SetProcessDelegate setProcess,
+            ShowInfoDelegate showInfo)
+        {
+            if (File.Exists(planFile) == false)
+            {
+                throw new Exception("计划文件['" + planFile + "']不存在。");
+            }
+
+            // 打开计划文件，取出参数，任务
+            XmlDocument dom = new XmlDocument();
+            dom.Load(planFile);  //也有可能抛异常
+
+
+            //<root startDate='2022/11/12' endDate='2022/12/12' dir='D:\a3' state=''>
+            //<task name='createXml' barcode='XZP00002' state=''/>
+            //<task name='createXml' barcode='XZP00003' state=''/>
+
+            XmlNode root = dom.DocumentElement;
+            string rootState=DomUtil.GetAttr(root, "state");
+            if (rootState == C_state_close)
+            {
+                showInfo("计划的状态是close，表示之前已处理完成。");
+                return;
+            }
+
+            // 取出参数
+            string startDate = DomUtil.GetAttr(root, "startDate");
+            string endDate = DomUtil.GetAttr(root, "endDate");
+            string dir = DomUtil.GetAttr(root, "dir");
+
+            XmlNodeList taskList = root.SelectNodes("task");
+            int max = taskList.Count;
+
+            // 设置进度条
+            setProcess(0, max, 0);
+
+            int nRet = 0;
+            string error = "";
+
+            // 排名dom
+            XmlDocument paiMingDom = null;
+
+            int nIndex = 0;
+            foreach (XmlNode task in taskList)
+            { 
+                nIndex++;
+                setProcess(-1, -1, nIndex);  // 设置进度条
+                showInfo(task.OuterXml);  //显示文字进展
+
+                // 外部停止
+                token.ThrowIfCancellationRequested();
+
+                string taskName=DomUtil.GetAttr(task, "name");
+                string patronBarcode = DomUtil.GetAttr(task, "barcode");
+
+                string patronXmlFile = dir + "\\" + patronBarcode + ".xml";
+
+                // 完成或出错的不处理
+                string state=DomUtil.GetAttr(task, "state");
+                if (state == C_state_close  || state==C_state_error)  // 已处理完
+                    continue;
+
+                // 执行任务
+                if (taskName == C_task_createXml)
+                {
+                    // 创建数据
+                    BorrowAnalysisReport report = null;
+                    nRet = BorrowAnalysisService.Instance.Build(token,
+                               patronBarcode,
+                               startDate,
+                               endDate,
+                               out report,
+                               out error);
+                    if (nRet == -1)
+                        goto ERROR1;
+
+                    // 输出报表
+                    string xml = "";
+                    nRet = BorrowAnalysisService.Instance.OutputReport(report,
+                        "xml",
+                        out xml,
+                        out error);
+                    if (nRet == -1)
+                        goto ERROR1;
+
+                    //string fileName = dir + "\\" + barcode + ".xml";
+                    // StreamWriter当文件不存在时，会自动创建一个新文件。
+                    using (StreamWriter writer = new StreamWriter(patronXmlFile, false, Encoding.UTF8))
+                    {
+                        // 写到打印文件
+                        writer.Write(xml);
+                    }
+
+                }
+                else if (taskName == C_task_paiMing)
+                {
+                    // 进行排名，将排名结果写到排名临时文件
+                    nRet = PaiMing(token,
+                        dir,
+                        out error);
+                    if (nRet == -1)
+                        goto ERROR1;
+                }
+                else if (taskName == C_task_writePaiMing)
+                {
+                    if (paiMingDom == null)
+                    {
+                        string paiMingFile = dir + "\\paiMing.txt";
+                        paiMingDom = new XmlDocument();
+                        paiMingDom.Load(paiMingFile);
+                    }
+
+                    // 把名次写到对应xml
+                    nRet = WritePaiMing(token,dir, patronBarcode, paiMingDom, out error);
+                    if (nRet == -1)
+                        goto ERROR1;
+
+                }
+                else if (taskName == C_task_xml2html)
+                {
+                    nRet = ConvertReport2Html(token,patronXmlFile,out error);
+                    if (nRet == -1)
+                        goto ERROR1;
+                }
+                else
+                {
+                    //不认识的任务
+                    error = "不认识的任务";
+                }
+
+
+                // 把这一任务设置成完成
+                DomUtil.SetAttr(task, "state", C_state_close);
+                dom.Save(planFile);// 立即保存一下plan文件。
+                continue;
+
+
+
+            ERROR1:
+
+                // 把这一任务设置成出错
+                DomUtil.SetAttr(task, "state", C_state_error);
+                if (string.IsNullOrEmpty(error) == false)  //写错误信息
+                { 
+                    DomUtil.SetAttr(task,"error",error);
+                }
+                dom.Save(planFile);// 立即保存一下plan文件。
+            }
+
+            //end
+            // 把plan设置成完成
+            DomUtil.SetAttr(root, "state", C_state_close);
+            dom.Save(planFile);// 立即保存一下plan文件。
+
+
+
+
+        }
+
+        // xml转html
+        private static int ConvertReport2Html(CancellationToken token, string xmlFile, out string error)
+        {
+            error = "";
+
+            // 停止
+            token.ThrowIfCancellationRequested();
+
+            // 如果对应的html存在，则显示，到时点击第一行时，显示对应
+            int nIndex = xmlFile.LastIndexOf('.');
+            string left = xmlFile.Substring(0, nIndex);
+            string htmlFile = left + ".html";
+            try
+            {
+                // 调接口将xml转为html
+                ConvertHelper.Convert(xmlFile, htmlFile);
+            }
+            catch (Exception ex)
+            {
+
+                error = xmlFile + "转html出错：" + ex.Message;
+
+                return -1;
+            }
+
+            return 0;
+
+        }
+
+
+        // 排名
+        private static int PaiMing(CancellationToken token, string dir,out string error)
+        {
+            error = "";
+            //this.SetProcessInfo("开始排名");
+
+            List<paiMingItem> paiMingList = new List<paiMingItem>();
+
+            string[] fiels = Directory.GetFiles(dir, "*.xml");
+
+            //this.SetProcessInfo("把目录中的所有xml文件中相关值装入内存结构");
+            //this.SetProcess(0, fiels.Length);
+
+            //int index = 0;
+            foreach (string file in fiels)
+            {
+                //if (file.IndexOf("plan.txt") != -1)
+                //    continue;
+
+                //// 更改进度条
+                //index++;
+                //this.SetProcessValue(index);
+
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                XmlDocument dom = new XmlDocument();
+                try
+                {
+                    dom.Load(file);
+                }
+                catch (Exception ex)
+                {
+                    error = "装载["+file+"]文件到dom出错:" + ex.Message;
+                    return -1;
+                }
+
+                XmlNode root = dom.DocumentElement;
+                //patron/barcode取内容
+                string barcode = DomUtil.GetElementInnerText(root, "patron/barcode");
+
+                //borrowInfo 取 totalBorrowedCount 属性
+                string totalBorrowedCount = DomUtil.GetAttr(root, "borrowInfo", "totalBorrowedCount");
+                int totalCount = Convert.ToInt32(totalBorrowedCount);
+
+                paiMingList.Add(new paiMingItem(barcode, totalCount, file, dom));
+            }
+
+           // this.SetProcessInfo("按借阅量排名");
+
+            // 按总量倒序排
+            List<paiMingItem> sortedList = paiMingList.OrderByDescending(x => x.totalBorrowedCount).ToList();
+
+            //this.SetProcessInfo("写回xml文件");
+            string paiMingFile = dir+ "\\paiMing.txt";
+
+            string xml = "<root>";
+
+            // 写到一个排名的临时xml
+            for (int i = 0; i < sortedList.Count; i++)
+            {
+                // 停止
+                token.ThrowIfCancellationRequested();
+
+                int paiming = i + 1;
+
+                paiMingItem item = sortedList[i];
+
+                xml += "<item barcode='"+item.PatronBarcode+"' paiMing='"+paiming.ToString()+"'/>";
+
+                //XmlNode borrowInfoNode = item.dom.DocumentElement.SelectSingleNode("borrowInfo");
+
+                //DomUtil.SetAttr(borrowInfoNode, "paiming", paiming.ToString());
+
+                //item.dom.Save(item.fileName);
+
+            }
+            xml += "</root>";
+
+            // 写到paiming临时文件
+            using (StreamWriter writer = new StreamWriter(paiMingFile, false, Encoding.UTF8))
+            {
+                // 写到打印文件
+                writer.Write(xml);
+            }
+
+
+            //this.SetProcessInfo("结束排名");
+
+            return 0;
+        }
+
+        // 把名字写到读者xml里
+        private static int WritePaiMing(CancellationToken token, 
+            string dir,
+            string patronBarcode, 
+            XmlDocument paiMingDom,
+            out string error)
+        {
+            error = "";
+
+            // 从paiMingDom中找到对应的排名
+            XmlNode node = paiMingDom.DocumentElement.SelectSingleNode("item[@barcode='" + patronBarcode + "']");
+            if (node == null)
+            {
+                error = "从排名xml中未找到["+patronBarcode+"]对应的名次。";
+                return -1;
+            }
+            string paiMing = DomUtil.GetAttr(node, "paiMing");
+
+
+            // 写到xml文件中
+            string patronXmlFile = dir + "\\" + patronBarcode + ".xml";
+            if (File.Exists(patronXmlFile) == false)
+            {
+                error = "读者[" + patronBarcode + "]的报表文件["+patronXmlFile+"]不存在。";
+                return -1;
+            }
+
+            XmlDocument dom = new XmlDocument();
+            try
+            {
+                dom.Load(patronXmlFile);
+            }
+            catch (Exception ex)
+            {
+                error = "装载报表文件[" + patronXmlFile + "]到dom出错："+ex.Message;
+                return -1;
+            }
+
+            // 给xml写排名
+            XmlNode borrowInfoNode = dom.DocumentElement.SelectSingleNode("borrowInfo");
+            DomUtil.SetAttr(borrowInfoNode, "paiMing", paiMing);
+
+            // 保存到文件
+            dom.Save(patronXmlFile);
+
+            return 0;
+        }
 
 
         public string GetCommentTitle(int borrowCount)
