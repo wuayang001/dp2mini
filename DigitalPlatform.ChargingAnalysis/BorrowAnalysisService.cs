@@ -483,9 +483,6 @@ namespace DigitalPlatform.ChargingAnalysis
             DomUtil.SetAttr(root, "state", C_state_close);
             dom.Save(planFile);// 立即保存一下plan文件。
 
-
-
-
         }
 
         // xml转html

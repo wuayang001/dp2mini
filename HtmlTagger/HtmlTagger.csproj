@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConvertHelper.cs" />
     <Compile Include="HtmlTagger.cs" />
     <Compile Include="NestedTagger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +71,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.csproj">
+      <Project>{58653586-420c-4060-942f-a47d1d613b35}</Project>
+      <Name>common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

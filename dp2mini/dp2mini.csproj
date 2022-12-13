@@ -31,7 +31,7 @@
     <PublisherName>DigitalPlatform</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>75</ApplicationRevision>
+    <ApplicationRevision>76</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -452,6 +452,10 @@
     <ProjectReference Include="..\DigitalPlatform.ChargingAnalysis\DigitalPlatform.BorrowAnalysis.csproj">
       <Project>{5be6c455-9d9a-4255-b650-9e0231f3581a}</Project>
       <Name>DigitalPlatform.BorrowAnalysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HtmlTagger\HtmlTagger.csproj">
+      <Project>{5bc48136-e9f9-4718-ab64-c4ca879e753c}</Project>
+      <Name>HtmlTagger</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
