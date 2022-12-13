@@ -192,7 +192,6 @@
             this.button_onekey.Text = "一键生成报表";
             this.button_onekey.UseVisualStyleBackColor = true;
             this.button_onekey.Visible = false;
-            //this.button_onekey.Click += new System.EventHandler(this.button_onekey_Click);
             // 
             // button_close
             // 
@@ -265,6 +264,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "createReport";
             this.Text = "创建报表";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.createReport_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

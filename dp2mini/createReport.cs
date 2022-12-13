@@ -68,7 +68,7 @@ namespace dp2mini
             if (dirInfo.GetFiles("*.xml").Length > 0
                 || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
             {
-                MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表(xml/html文件)，创建报表时需要选择一个空目录。");
+                MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表文件，新创建报表时请选择一个空目录。");
                 return -1;
             }
 
@@ -629,11 +629,14 @@ namespace dp2mini
         {
             // 如果里面有plan文件，则按计划生成
             this.button_plan.Enabled = true;
-            this.button_stop.Enabled = true;
+
+            // 未开始前停止按钮都是不可用的
+            this.button_stop.Enabled = false;
 
             // 清空进度条和信息
             this.progressBar1.Value = 0;
-            this.SetProcessInfo("");
+            this.label_info.Text = "";
+            //this.SetProcessInfo("");
 
             // 检查计划文件是否存在
             string planFile = this.OutputDir + "\\plan.txt";
@@ -665,21 +668,7 @@ namespace dp2mini
 
         }
 
-        // 根据选择目录，决定条码框输入和选择日期范围是否可用。
-        private void EnableCtrlForSelectDir(bool bEnable)
-        {
-            // 证条码输入框与选择按钮
-            this.textBox_patronBarcode.Enabled = bEnable;
-            this.button_selectBatcodeFile.Enabled = bEnable;
 
-            // 时间范围控件
-            this.comboBox_quickSetFilenames.Enabled = bEnable;
-            this.dateTimePicker_start.Enabled = bEnable;
-            this.dateTimePicker_end.Enabled = bEnable;
-
-            // stop按钮
-            this.button_stop.Enabled = bEnable;
-        }
 
         // 选择证条码号文件
         private void button_selectBatcodeFile_Click(object sender, EventArgs e)
@@ -708,8 +697,19 @@ namespace dp2mini
         // 关闭
         private void button_close_Click_1(object sender, EventArgs e)
         {
+            // 先停止线程
+            this._cancel.Cancel();
+
+            // 再关闭
             this.Close();
         }
+
+        private void createReport_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 先停止线程
+            this._cancel.Cancel();
+        }
+
 
         // 停止
         private void button_stop_Click(object sender, EventArgs e)
@@ -729,10 +729,33 @@ namespace dp2mini
         // 生成报表过程，设置 开始和停止 按钮是否可用
         void EnableControls(bool bEnable)
         {
+            // 停止按钮
             this.button_stop.Enabled = !(bEnable);
 
+            // 开始/继续
             this.button_plan.Enabled = bEnable;
+
+            // 选择目录
             this.textBox_outputDir.Enabled = bEnable;
+            this.button_selectDir.Enabled = bEnable;
+
+            // 条码号与日期范围
+            this.EnableCtrlForSelectDir(bEnable);
+
+
+        }
+
+        // 根据选择目录，决定条码框输入和选择日期范围是否可用。
+        private void EnableCtrlForSelectDir(bool bEnable)
+        {
+            // 证条码输入框与选择按钮
+            this.textBox_patronBarcode.Enabled = bEnable;
+            this.button_selectBatcodeFile.Enabled = bEnable;
+
+            // 时间范围控件
+            this.comboBox_quickSetFilenames.Enabled = bEnable;
+            this.dateTimePicker_start.Enabled = bEnable;
+            this.dateTimePicker_end.Enabled = bEnable;
         }
 
         // 设置进度条
@@ -868,7 +891,7 @@ namespace dp2mini
                 }
                 ));
             }
-            finally
+            catch (Exception ex)
             {
                 // 设置按置状态
                 this.Invoke((Action)(() =>
@@ -876,6 +899,17 @@ namespace dp2mini
                     EnableControls(true);
                     this.Cursor = oldCursor;
 
+                    MessageBox.Show(this, "生成报表出错："+ex.Message);
+                }
+                ));
+            }
+            finally
+            {
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
                 }
                 ));
             }
@@ -922,9 +956,20 @@ namespace dp2mini
                 }
                     ));
             }
+            catch (Exception ex)
+            {
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
+
+                    MessageBox.Show(this, "生成报表出错：" + ex.Message);
+                }
+                ));
+            }
             finally
             {
-
                 // 设置按置状态
                 this.Invoke((Action)(() =>
                 {
@@ -932,10 +977,13 @@ namespace dp2mini
                     this.Cursor = oldCursor;
 
                 }));
+
             }
 
         }
 
         #endregion
+
+
     }
 }
