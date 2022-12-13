@@ -1,0 +1,12 @@
+﻿
+1)
+建议在源代码目录中包含一个样例 读者信息 XML 文件。这样只要有人
+把这个 repo 克隆下来以后就可以马上执行转换验证，不必另外去找样例文件
+
+2)
+建议增加单元测试
+
+3)
+还可以继续尝试使用 HtmlWriter 类来书写输出部分代码，体验一下书写是否
+方便
+https://learn.microsoft.com/zh-cn/dotnet/api/system.web.ui.htmltextwriter?redirectedfrom=MSDN&view=netframework-4.8

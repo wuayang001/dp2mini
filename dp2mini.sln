@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalPlatform.BorrowAnaly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlTagger", "HtmlTagger\HtmlTagger.csproj", "{5BC48136-E9F9-4718-AB64-C4CA879E753C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xml2html", "xml2html\xml2html.csproj", "{9F4111EC-A35B-4892-A8F2-C7421C59ADB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BC48136-E9F9-4718-AB64-C4CA879E753C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F4111EC-A35B-4892-A8F2-C7421C59ADB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F4111EC-A35B-4892-A8F2-C7421C59ADB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F4111EC-A35B-4892-A8F2-C7421C59ADB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F4111EC-A35B-4892-A8F2-C7421C59ADB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
