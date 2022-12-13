@@ -83,7 +83,7 @@ namespace DigitalPlatform.LibraryRestClient
 
     #region Reservation
 
-    // SearchBiblioRequest
+    // ReservationRequest
     [DataContract]
     public class ReservationRequest
     {
@@ -178,6 +178,181 @@ namespace DigitalPlatform.LibraryRestClient
     #endregion
 
 
+
+    #region SearchCharging
+
+
+    /*
+        // parameters:
+        //      actions noResult 表示不返回 results，只返回 result.Value(totalCount)
+        public LibraryServerResult SearchCharging(
+            string patronBarcode,
+            string timeRange,
+            string actions,
+            string order,
+            long start,
+            long count,
+            out ChargingItemWrapper[] results) 
+     */
+
+    // SearchItemRequest
+    [DataContract]
+    public class SearchChargingRequest
+    {
+        [DataMember]
+        public string patronBarcode { get; set; }
+
+        [DataMember]
+        public string timeRange { get; set; }
+
+
+        [DataMember]
+        public string actions { get; set; }
+
+        [DataMember]
+        public string order { get; set; }
+
+        [DataMember]
+        public long start { get; set; }
+
+        [DataMember]
+        public long count { get; set; }
+
+    }
+
+
+    //SearchItemResult
+    [DataContract]
+    public class SearchChargingResponse
+    {
+        [DataMember]
+        public LibraryServerResult SearchChargingResult { get; set; }
+
+        [DataMember]
+        public ChargingItemWrapper[] results { get; set; }
+
+    }
+
+    [DataContract(Namespace = "http://dp2003.com/dp2library/")]
+    public class ChargingItemWrapper
+    {
+        // 基本 Item
+        [DataMember]
+        public ChargingItem Item { get; set; }
+
+        // 相关的 Item。比如一个 return 动作的 item 就可能具有一个 borrow 动作的 item
+        [DataMember]
+        public ChargingItem RelatedItem { get; set; }
+    }
+
+    [DataContract(Namespace = "http://dp2003.com/dp2library/")]
+    public class ChargingItem
+    {
+        [DataMember]
+        public string Id { get; set; }
+
+        [DataMember]
+        public string LibraryCode { get; set; } // 访问者的图书馆代码
+        [DataMember]
+        public string Operation { get; set; } // 操作名
+        [DataMember]
+        public string Action { get; set; }  // 动作
+
+        [DataMember]
+        public string ItemBarcode { get; set; }
+        [DataMember]
+        public string PatronBarcode { get; set; }
+        [DataMember]
+        public string BiblioRecPath { get; set; }
+
+        [DataMember]
+        public string Period { get; set; }  // 期限
+        [DataMember]
+        public string No { get; set; }  // 续借次，序号
+
+        // 2017/5/22
+        [DataMember]
+        public string Volume { get; set; }  // 卷册
+
+        [DataMember]
+        public string ClientAddress { get; set; }  // 访问者的IP地址
+
+        [DataMember]
+        public string Operator { get; set; }  // 操作者(访问者)
+        [DataMember]
+        public string OperTime { get; set; } // 操作时间。? 格式
+
+    }
+    #endregion
+
+
+    #region SearchItem
+
+    /*
+    LibraryServerResult SearchItem(
+        string strItemDbName,
+        string strQueryWord,
+        int nPerMax,
+
+        string strFrom,
+        string strMatchStyle,
+        string strLang,
+
+        string strResultSetName,
+        string strSearchStyle,
+        string strOutputStyle);
+
+ */
+    // SearchItemRequest
+    [DataContract]
+    public class SearchItemRequest
+    {
+        [DataMember]
+        public string strItemDbName { get; set; }
+        [DataMember]
+        public string strQueryWord { get; set; }
+        [DataMember]
+        public int nPerMax { get; set; }
+        [DataMember]
+
+        public string strFrom{ get; set; }
+        [DataMember]
+        public string strMatchStyle { get; set; }
+        [DataMember]
+        public string strLang { get; set; }
+        [DataMember]
+
+        public string strResultSetName { get; set; }
+        [DataMember]
+        public string strSearchStyle { get; set; }
+        [DataMember]
+        public string strOutputStyle { get; set; }
+    }
+
+    /*
+成员	返回值	说明
+LibraryServerResult.Value		
+	-1	错误
+	0	没有命中
+	>=1	命中。返回值为命中的记录条数
+LibraryServerResult.ErrorInfo		出错信息
+
+     */
+
+    //SearchItemResult
+    [DataContract]
+    public class SearchItemResponse
+    {
+        [DataMember]
+        public LibraryServerResult SearchItemResult { get; set; }
+
+        //// strQueryXml
+        //[DataMember]
+        //public string strQueryXml { get; set; }
+    }
+
+    #endregion
+
     #region SearchBiblio
 
     // SearchBiblioRequest
@@ -202,6 +377,9 @@ namespace DigitalPlatform.LibraryRestClient
         public string strSearchStyle { get; set; }
         [DataMember]
         public string strOutputStyle { get; set; }
+
+        [DataMember]
+        public string strLocationFilter { get; set; }
     }
 
     //SearchBiblioResult
@@ -356,6 +534,56 @@ namespace DigitalPlatform.LibraryRestClient
 
         //[DataMember]
         //public ErrorCodeValue kernel_errorcode { get; set; }
+    }
+
+    #endregion
+
+    #region SetBiblioInfo
+
+    /*
+        public LibraryServerResult SetBiblioInfo(
+            string strAction,
+            string strBiblioRecPath,
+            string strBiblioType,
+            string strBiblio,
+            byte[] baTimestamp,
+            string strComment,
+            string strStyle,    // 2016/12/22
+            out string strOutputBiblioRecPath,
+            out byte[] baOutputTimestamp) 
+     */
+
+    // SetReaderInfo
+    [DataContract]
+    public class SetBiblioInfoRequest
+    {
+        [DataMember]
+        public string strAction { get; set; }
+        [DataMember]
+        public string strBiblioRecPath { get; set; }
+        [DataMember]
+        public string strBiblioType { get; set; }
+        [DataMember]
+        public string strBiblio { get; set; }
+        [DataMember]
+        public byte[] baTimestamp { get; set; }
+        [DataMember]
+        public string strComment { get; set; }
+        [DataMember]
+        public string strStyle { get; set; }
+    }
+
+    [DataContract]
+    public class SetBiblioInfoResponse
+    {
+        [DataMember]
+        public LibraryServerResult SetBiblioInfoResult { get; set; }
+
+        [DataMember]
+        public string strOutputBiblioRecPath { get; set; }
+
+        [DataMember]
+        public byte[] baOutputTimestamp { get; set; }
     }
 
     #endregion
@@ -619,7 +847,35 @@ namespace DigitalPlatform.LibraryRestClient
 
     #region GetItemInfo
 
-    //getItemInfo
+    // 获得册信息
+    // TODO: 需要改进为，如果册记录存在，但是书目记录不存在，也能够适当返回
+    // parameters:
+    //      strItemDbType   2015/1/30
+    //      strBarcode  册条码号。特殊情况下，可以使用"@path:"引导的册记录路径(只需要库名和id两个部分)作为检索入口。在@path引导下，路径后面还可以跟随 "$prev"或"$next"表示方向
+    //      strResultType   指定需要在strResult参数中返回的数据格式。为"xml" "html" "uii"之一。
+    //                      如果为空，则表示strResult参数中不返回任何数据。无论这个参数为什么值，strItemRecPath中都回返回册记录路径(如果命中了的话)
+    //      strItemRecPath  返回册记录路径。可能为逗号间隔的列表，包含多个路径
+    //      strBiblioType   指定需要在strBiblio参数中返回的数据格式。为"xml" "html"之一。
+    //                      如果为空，则表示strBiblio参数中不返回任何数据，strBilbioRecPath中也不返回路径。
+    //                      如果要仅仅在strBiblioRecPath中返回路径，请使用"recpath"作为strBiblioType参数的值。
+    //                      如果为"html"或"xml"之一，则会在strBiblioRecPath中返回路径。
+    //                      之所以要这样设计，主要是为了效率考虑。用""调用时，甚至不需要返回书目记录路径，这会更多地省去一些关于种的操作。
+    //      strBiblioRecPath    返回书目记录路径
+    // return:
+    // Result.Value -1出错 0册记录没有找到 1册记录找到 >1册记录命中多于1条
+    // 权限:   需要具有getiteminfo权限
+    //public LibraryServerResult GetItemInfo(
+    //    string strItemDbType,
+    //    string strBarcode,
+    //    string strItemXml,  // 前端提供给服务器的记录内容。例如，需要模拟创建检索点，就需要前端提供记录内容
+    //    string strResultType,
+    //    out string strResult,
+    //    out string strItemRecPath,
+    //    out byte[] item_timestamp,
+    //    string strBiblioType,
+    //    out string strBiblio,
+    //    out string strBiblioRecPath)
+
     [DataContract]
     public class GetItemInfoRequest
     {
@@ -629,6 +885,12 @@ namespace DigitalPlatform.LibraryRestClient
         public string strResultType { get; set; }
         [DataMember]
         public string strBiblioType { get; set; }
+
+        // 2022/11/9 把原来省掉的两个参数加在这里，使用的时候可以不赋值
+        [DataMember]
+        public string strItemDbType { get; set; }
+        [DataMember]
+        public string strItemXml { get; set; }
     }
     [DataContract]
     public class GetItemInfoResponse
@@ -673,6 +935,35 @@ namespace DigitalPlatform.LibraryRestClient
 
     #endregion
 
+    
+    #region GetBiblioInfos  2022/10新增
+
+
+    [DataContract]
+    public class GetBiblioInfosRequest
+    {
+        [DataMember]
+        public string strBiblioRecPath { get; set; }
+        [DataMember]
+        public string strBiblioXml { get; set; }
+        [DataMember]
+        public string[] formats { get; set; }
+    }
+
+    [DataContract]
+    public class GetBiblioInfosResponse
+    {
+        [DataMember]
+        public LibraryServerResult GetBiblioInfosResult { get; set; }
+        [DataMember]
+        public string[] results { get; set; }
+
+        [DataMember]
+        public byte[] baTimestamp { get; set; }
+
+    }
+
+    #endregion
 
     #region GetEntities
 
