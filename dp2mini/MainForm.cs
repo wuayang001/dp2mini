@@ -34,6 +34,8 @@ namespace dp2mini
 
         public string Version = "";
 
+
+
         /// <summary>
         /// 窗体构造函数
         /// </summary>
@@ -605,6 +607,10 @@ namespace dp2mini
                 form = Activator.CreateInstance<T>();
                 dynamic o = form;
                 o.MdiParent = this;
+                if (form.GetType() == typeof(chargingAnalysisForm))
+                {
+                    o.WindowState = FormWindowState.Maximized;
+                }
 
                 {
                     try
@@ -790,6 +796,21 @@ namespace dp2mini
         private void toolStripLabel_marc_Click(object sender, EventArgs e)
         {
             EnsureChildForm<MarcForm>(true);
+        }
+
+        private void 巡检ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EnsureChildForm<toolForm>(true);
+        }
+
+        private void toolStripLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton_chargingAnalysis_Click(object sender, EventArgs e)
+        {
+            EnsureChildForm<chargingAnalysisForm>(true);
         }
     }
 

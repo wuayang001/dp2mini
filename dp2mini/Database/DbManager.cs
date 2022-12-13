@@ -222,6 +222,25 @@ namespace dp2mini
             this._dbclient.SaveChanges();
         }
 
+
+        #region 巡检本地表
+
+
+        // 给本地库增加一笔册记录
+        public void AddEntity(Entity entity)
+        {
+            this._dbclient.Entities.Add(entity);
+            this._dbclient.SaveChanges(true);
+        }
+
+        // 获取全部
+        public List<Entity> GetEntityList()
+        {
+            return this._dbclient.Entities.ToList();
+        }
+
+        #endregion
+
     }
 
     // 增加备书单委托
