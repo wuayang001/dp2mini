@@ -1347,7 +1347,7 @@ namespace DigitalPlatform.ChargingAnalysis
             XmlDocument dom = new XmlDocument();
             dom.LoadXml(patronXml);
 
-            //为了防止输出的xml文件过大，过滤到了borrows/reservations/overdues/borrowHistory/outofReservations/face元素
+            //为了防止输出的xml文件过大，过滤到了borrows/borrowHistory/outofReservations/reservations/overdues/face/fingerprint
 
             // 删除borrows节点，后面会输出清洗后在借
             XmlNode borrowsNode = dom.DocumentElement.SelectSingleNode("borrows");
@@ -1363,6 +1363,31 @@ namespace DigitalPlatform.ChargingAnalysis
             XmlNode outofReservationsNode = dom.DocumentElement.SelectSingleNode("outofReservations");
             if (outofReservationsNode != null)
                 dom.DocumentElement.RemoveChild(outofReservationsNode);
+
+            //reservations
+            XmlNode tempNode = dom.DocumentElement.SelectSingleNode("reservations");
+            if (tempNode != null)
+                dom.DocumentElement.RemoveChild(tempNode);
+
+            //overdues
+            tempNode = dom.DocumentElement.SelectSingleNode("overdues");
+            if (tempNode != null)
+                dom.DocumentElement.RemoveChild(tempNode);
+
+            //face
+            tempNode = dom.DocumentElement.SelectSingleNode("face");
+            if (tempNode != null)
+                dom.DocumentElement.RemoveChild(tempNode);
+
+            //fingerprint
+            tempNode = dom.DocumentElement.SelectSingleNode("fingerprint");
+            if (tempNode != null)
+                dom.DocumentElement.RemoveChild(tempNode);
+
+            //palmprint
+            tempNode = dom.DocumentElement.SelectSingleNode("palmprint");
+            if (tempNode != null)
+                dom.DocumentElement.RemoveChild(tempNode);
 
             // 拼出新的xml
             patronXml = "<patron>" + dom.DocumentElement.InnerXml + "</patron>";
