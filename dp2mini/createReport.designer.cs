@@ -184,7 +184,7 @@
             // button_onekey
             // 
             this.button_onekey.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_onekey.Location = new System.Drawing.Point(678, 699);
+            this.button_onekey.Location = new System.Drawing.Point(674, 684);
             this.button_onekey.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_onekey.Name = "button_onekey";
             this.button_onekey.Size = new System.Drawing.Size(231, 42);
@@ -192,7 +192,7 @@
             this.button_onekey.Text = "一键生成报表";
             this.button_onekey.UseVisualStyleBackColor = true;
             this.button_onekey.Visible = false;
-            this.button_onekey.Click += new System.EventHandler(this.button_onekey_Click);
+            //this.button_onekey.Click += new System.EventHandler(this.button_onekey_Click);
             // 
             // button_close
             // 

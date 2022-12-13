@@ -32,6 +32,8 @@ namespace dp2mini
 {
     public partial class chargingAnalysisForm : Form
     {
+        #region 窗体装载
+
         // mid父窗口
         MainForm _mainForm = null;
 
@@ -71,24 +73,15 @@ namespace dp2mini
                 return;
             }
 
-            //把评语模板列出来
-            if (BorrowAnalysisService.Instance.CommentTemplates != null
-                && BorrowAnalysisService.Instance.CommentTemplates.Count > 0)
-            {
-                this.comboBox_comment.Text = C_SelectComment;
-                this.comboBox_comment.Items.Add(C_SelectComment);
-                foreach (string comment in BorrowAnalysisService.Instance.CommentTemplates)
-                {
-                    this.comboBox_comment.Items.Add(comment);
-                }
-            }
+            // 装载评语模板
+            this.LoadCommentTemplate();
+
 
             // 把主窗口的状态条清一下。
             this._mainForm.SetStatusMessage("");
         }
 
-
-
+        #endregion
 
         #region 报表目录
 
@@ -294,6 +287,24 @@ namespace dp2mini
 
         #region 评语相关
 
+        // 装载评语模板
+        public void LoadCommentTemplate()
+        {
+            // 先清空评语列表
+            this.comboBox_comment.Items.Clear();
+            //把评语模板加到下拉列表
+            if (BorrowAnalysisService.Instance.CommentTemplates != null
+                && BorrowAnalysisService.Instance.CommentTemplates.Count > 0)
+            {
+                this.comboBox_comment.Text = C_SelectComment;
+                this.comboBox_comment.Items.Add(C_SelectComment);
+                foreach (string comment in BorrowAnalysisService.Instance.CommentTemplates)
+                {
+                    this.comboBox_comment.Items.Add(comment);
+                }
+            }
+        }
+
         // 评语模板列表第一行
         public const string C_SelectComment = "请选择评语模板";
 
@@ -315,7 +326,7 @@ namespace dp2mini
             MessageBox.Show(this, "评语保存成功。");
         }
 
-        // 提交评语
+        // 提交评语内部函数
         private void SaveComment(string comment1)
         {
             if (this.listView_files.SelectedItems.Count == 0)
@@ -409,11 +420,9 @@ namespace dp2mini
 
             // 设到编辑框
             this.SetCommentForEdit(comment);
-            
 
             // 也同时保存一下评语,感觉直接保存，这样太快太自动了，还是让用户点一下提交评语为好。
             // this.SaveComment(comment);
-
         }
         
         // 评语开始时间
@@ -429,6 +438,7 @@ namespace dp2mini
             }
         }
 
+        // 编辑评语
         public void SetCommentForEdit(string comment)
         {
             // 设到编辑框
@@ -436,6 +446,32 @@ namespace dp2mini
 
             // 设一下开始时间
             this._startTime = DateTime.Now;
+        }
+
+        // 保存评语为模板
+        private void button_saveCommentTemplate_Click(object sender, EventArgs e)
+        {
+            string comment = this.textBox_comment.Text.Trim();
+            if (comment == "")
+            {
+                MessageBox.Show(this, "尚未输入评语。");
+                return;
+            }
+
+            // 保存评语为模板
+            bool bRet = BorrowAnalysisService.Instance.SaveCommentTemplate(comment, out string error);
+            if (bRet == false)
+            {
+                MessageBox.Show(this, "保存失败：" + error);
+                return;
+            }
+
+            // 装载到下拉列表
+            this.LoadCommentTemplate();
+
+            this.comboBox_comment.Text = comment;
+
+            MessageBox.Show(this, "保存评语模板成功。");
         }
 
         #endregion
@@ -515,29 +551,9 @@ namespace dp2mini
         }
 
 
-        // 另存
-        private void button_download_Click(object sender, EventArgs e)
-        {
 
-            //// 输出报表
-            //string xml = "";
-            //string strError = "";
-            //int nRet = BorrowAnalysisService.Instance.OutputReport(this._report,
-            //    "xml",
-            //    out xml,
-            //    out strError);
-            //if (nRet == -1)
-            //{
-            //    MessageBox.Show(this, strError);
-            //    return;
-            //}
 
-           
-
-        }
-
-        #endregion
-
+        // 另存文件
         private void ToolStripMenuItem_download_Click(object sender, EventArgs e)
         {
 
@@ -550,7 +566,7 @@ namespace dp2mini
             }
 
 
-            if (this.listView_files.SelectedItems.Count >1)
+            if (this.listView_files.SelectedItems.Count > 1)
             {
                 MessageBox.Show(this, "您选择了多条读者，请选择一个读者另存。");
                 return;
@@ -559,12 +575,17 @@ namespace dp2mini
             ListViewItem viewItem = this.listView_files.SelectedItems[0];
 
             // 用于拼文件名
-            string barcode=viewItem.SubItems[0].Text;  
-            string name=viewItem.SubItems[1].Text;
+            string barcode = viewItem.SubItems[0].Text;
+            string name = viewItem.SubItems[1].Text;
             string tempFileName = barcode + "_" + name + ".html";
 
             // 源文件
-            string htmlFile= viewItem.SubItems[8].Text;
+            string htmlFile = viewItem.SubItems[8].Text;
+            if (htmlFile == "")
+            {
+                MessageBox.Show(this, "该读者还未转成html报表。");
+                return;
+            }
 
             //把html保存到文件
             //询问文件名
@@ -603,6 +624,8 @@ namespace dp2mini
             // 打开文件
             Process.Start(targetFileName);
         }
+
+        #endregion
     }
 
 

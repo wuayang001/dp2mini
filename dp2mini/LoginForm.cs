@@ -30,7 +30,7 @@ namespace dp2mini
         {
             get
             {
-                return this.textBox_libraryUrl.Text;
+                return this.textBox_libraryUrl.Text.Trim();
             }
             set
             {
@@ -106,7 +106,7 @@ namespace dp2mini
             Debug.Assert(mainForm != null, "登录对话框的父窗口为空");
 
             // 登录地址必须为rest.开头的地址
-            string url = this.textBox_libraryUrl.Text;
+            string url = this.textBox_libraryUrl.Text.Trim();
             if (url.Length < 5
                 || (url.Substring(0, 5).ToLower() != "rest."))
             {

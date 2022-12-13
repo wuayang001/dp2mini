@@ -28,13 +28,15 @@ namespace dp2mini
         #region 内部函数
 
         // 报表目录
-        public string OutputDir {
+        public string OutputDir
+        {
             get
             {
-                return this.textBox_outputDir.Text;
+                return this.textBox_outputDir.Text.Trim();
             }
             set
-            {this.textBox_outputDir.Text = value;
+            {
+                this.textBox_outputDir.Text = value;
             }
         }
 
@@ -92,6 +94,11 @@ namespace dp2mini
         }
 
 
+        #endregion
+
+
+#if REMOVED
+
         // 创建xml
         private int CreateXml(CancellationToken token,
             string patronBarcodes,
@@ -107,7 +114,7 @@ namespace dp2mini
             patronBarcodes = patronBarcodes.Replace("\r\n", "\n");
             string[] patronBarcodeList = patronBarcodes.Split(new char[] { '\n' });
 
-            this.SetProcess(0,patronBarcodeList.Length);
+            this.SetProcess(0, patronBarcodeList.Length);
             int index = 0;
 
             string errorlog = "";
@@ -120,7 +127,7 @@ namespace dp2mini
             {
                 index++;
                 this.SetProcessValue(index);
-                this.SetProcessInfo("开始处理"+patronBarcode);
+                this.SetProcessInfo("开始处理" + patronBarcode);
 
                 // 停止
                 token.ThrowIfCancellationRequested();
@@ -183,14 +190,14 @@ namespace dp2mini
                     writer.Write(errorlog);
                 }
             }
-            error = "成功"+successCount+"条，失败"+errorCount+"条。";
+            error = "成功" + successCount + "条，失败" + errorCount + "条。";
             if (errorCount > 0)
             {
                 error += "出错信息详见：" + errorFileName;
             }
 
 
-            return 0; 
+            return 0;
         }
 
         // 排名
@@ -284,7 +291,7 @@ namespace dp2mini
 
             foreach (string xmlFile in fiels)
             {
-                this.SetProcessInfo("转换"+xmlFile);
+                this.SetProcessInfo("转换" + xmlFile);
 
                 index++;
                 this.SetProcessValue(index);
@@ -315,8 +322,196 @@ namespace dp2mini
             this.SetProcessInfo("结束xml转html");
         }
 
+        
+        public void SetProcess(int min, int max)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                this.progressBar1.Minimum = min;
+                this.progressBar1.Maximum = max;
+            }
+            ));
+        }
 
-        #endregion
+        public void SetProcessValue(int value)
+        {
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                this.progressBar1.Value = value;
+            }
+            ));
+        }
+
+                // 一键生成
+        private void button_onekey_Click(object sender, EventArgs e)
+        {
+            // 获取界面输入参数
+            int nRet = this.GetInput(out string patronBarcodes,
+                out string startDate,
+                out string endDate,
+                out string dir);
+            if (nRet == -1)
+                return;
+
+
+            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
+            this._cancel.Dispose();
+            this._cancel = new CancellationTokenSource();
+
+            // 开一个新线程
+            Task.Run(() =>
+            {
+                OneKey(this._cancel.Token,
+                    patronBarcodes,
+                    startDate,
+                    endDate,
+                    dir);
+            });
+        }
+
+        /// <summary>
+        /// 检索做事的函数
+        /// </summary>
+        /// <param name="token"></param>
+        private void OneKey(CancellationToken token,
+            string patronBarcode,
+            string startDate,
+            string endDate,
+            string outputDir)
+        {
+            string strError = "";
+
+            // 记下原来的光标
+            Cursor oldCursor = Cursor.Current;
+
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                // 设置按钮状态
+                EnableControls(false);
+
+                //清空界面数据
+                this.SetProcessInfo("");
+
+                // 鼠标设为等待状态
+                oldCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
+            }
+            ));
+
+            try
+            {
+
+                // 创建xml
+                int nRet = this.CreateXml(token,
+                    patronBarcode,
+                    startDate,
+                    endDate,
+                    outputDir,
+                     out strError);
+                if (nRet == -1)
+                    goto ERROR1;
+
+
+                // 排名
+                this.PaiMing(token, outputDir);
+
+                // xml2html
+                this.Xml2Html(token, outputDir);
+
+                //
+                this.Invoke((Action)(() =>
+                {
+                    if (string.IsNullOrEmpty(strError) == false)
+                        MessageBox.Show("生成报表完成。" + strError);
+                    else
+                        MessageBox.Show(this, "生成报表完成");
+                }
+                ));
+
+                return;
+
+            }
+            finally
+            {
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
+
+                }
+                ));
+            }
+
+        ERROR1:
+            this.Invoke((Action)(() =>
+            {
+                MessageBox.Show(strError);
+            }
+            ));
+        }
+
+                private void 生成报表xml格式ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // 获取界面输入参数
+            int nRet = this.GetInput(out string patronBarcodes,
+                out string startDate,
+                out string endDate,
+                out string outputDir);
+            if (nRet == -1)
+                return;
+
+
+            // 创建xml
+            nRet = this.CreateXml(this._cancel.Token,
+                patronBarcodes,
+                startDate,
+                endDate,
+                outputDir,
+                out string strError);
+            if (nRet == -1)
+            {
+                MessageBox.Show(this, "出错：" + strError);
+                return;
+            }
+
+            MessageBox.Show(this, "批量生成借阅报表完成。");
+            return;
+        }
+
+        private void 按借阅量排名ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未选择报表目录。");
+                return;
+            }
+
+            this.Xml2Html(this._cancel.Token, dir);
+
+            MessageBox.Show(this, "xml转html完成");
+        }
+
+        private void 报表xml转htmlToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            string dir = this.textBox_outputDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "尚未选择报表目录。");
+                return;
+            }
+
+            this.PaiMing(this._cancel.Token, dir);
+
+            MessageBox.Show(this, "排名处理完成。");
+        }
+
+#endif
+
 
         #region 快速设置时间
         delegate void Delegate_QuickSetFilenames(Control control);
@@ -410,108 +605,6 @@ namespace dp2mini
 
         #endregion
 
-        #region 界面控件是否可用，和进度条
-
-        /// <summary>
-        /// 清空界面数据
-        /// </summary>
-        public void ClearInfo()
-        {
-            this.label_info.Text = "";
-        }
-
-        /// <summary>
-        /// 设置控件是否可用
-        /// </summary>
-        /// <param name="bEnable"></param>
-        void EnableControls(bool bEnable)
-        {
-            this.button_stop.Enabled = !(bEnable);
-
-            this.button_plan.Enabled = bEnable;
-            this.textBox_outputDir.Enabled = bEnable;
-            //this.button_onekey.Enabled = bEnable;
-        }
-
-
-
-
-
-
-        // 名字以用途命名即可。TokenSource 这种类型名称可以不出现在名字中
-        CancellationTokenSource _cancel = new CancellationTokenSource();
-
-
-
-        public void SetProcess(int min, int max)
-        {
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                this.progressBar1.Minimum = min;
-                this.progressBar1.Maximum = max;
-            }
-            ));
-        }
-
-        public void SetProcessValue(int value)
-        {
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                this.progressBar1.Value = value;
-            }
-            ));
-        }
-
-        public void SetProcess1(int min, int max,int value)
-        {
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                if (min!=-1)
-                     this.progressBar1.Minimum = min;
-
-                if (max!=-1)    
-                    this.progressBar1.Maximum = max;
-
-                if (value!=-1)
-                    this.progressBar1.Value=value;
-            }
-            ));
-        }
-
-        public void SetProcessInfo(string text)
-        {
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                this.label_info.Text = text;
-            }
-            ));
-        }
-
-        #endregion
-
-        #region 右键菜单
-
-        private void 生成xml报表ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void 报表xml转htmlToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void 按借阅量排名ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        #endregion
-
         #region 按钮事件
 
         // 选择目录
@@ -529,6 +622,63 @@ namespace dp2mini
             }
 
             this.textBox_outputDir.Text = dlg.SelectedPath;
+        }
+
+        // 选择目录发生变化
+        private void textBox_outputDir_TextChanged(object sender, EventArgs e)
+        {
+            // 如果里面有plan文件，则按计划生成
+            this.button_plan.Enabled = true;
+            this.button_stop.Enabled = true;
+
+            // 清空进度条和信息
+            this.progressBar1.Value = 0;
+            this.SetProcessInfo("");
+
+            // 检查计划文件是否存在
+            string planFile = this.OutputDir + "\\plan.txt";
+            if (File.Exists(planFile) == true)
+            {
+                // 条码输入框一类都不能再用了。
+                this.EnableCtrlForSelectDir(false);
+
+                // 检查plan中的状态，确实是已经完成，还是未完成。
+                XmlDocument dom = new XmlDocument();
+                dom.Load(planFile);
+                string state = DomUtil.GetAttr(dom.DocumentElement, "state");
+                if (state == BorrowAnalysisService.C_state_close)
+                {
+                    this.button_plan.Text = "此目录下的报表已生成完成";
+                    this.button_plan.Enabled = false;
+                }
+                else
+                {
+                    this.button_plan.Text = "继续生成报表";
+                }
+            }
+            else
+            {
+                this.EnableCtrlForSelectDir(true);
+                this.button_plan.Text = "开始生成报表";
+            }
+
+
+        }
+
+        // 根据选择目录，决定条码框输入和选择日期范围是否可用。
+        private void EnableCtrlForSelectDir(bool bEnable)
+        {
+            // 证条码输入框与选择按钮
+            this.textBox_patronBarcode.Enabled = bEnable;
+            this.button_selectBatcodeFile.Enabled = bEnable;
+
+            // 时间范围控件
+            this.comboBox_quickSetFilenames.Enabled = bEnable;
+            this.dateTimePicker_start.Enabled = bEnable;
+            this.dateTimePicker_end.Enabled = bEnable;
+
+            // stop按钮
+            this.button_stop.Enabled = bEnable;
         }
 
         // 选择证条码号文件
@@ -558,7 +708,7 @@ namespace dp2mini
         // 关闭
         private void button_close_Click_1(object sender, EventArgs e)
         {
-            this.Close(); 
+            this.Close();
         }
 
         // 停止
@@ -568,184 +718,43 @@ namespace dp2mini
             this._cancel.Cancel();
         }
 
+        #endregion
+
+        #region 界面控件是否可用，和进度条
+
+        // 名字以用途命名即可。TokenSource 这种类型名称可以不出现在名字中
+        CancellationTokenSource _cancel = new CancellationTokenSource();
 
 
-
-
-
-        // 一键生成
-        private void button_onekey_Click(object sender, EventArgs e)
+        // 生成报表过程，设置 开始和停止 按钮是否可用
+        void EnableControls(bool bEnable)
         {
-            // 获取界面输入参数
-            int nRet = this.GetInput(out string patronBarcodes,
-                out string startDate,
-                out string endDate,
-                out string dir);
-            if (nRet == -1)
-                return;
+            this.button_stop.Enabled = !(bEnable);
 
-
-            // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
-            this._cancel.Dispose();
-            this._cancel = new CancellationTokenSource();
-
-            // 开一个新线程
-            Task.Run(() =>
-            {
-                OneKey(this._cancel.Token,
-                    patronBarcodes,
-                    startDate,
-                    endDate,
-                    dir);
-            });
+            this.button_plan.Enabled = bEnable;
+            this.textBox_outputDir.Enabled = bEnable;
         }
 
-        /// <summary>
-        /// 检索做事的函数
-        /// </summary>
-        /// <param name="token"></param>
-        private void OneKey(CancellationToken token,
-            string patronBarcode,
-            string startDate,
-            string endDate,
-            string outputDir)
+        // 设置进度条
+        public void SetProcess(int min, int max, int value)
         {
-            string strError = "";
-
-            // 记下原来的光标
-            Cursor oldCursor = Cursor.Current;
-
             // 用Invoke线程安全的方式来调
             this.Invoke((Action)(() =>
             {
-                // 设置按钮状态
-                EnableControls(false);
+                if (min != -1)
+                    this.progressBar1.Minimum = min;
 
-                //清空界面数据
-                this.ClearInfo();
+                if (max != -1)
+                    this.progressBar1.Maximum = max;
 
-                // 鼠标设为等待状态
-                oldCursor = this.Cursor;
-                this.Cursor = Cursors.WaitCursor;
-            }
-            ));
-
-            try
-            {
-
-                // 创建xml
-                int nRet = this.CreateXml(token,
-                    patronBarcode,
-                    startDate,
-                    endDate,
-                    outputDir,
-                     out strError);
-                if (nRet == -1)
-                    goto ERROR1;
-
-
-                // 排名
-                this.PaiMing(token, outputDir);
-
-                // xml2html
-                this.Xml2Html(token, outputDir);
-
-                //
-                this.Invoke((Action)(() =>
-                {
-                    if (string.IsNullOrEmpty(strError) == false)
-                        MessageBox.Show("生成报表完成。" + strError);
-                    else
-                        MessageBox.Show(this, "生成报表完成");
-                }
-                ));
-
-                return;
-
-            }
-            finally
-            {
-                // 设置按置状态
-                this.Invoke((Action)(() =>
-                {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
-
-                }
-                ));
-            }
-
-        ERROR1:
-            this.Invoke((Action)(() =>
-            {
-                MessageBox.Show(strError);
+                if (value != -1)
+                    this.progressBar1.Value = value;
             }
             ));
         }
 
-        #endregion
-
-        #region 菜单
-
-        private void 生成报表xml格式ToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            // 获取界面输入参数
-            int nRet = this.GetInput(out string patronBarcodes,
-                out string startDate,
-                out string endDate,
-                out string outputDir);
-            if (nRet == -1)
-                return;
-
-
-            // 创建xml
-            nRet = this.CreateXml(this._cancel.Token,
-                patronBarcodes,
-                startDate,
-                endDate,
-                outputDir,
-                out string strError);
-            if (nRet == -1)
-            {
-                MessageBox.Show(this, "出错：" + strError);
-                return;
-            }
-
-            MessageBox.Show(this, "批量生成借阅报表完成。");
-            return;
-        }
-
-        private void 按借阅量排名ToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            string dir = this.textBox_outputDir.Text.Trim();
-            if (string.IsNullOrEmpty(dir) == true)
-            {
-                MessageBox.Show(this, "尚未选择报表目录。");
-                return;
-            }
-
-            this.Xml2Html(this._cancel.Token, dir);
-
-            MessageBox.Show(this, "xml转html完成");
-        }
-
-        private void 报表xml转htmlToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            string dir = this.textBox_outputDir.Text.Trim();
-            if (string.IsNullOrEmpty(dir) == true)
-            {
-                MessageBox.Show(this, "尚未选择报表目录。");
-                return;
-            }
-
-            this.PaiMing(this._cancel.Token, dir);
-
-            MessageBox.Show(this, "排名处理完成。");
-        }
-
-        #endregion
-
-        public void ShowInfo(string text)
+        // 显示信息
+        public void SetProcessInfo(string text)
         {
             // 用Invoke线程安全的方式来调
             this.Invoke((Action)(() =>
@@ -754,6 +763,13 @@ namespace dp2mini
             }
             ));
         }
+
+        #endregion
+
+        #region 按计划生成的报表
+
+
+        // 按计划生成报表
         private void button_plan_Click(object sender, EventArgs e)
         {
 
@@ -802,62 +818,7 @@ namespace dp2mini
         }
 
 
-        public void ContinuePlan(CancellationToken token, string dir)
-        {
-            // 记下原来的光标
-            Cursor oldCursor = Cursor.Current;
-
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                    // 设置按钮状态
-                    EnableControls(false);
-
-                    //清空界面数据
-                    this.ClearInfo();
-
-                    // 鼠标设为等待状态
-                    oldCursor = this.Cursor;
-                this.Cursor = Cursors.WaitCursor;
-            }
-            ));
-
-            try
-            {
-
-
-
-                string planFile = dir + "\\plan.txt";
-
-                // 执行计划
-                BorrowAnalysisService.ExecutePlan(token,
-                        planFile,
-                        this.SetProcess1,
-                        this.ShowInfo);
-
-                //
-                this.Invoke((Action)(() =>
-                {
-                    MessageBox.Show(this, "生成报表完成");
-                }
-                    ));
-
-
-            }
-            finally
-            {
-
-                // 设置按置状态
-                this.Invoke((Action)(() =>
-                {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
-
-                }));
-            }
-
-        }
-
+        // 开始生成报表
         private void StartPlan(CancellationToken token,
             string patronBarcodes,
             string startDate,
@@ -876,7 +837,7 @@ namespace dp2mini
                 EnableControls(false);
 
                 //清空界面数据
-                this.ClearInfo();
+                this.SetProcessInfo("");
 
                 // 鼠标设为等待状态
                 oldCursor = this.Cursor;
@@ -893,21 +854,19 @@ namespace dp2mini
                     startDate,
                     endDate,
                     dir,
-                    this.ShowInfo);
+                    this.SetProcessInfo);
 
                 // 执行计划
                 BorrowAnalysisService.ExecutePlan(this._cancel.Token,
                         planFile,
-                        this.SetProcess1,
-                        this.ShowInfo);
-
+                        this.SetProcess,
+                        this.SetProcessInfo);
 
                 this.Invoke((Action)(() =>
                 {
                     MessageBox.Show(this, "生成报表完成");
                 }
                 ));
-
             }
             finally
             {
@@ -924,56 +883,59 @@ namespace dp2mini
 
         }
 
-        private void textBox_outputDir_TextChanged(object sender, EventArgs e)
+        // 继续生成报表
+        private void ContinuePlan(CancellationToken token, string dir)
         {
-            // 如果里面有plan文件，则按计划生成
-            this.button_plan.Enabled = true;
-            this.button_stop.Enabled = true;
+            // 记下原来的光标
+            Cursor oldCursor = Cursor.Current;
 
-            // 清空进度条和信息
-            this.progressBar1.Value = 0;
-            this.label_info.Text = "";
-
-            string dir = this.textBox_outputDir.Text.Trim();
-
-            string planFile = dir + "\\plan.txt";
-            if (File.Exists(planFile) == true)
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
             {
-                // 条码输入框一类都不能再用了。
-                this.EnableCtrl(false);
+                // 设置按钮状态
+                EnableControls(false);
 
-                // 检查xml中状态
-                XmlDocument dom = new XmlDocument();
-                dom.Load(planFile);
-                string state=DomUtil.GetAttr(dom.DocumentElement, "state");
-                if (state == BorrowAnalysisService.C_state_close)
-                {
-                    this.button_plan.Text = "此目录下的报表已生成完成";
-                    this.button_plan.Enabled = false;
-                }
-                else
-                {
-                    this.button_plan.Text = "继续生成报表";
-                }
+                //清空界面数据
+                //this.ClearInfo();
+                this.SetProcessInfo("");
+
+                // 鼠标设为等待状态
+                oldCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
             }
-            else
+            ));
+
+            try
             {
-                this.EnableCtrl(true);
-                this.button_plan.Text = "开始生成报表";
+                string planFile = dir + "\\plan.txt";
+
+                // 执行计划
+                BorrowAnalysisService.ExecutePlan(token,
+                        planFile,
+                        this.SetProcess,
+                        this.SetProcessInfo);
+
+                //
+                this.Invoke((Action)(() =>
+                {
+                    MessageBox.Show(this, "生成报表完成");
+                }
+                    ));
+            }
+            finally
+            {
+
+                // 设置按置状态
+                this.Invoke((Action)(() =>
+                {
+                    EnableControls(true);
+                    this.Cursor = oldCursor;
+
+                }));
             }
 
-           
         }
 
-        private void EnableCtrl(bool bEnable)
-        {
-            this.textBox_patronBarcode.Enabled = bEnable;
-            this.button_selectBatcodeFile.Enabled = bEnable;
-            this.comboBox_quickSetFilenames.Enabled = bEnable;
-            this.dateTimePicker_start.Enabled = bEnable;
-            this.dateTimePicker_end.Enabled = bEnable;
-
-            this.button_stop.Enabled = bEnable;
-        }
+        #endregion
     }
 }

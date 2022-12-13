@@ -64,6 +64,9 @@ namespace DigitalPlatform.ChargingAnalysis
             this._dataDir = dataDir;
 
             // 类号中英文对照文件
+            if (this._clcHT !=null)
+                this._clcHT.Clear();
+
             string clcclassFile = Path.Combine(this._dataDir, "clcclass.txt");
             if (File.Exists(clcclassFile) == false)
             {
@@ -82,6 +85,8 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
             // 馆员评语
+            if (this._commentHT != null)
+                this._commentHT.Clear();
             this._commentFile = Path.Combine(this._dataDir, "comment.xml");
             if (File.Exists(this._commentFile) == true)
             {
@@ -98,6 +103,8 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
             // 阅读称号 titleRole.xml
+            if (this._roles !=null)
+                this._roles.Clear();
             string titleRoleFile = Path.Combine(this._dataDir, "titleRole.xml");
             if (File.Exists(titleRoleFile) == true)
             {
@@ -131,11 +138,13 @@ namespace DigitalPlatform.ChargingAnalysis
             }
 
             // 评语模板commentTemplate.xml
-            string commentTemplateFile = Path.Combine(this._dataDir, "commentTemplate.xml");
-            if (File.Exists(commentTemplateFile) == true)
+            if (this._commentTemplates != null)
+                this._commentTemplates.Clear();
+            this._commentTemplateFile = Path.Combine(this._dataDir, "commentTemplate.xml");
+            if (File.Exists(this._commentTemplateFile) == true)
             {
                 XmlDocument dom = new XmlDocument();
-                dom.Load(commentTemplateFile);
+                dom.Load(this._commentTemplateFile);
 
                 XmlNodeList list = dom.DocumentElement.SelectNodes("comment");
                 foreach (XmlNode node in list)
@@ -157,6 +166,9 @@ namespace DigitalPlatform.ChargingAnalysis
             return 0;
         }
 
+        // 评语模板文件 2022/12/13
+        public string _commentTemplateFile = "";
+
         // 评语模板 2022/12/7
         public List<string> CommentTemplates
         {
@@ -164,6 +176,45 @@ namespace DigitalPlatform.ChargingAnalysis
             {
                 return this._commentTemplates;
             }
+        }
+
+        public bool SaveCommentTemplate(string commentT,out string error)
+        {
+            error = "";
+
+            if (this._commentTemplates == null)
+            {
+                error = "异常情况：内存中的_commentTemplates不可能为null。";
+                return false;
+            }
+
+            // 先检查一下模板中是否已经存在
+            foreach (string one in this._commentTemplates)
+            {
+                if (one == commentT)
+                {
+                    error = "评语模板中已经存在此项。";
+                    return false;
+                }
+            }
+            
+
+            // 更新到内存中
+            this._commentTemplates.Add(commentT);
+
+            // 保存到评语模板中
+            string xml = "<root>";
+            foreach (string comm in this._commentTemplates)
+            {
+                xml += "<comment>"+comm+"</comment>";
+            }
+            xml += "</root>";
+            using (StreamWriter writer = new StreamWriter(this._commentTemplateFile, false, Encoding.UTF8))
+            {
+                writer.Write(xml);
+            }
+
+            return true;
         }
 
         #endregion
