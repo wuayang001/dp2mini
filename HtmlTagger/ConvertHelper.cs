@@ -168,6 +168,10 @@ namespace xml2html
                     var borrowInfotime = borrowInfo_node.Attributes["firstBorrowDate"].Value;
                     var borrowInfos_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@totalBorrowedCount]");
                     var totalBorrowedCount = borrowInfos_node.Attributes["totalBorrowedCount"].Value;
+                    var timeRange_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@timeRange]");
+                    var timeRange = timeRange_node.Attributes["timeRange"].Value;
+                    var title_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@title]");
+                    var title = title_node.Attributes["title"].Value;
 
                     //判断是否有借书
                     if (string.IsNullOrEmpty(borrowInfotime) == false)
@@ -175,7 +179,7 @@ namespace xml2html
 
                         var p_borrowInfo = new HtmlTagger("p")
                         .AddCssClass("borrowInfo")
-                        .SetInnerText("您首次借阅时间为" + borrowInfotime + ",共借阅" + totalBorrowedCount + "册。");
+                        .SetInnerText("您首次借阅时间为" + borrowInfotime + ",共借阅" + totalBorrowedCount + "册。报告统计范围"+timeRange+"，恭喜您获得：“"+title+"”称号");
                         sw.WriteLine(p_borrowInfo.ToString());
                     }
                 }
@@ -424,7 +428,7 @@ namespace xml2html
                         .SetInnerText(comment);
                     sw.WriteLine(p_remark.ToString());
                 }
-                //if(_remark==1)
+                
                 if (comment_node != null)
                     remark();
 
@@ -436,7 +440,7 @@ namespace xml2html
                         .SetInnerText("数字平台（北京）软件有限责任公司");
                     sw.WriteLine(p_company.ToString());
                 }
-                //if(_company==1)
+                
                 company();
             }
         }
