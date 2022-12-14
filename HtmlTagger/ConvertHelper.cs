@@ -50,8 +50,14 @@ namespace xml2html
                     var readerType = DomUtil.GetElementText(patronNode, "readerType");
                     var refID = DomUtil.GetElementText(patronNode, "refID");
                     var libraryCode = DomUtil.GetElementText(patronNode, "libraryCode");
+                   
+                    /*
                     var borrowedNum = DomUtil.GetElementText(patronNode, "info/item[@name='可借总册数']");
                     var canBorrowNum = DomUtil.GetElementText(patronNode, "info/item[@name='当前还可借']");
+                    */
+                    var borrowedNum = DomUtil.GetElementAttr(patronNode, "info/item[@name='可借总册数']", "value");
+                    var canBorrowNum = DomUtil.GetElementAttr(patronNode, "info/item[@name='当前还可借']", "value");
+
 
                     var H2_readersInformation = new HtmlTagger("H2")
                         .AddCssClass("headline")
@@ -428,7 +434,7 @@ namespace xml2html
                         .SetInnerText(comment);
                     sw.WriteLine(p_remark.ToString());
                 }
-                
+                //if (string.IsNullOrEmpty(comment_node) == false)
                 if (comment_node != null)
                     remark();
 
