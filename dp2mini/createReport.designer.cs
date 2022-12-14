@@ -234,7 +234,7 @@
             this.button_plan.Name = "button_plan";
             this.button_plan.Size = new System.Drawing.Size(918, 89);
             this.button_plan.TabIndex = 57;
-            this.button_plan.Text = "开始生成报表";
+            this.button_plan.Text = "开始生成借阅报表";
             this.button_plan.UseVisualStyleBackColor = true;
             this.button_plan.Click += new System.EventHandler(this.button_plan_Click);
             // 

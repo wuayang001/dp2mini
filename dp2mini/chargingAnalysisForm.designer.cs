@@ -94,11 +94,11 @@
             this.columnHeader_html = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.button_saveCommentTemplate = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox_comment = new System.Windows.Forms.ComboBox();
             this.button_createReport = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
-            this.button_saveCommentTemplate = new System.Windows.Forms.Button();
             this.contextMenuStrip_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -366,7 +366,7 @@
             this.textBox_comment.Location = new System.Drawing.Point(24, 617);
             this.textBox_comment.Multiline = true;
             this.textBox_comment.Name = "textBox_comment";
-            this.textBox_comment.Size = new System.Drawing.Size(1027, 90);
+            this.textBox_comment.Size = new System.Drawing.Size(972, 90);
             this.textBox_comment.TabIndex = 26;
             this.textBox_comment.Enter += new System.EventHandler(this.textBox_comment_Enter);
             // 
@@ -438,7 +438,7 @@
             this.listView_files.HideSelection = false;
             this.listView_files.Location = new System.Drawing.Point(23, 84);
             this.listView_files.Name = "listView_files";
-            this.listView_files.Size = new System.Drawing.Size(1028, 464);
+            this.listView_files.Size = new System.Drawing.Size(973, 464);
             this.listView_files.TabIndex = 36;
             this.listView_files.UseCompatibleStateImageBehavior = false;
             this.listView_files.View = System.Windows.Forms.View.Details;
@@ -522,9 +522,22 @@
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Info;
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser1);
-            this.splitContainer1.Size = new System.Drawing.Size(1340, 783);
-            this.splitContainer1.SplitterDistance = 1068;
+            this.splitContainer1.Size = new System.Drawing.Size(1198, 783);
+            this.splitContainer1.SplitterDistance = 1013;
             this.splitContainer1.TabIndex = 37;
+            // 
+            // button_saveCommentTemplate
+            // 
+            this.button_saveCommentTemplate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_saveCommentTemplate.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_saveCommentTemplate.Location = new System.Drawing.Point(636, 718);
+            this.button_saveCommentTemplate.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.button_saveCommentTemplate.Name = "button_saveCommentTemplate";
+            this.button_saveCommentTemplate.Size = new System.Drawing.Size(308, 55);
+            this.button_saveCommentTemplate.TabIndex = 40;
+            this.button_saveCommentTemplate.Text = "保存评语为模板";
+            this.button_saveCommentTemplate.UseVisualStyleBackColor = true;
+            this.button_saveCommentTemplate.Click += new System.EventHandler(this.button_saveCommentTemplate_Click);
             // 
             // label1
             // 
@@ -554,9 +567,9 @@
             this.button_createReport.Location = new System.Drawing.Point(809, 6);
             this.button_createReport.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.button_createReport.Name = "button_createReport";
-            this.button_createReport.Size = new System.Drawing.Size(251, 74);
+            this.button_createReport.Size = new System.Drawing.Size(348, 74);
             this.button_createReport.TabIndex = 37;
-            this.button_createReport.Text = "创建报表";
+            this.button_createReport.Text = "创建借阅报表";
             this.button_createReport.UseVisualStyleBackColor = true;
             this.button_createReport.Click += new System.EventHandler(this.button_createReport_Click);
             // 
@@ -566,27 +579,14 @@
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(19, 18);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(268, 783);
+            this.webBrowser1.Size = new System.Drawing.Size(181, 783);
             this.webBrowser1.TabIndex = 0;
-            // 
-            // button_saveCommentTemplate
-            // 
-            this.button_saveCommentTemplate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button_saveCommentTemplate.Font = new System.Drawing.Font("宋体", 10.66667F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_saveCommentTemplate.Location = new System.Drawing.Point(636, 718);
-            this.button_saveCommentTemplate.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.button_saveCommentTemplate.Name = "button_saveCommentTemplate";
-            this.button_saveCommentTemplate.Size = new System.Drawing.Size(308, 55);
-            this.button_saveCommentTemplate.TabIndex = 40;
-            this.button_saveCommentTemplate.Text = "保存评语为模板";
-            this.button_saveCommentTemplate.UseVisualStyleBackColor = true;
-            this.button_saveCommentTemplate.Click += new System.EventHandler(this.button_saveCommentTemplate_Click);
             // 
             // chargingAnalysisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1381, 833);
+            this.ClientSize = new System.Drawing.Size(1239, 833);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.Name = "chargingAnalysisForm";

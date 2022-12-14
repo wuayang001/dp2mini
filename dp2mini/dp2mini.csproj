@@ -31,7 +31,7 @@
     <PublisherName>DigitalPlatform</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>78</ApplicationRevision>
+    <ApplicationRevision>80</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -234,6 +234,7 @@
     <Compile Include="MarcForm.designer.cs">
       <DependentUpon>MarcForm.cs</DependentUpon>
     </Compile>
+    <Content Include="del.txt" />
     <Content Include="rest\DataStructure.cs.txt" />
     <Compile Include="createReport.cs">
       <SubType>Form</SubType>
