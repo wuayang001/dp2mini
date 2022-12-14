@@ -421,23 +421,23 @@ namespace xml2html
 
                 //馆长评语
                 var comment_node = dom.DocumentElement.SelectSingleNode("comment");
-
+                var comment = comment_node.InnerText;
                 void remark()
                 {
                     var H2_remark = new HtmlTagger("H2")
                        .AddCssClass("headline")
                         .SetInnerText("馆长评语");
                     sw.WriteLine(H2_remark.ToString());
-                    var comment = comment_node.InnerText;
+                    
                     var p_remark = HtmlTagger.Create("p")
                         .AddCssClass("comment")
                         .SetInnerText(comment);
                     sw.WriteLine(p_remark.ToString());
                 }
-                //if (string.IsNullOrEmpty(comment_node) == false)
-                if (comment_node != null)
+                //if (XmlNode.IsNullOrEmpty(comment_node) == false)
+                if (comment == null)
                     remark();
-
+                
                 //公司名称
                 void company()
                 {
