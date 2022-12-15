@@ -188,6 +188,13 @@ namespace xml2html
                         .SetInnerText("您首次借阅时间为" + borrowInfotime + ",共借阅" + totalBorrowedCount + "册。报告统计范围"+timeRange+"，恭喜您获得：“"+title+"”称号");
                         sw.WriteLine(p_borrowInfo.ToString());
                     }
+                    else
+                    {
+                        var p_borrowInfo = new HtmlTagger("p")
+                        .AddCssClass("borrowInfo")
+                        .SetInnerText("该读者在" + timeRange + "期间没有借书！");
+                        sw.WriteLine(p_borrowInfo.ToString());
+                    }
                 }
 
                 fast_borrow();

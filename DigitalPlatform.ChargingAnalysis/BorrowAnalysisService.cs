@@ -619,8 +619,10 @@ namespace DigitalPlatform.ChargingAnalysis
 
            // this.SetProcessInfo("按借阅量排名");
 
-            // 按总量倒序排
-            List<paiMingItem> sortedList = paiMingList.OrderByDescending(x => x.totalBorrowedCount).ToList();
+            // 先借阅量倒序排序
+            // 2022/12/15 增加相同的情况下按条码排序
+            List<paiMingItem> sortedList = paiMingList.OrderByDescending(x => x.totalBorrowedCount)
+                .ThenBy(x=>x.PatronBarcode).ToList();
 
             //this.SetProcessInfo("写回xml文件");
             string paiMingFile = dir+ "\\paiMing.txt";
