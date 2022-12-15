@@ -98,6 +98,7 @@ namespace dp2mini
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = this.textBox_outputDir.Text;
             DialogResult result = dlg.ShowDialog();
 
             // todo记住上次选择的目录

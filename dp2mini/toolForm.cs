@@ -2649,6 +2649,7 @@ namespace dp2mini
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = this.textBox_dir.Text;
             DialogResult ret = dlg.ShowDialog();
             if (ret == DialogResult.OK)
             {
@@ -4260,11 +4261,39 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
 
             return strLocation;
         }
+
+        private void button_outputFiles_Click(object sender, EventArgs e)
+        {
+            this.textBox_info.Text = "";
+            string dir = this.textBox_dir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "请先选择目录");
+                return;
+            }
+
+            string info = "";
+
+            string[] files = Directory.GetFiles(dir);
+            foreach (string file in files)
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                string name = fileInfo.Name;
+                if (name.LastIndexOf(".") != -1)
+                    name= name.Substring(0, name.LastIndexOf("."));
+                info += name + "\r\n";
+            }
+
+            this.textBox_info.Text=info;
+               
+
+
+        }
     }
 
 
 
-        public class BookTypeGroup
+    public class BookTypeGroup
     {
         // 册类型
         public string bookType { get; set; }
