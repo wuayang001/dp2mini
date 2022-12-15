@@ -36,7 +36,7 @@ namespace xml2html
                 //标题
                 var H1_TheDebitBooks = new HtmlTagger("H1")  //添加一个H1标签
                     .AddCssClass("bookReview")
-                   .SetInnerText("读者借阅报告");
+                   .SetInnerText("读者借阅报表");
 
                 sw.WriteLine(H1_TheDebitBooks.ToString());
 
