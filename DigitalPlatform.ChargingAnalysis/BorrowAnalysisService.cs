@@ -285,7 +285,7 @@ namespace DigitalPlatform.ChargingAnalysis
         public const string C_state_close = "close";
         public const string C_state_error = "error";
 
-        // 返回生成的plan文件名
+        // 生成任务plan文件名
         public static string CreatePlan(CancellationToken token, 
             string patronBarcodes, 
             string startDate,
@@ -308,8 +308,11 @@ namespace DigitalPlatform.ChargingAnalysis
 
             string xml = "<root startDate='" + startDate + "' endDate='" + endDate + "' dir='" + dir + "' state=''>";
 
-            List<string> patronList = new List<string>();
+            // 2022/12/15 把条码号内容也加到计划里，方便后面继续里显示
+            xml += "<barcodes>" + patronBarcodes + "</barcodes>";
 
+
+            List<string> patronList = new List<string>();
             // 拆分证条码号，每个号码一行
             patronBarcodes = patronBarcodes.Replace("\r\n", "\n");
             string[] tempList = patronBarcodes.Split(new char[] { '\n' });

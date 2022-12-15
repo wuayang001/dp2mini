@@ -68,7 +68,7 @@ namespace dp2mini
             if (dirInfo.GetFiles("*.xml").Length > 0
                 || dirInfo.GetFiles("*.html").Length > 0)  // todo，后面里面可能会放一个cfg目录，里面是配置文件
             {
-                MessageBox.Show(this, "报表目录[" + dir + "]里，存在已生成好的报表文件，新创建报表时请选择一个空目录。");
+                MessageBox.Show(this, "报表目录[" + dir + "]里，存在已创建好的报表文件，新创建报表时请选择一个空目录。");
                 return -1;
             }
 
@@ -211,34 +211,44 @@ namespace dp2mini
         // 选择目录发生变化
         private void textBox_outputDir_TextChanged(object sender, EventArgs e)
         {
-            // 如果里面有plan文件，则按计划生成
-            this.button_plan.Enabled = true;
+            // 先把除选择文件外的所有输入框和按钮置为不可用状态
 
-            // 未开始前停止按钮都是不可用的
+            // 开始，停止按钮
+            this.button_plan.Enabled = false;
             this.button_stop.Enabled = false;
+
+            // 先统一将 证条码输入框与选择按钮 设为不可用
+            this.SetBarcodeDateCtrol(false);
+            this.textBox_patronBarcode.Text = "";
+            this.dateTimePicker_start.Text = DateTime.Now.ToString("yyyy/MM/dd");
+            this.dateTimePicker_end.Text = DateTime.Now.ToString("yyyy/MM/dd");
+            this.comboBox_quickSetFilenames.Text = "";
 
             // 清空进度条和信息
             this.progressBar1.Value = 0;
             this.label_info.Text = "";
-            //this.SetProcessInfo("");
 
-            // 设置按钮的名称
-            this.SetButtonText();
-        }
-
-        private void SetButtonText()
-        {
-            // 检查计划文件是否存在
+            // ==根据是否存在计划文件，设置各控件是否可用
             string planFile = this.OutputDir + "\\plan.txt";
-            if (File.Exists(planFile) == true)
+            if (File.Exists(planFile) == false)  // 无plan文件，开始创建报表
             {
-                // 条码输入框一类都不能再用了。
-                this.EnableCtrlForSelectDir(false);
+                // 无plan文件，条码输入框和日期范围可用
+                this.SetBarcodeDateCtrol(true); 
 
-                // 检查plan中的状态，确实是已经完成，还是未完成。
+                // 按钮名称设为 开始...
+                this.button_plan.Enabled = true;
+                this.button_plan.Text = "开始创建借阅报表";
+            }
+            else   // 存在plan文件
+            {
+                // 无plan文件，条码输入框和日期范围不可用
+                this.SetBarcodeDateCtrol(false);
+
+                // 检查plan中的状态，如果是close则已经完成，空值表示未完成。
                 XmlDocument dom = new XmlDocument();
                 dom.Load(planFile);
-                string state = DomUtil.GetAttr(dom.DocumentElement, "state");
+                XmlNode root = dom.DocumentElement;
+                string state = DomUtil.GetAttr(root, "state");
                 if (state == BorrowAnalysisService.C_state_close)
                 {
                     this.button_plan.Text = "此目录下的借阅报表已创建完成";
@@ -246,14 +256,37 @@ namespace dp2mini
                 }
                 else
                 {
-                    this.button_plan.Text = "继续生成借阅报表";
+                    this.button_plan.Enabled = true;
+                    this.button_plan.Text = "继续创建借阅报表";
                 }
+
+                //<root startDate="2022/11/15" endDate="2022/12/15" dir="d:\temp\a" state="">
+                //    <barcodes>XZP00002
+                //        XZP00003
+                // 显示原来的条码和日期范围
+                string barcodes = DomUtil.GetElementText(root, "barcodes");
+                barcodes = barcodes.Replace("\r\n", "\n");
+                barcodes = barcodes.Replace("\n", "\r\n");
+                this.textBox_patronBarcode.Text = barcodes;
+                
+                string startDate = DomUtil.GetAttr(root, "startDate");
+                string endDate = DomUtil.GetAttr(root, "endDate");
+                this.dateTimePicker_start.Text = startDate;
+                this.dateTimePicker_end.Text = endDate;
             }
-            else
-            {
-                this.EnableCtrlForSelectDir(true);
-                this.button_plan.Text = "开始生成借阅报表";
-            }
+        }
+
+        // 设置条码输入框和日期控件是否可用
+        public void SetBarcodeDateCtrol(bool bEnable)
+        {
+            // 条码
+            this.textBox_patronBarcode.ReadOnly = !bEnable;
+            this.button_selectBatcodeFile.Enabled = bEnable;
+
+            // 时间范围控件
+            this.comboBox_quickSetFilenames.Enabled = bEnable;
+            this.dateTimePicker_start.Enabled = bEnable;
+            this.dateTimePicker_end.Enabled = bEnable;
         }
 
 
@@ -299,15 +332,14 @@ namespace dp2mini
         }
 
 
-        // 停止
+        // 暂停
         private void button_stop_Click(object sender, EventArgs e)
         {
-            // 停止
+            // 暂停。注：会走到线程的catch里，那里会设置按钮的状态
             this._cancel.Cancel();
 
             // 这个时候，显示新的按钮名称
-            this.button_plan.Text = "继续生成借阅报表";
-            //EnableCtrlForSelectDir(false);
+            this.button_plan.Text = "继续创建借阅报表";
         }
 
         #endregion
@@ -318,27 +350,25 @@ namespace dp2mini
         CancellationTokenSource _cancel = new CancellationTokenSource();
 
 
-        // 生成报表过程，设置 开始和停止 按钮是否可用
-        void EnableControls(bool bEnable)
-        {
-            // 停止按钮
-            this.button_stop.Enabled = !(bEnable);
+        ////创建报表过程，设置 开始和停止 按钮是否可用
+        //void EnableControls(bool bEnable)
+        //{
+        //    // 停止按钮
+        //    this.button_stop.Enabled = !(bEnable);
 
-            // 开始/继续
-            //this.button_plan.Enabled = bEnable;
+        //    // 开始/继续
+        //    //this.button_plan.Enabled = bEnable;
 
-            // 选择目录
-            this.textBox_outputDir.Enabled = bEnable;
-            this.button_selectDir.Enabled = bEnable;
+        //    // 选择目录
+        //    this.textBox_outputDir.Enabled = bEnable;
+        //    this.button_selectDir.Enabled = bEnable;
 
-            if (bEnable == false)
-            {
-                // 条码号与日期范围
-                this.EnableCtrlForSelectDir(bEnable);
-            }
-
-
-        }
+        //    if (bEnable == false)
+        //    {
+        //        // 条码号与日期范围
+        //        this.EnableCtrlForSelectDir(bEnable);
+        //    }
+        //}
 
         // 根据选择目录，决定条码框输入和选择日期范围是否可用。
         private void EnableCtrlForSelectDir(bool bEnable)
@@ -384,34 +414,27 @@ namespace dp2mini
 
         #endregion
 
-        #region 按计划生成的报表
+        #region 按计划创建的报表
 
 
-        // 按计划生成报表
+        // 按计划创建报表
         private void button_plan_Click(object sender, EventArgs e)
         {
-
-
             // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
             this._cancel.Dispose();
             this._cancel = new CancellationTokenSource();
 
-            // 继续生成报表
-            if (this.button_plan.Text == "继续生成借阅报表")
+            // 继续创建报表
+            if (this.button_plan.Text == "继续创建借阅报表")
             {
                 string dir = this.textBox_outputDir.Text.Trim();
-                if (Directory.Exists(dir) == false)
-                {
-                    MessageBox.Show(this, "报表目录不存在。");
-                    return;
-                }
                 // 开一个新线程
                 Task.Run(() =>
                 {
                     ContinuePlan(this._cancel.Token, dir);
                 });
             }
-            else
+            else if (this.button_plan.Text == "开始创建借阅报表")
             {
                 // 获取界面输入参数
                 int nRet = this.GetInput(out string patronBarcodes,
@@ -431,42 +454,77 @@ namespace dp2mini
                         dir);
                 });
             }
-
-
+            else
+            {
+                MessageBox.Show(this, "不认识的操作按钮名称");
+                return;
+            }
         }
 
+        private Cursor SetCtrlForThreadStart(bool first)
+        {
+            Cursor oldCursor = Cursor.Current;
 
-        // 开始生成报表
+            // 用Invoke线程安全的方式来调
+            this.Invoke((Action)(() =>
+            {
+                // 设置开始按钮为不可用，停止按钮可用
+                this.button_plan.Enabled = false;
+                this.button_stop.Enabled = true;
+
+                // 设置选择目录不可用
+                this.textBox_outputDir.Enabled = false;
+                this.button_selectDir.Enabled = false;
+
+                //清空界面数据
+                this.label_info.Text = "";
+
+                // 鼠标设为等待状态
+                oldCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
+
+                // 如果是首次创建，还需把条码和日期范围置为不可用
+                if (first == true)
+                {
+                    this.SetBarcodeDateCtrol(false);
+                }
+            }
+            ));
+
+            return oldCursor;
+        }
+
+        private void SetCtrlForThreadEnd(Cursor oldCursor)
+        {
+            this.Invoke((Action)(() =>
+            {
+                // 设置选择目录可用，用户可选择其它目录
+                this.textBox_outputDir.Enabled = true;
+                this.button_selectDir.Enabled = true;
+
+                //停止按钮不可用
+                this.button_stop.Enabled = false;
+
+                if (oldCursor!=null)
+                    this.Cursor = oldCursor;
+            }
+            ));
+        }
+
+        // 开始创建报表
         private void StartPlan(CancellationToken token,
             string patronBarcodes,
             string startDate,
             string endDate,
             string dir)
         {
-            string strError = "";
-
-            // 记下原来的光标
-            Cursor oldCursor = Cursor.Current;
-
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                // 设置按钮状态
-                EnableControls(false);
-
-                //清空界面数据
-                this.SetProcessInfo("");
-
-                // 鼠标设为等待状态
-                oldCursor = this.Cursor;
-                this.Cursor = Cursors.WaitCursor;
-            }
-            ));
+            // 设置按钮状态不可用，只有停止按钮可用
+            Cursor oldCursor = SetCtrlForThreadStart(true);
 
             try
             {
 
-                // 生成计划文件
+                // 创建计划文件
                 string planFile = BorrowAnalysisService.CreatePlan(this._cancel.Token,
                     patronBarcodes,
                     startDate,
@@ -483,9 +541,12 @@ namespace dp2mini
                 this.Invoke((Action)(() =>
                 {
                     this.button_plan.Text = "此目录下的借阅报表已创建完成";
+
+                    // 创建完成后，创建按钮就不可用了
                     this.button_plan.Enabled = false;
 
-                    MessageBox.Show(this, "生成报表完成");
+
+                    MessageBox.Show(this, "创建报表完成");
                 }
                 ));
 
@@ -493,51 +554,30 @@ namespace dp2mini
             }
             catch (Exception ex)
             {
-                // 设置按置状态
+                // 报错的情况
                 this.Invoke((Action)(() =>
                 {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
+                    // 出错时，创建按钮变为可用，可以继续处理
+                    this.button_plan.Enabled = true;
 
-                    MessageBox.Show(this, "生成报表出错："+ex.Message);
+                    MessageBox.Show(this, "创建报表出错："+ex.Message);
                 }
                 ));
             }
             finally
             {
-                // 设置按置状态
-                this.Invoke((Action)(() =>
-                {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
-                }
-                ));
+                // 线程结束，设置选择目录可用，停止按钮不可用，光标还原
+                 this.SetCtrlForThreadEnd(oldCursor);
             }
 
 
         }
 
-        // 继续生成报表
+        // 继续创建报表
         private void ContinuePlan(CancellationToken token, string dir)
         {
-            // 记下原来的光标
-            Cursor oldCursor = Cursor.Current;
-
-            // 用Invoke线程安全的方式来调
-            this.Invoke((Action)(() =>
-            {
-                // 设置按钮状态
-                EnableControls(false);
-
-                //清空界面数据
-                //this.ClearInfo();
-                this.SetProcessInfo("");
-
-                // 鼠标设为等待状态
-                oldCursor = this.Cursor;
-                this.Cursor = Cursors.WaitCursor;
-            }
-            ));
+            // 设置按钮状态，记下原来的光标
+            Cursor oldCursor =this.SetCtrlForThreadStart(false);
 
             try
             {
@@ -553,9 +593,11 @@ namespace dp2mini
                 this.Invoke((Action)(() =>
                 {
                     this.button_plan.Text = "此目录下的借阅报表已创建完成";
+
+                    // 创建完成，按钮变不可用状态
                     this.button_plan.Enabled = false;
 
-                    MessageBox.Show(this, "生成报表完成");
+                    MessageBox.Show(this, "创建报表完成");
                 }
                     ));
             }
@@ -564,29 +606,23 @@ namespace dp2mini
                 // 设置按置状态
                 this.Invoke((Action)(() =>
                 {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
+                    // 出错时，创建按钮变为可用，可以继续处理
+                    this.button_plan.Enabled = true;
 
-                    MessageBox.Show(this, "生成报表出错：" + ex.Message);
+                    MessageBox.Show(this, "创建报表出错：" + ex.Message);
                 }
                 ));
             }
             finally
             {
-                // 设置按置状态
-                this.Invoke((Action)(() =>
-                {
-                    EnableControls(true);
-                    this.Cursor = oldCursor;
-
-                }));
-
+                // 线程结束，设置选择目录可用，停止按钮不可用，光标还原
+                this.SetCtrlForThreadEnd(oldCursor);
             }
 
         }
 
-        #endregion
 
+        #endregion
 
     }
 }
