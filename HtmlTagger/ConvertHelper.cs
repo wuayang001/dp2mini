@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DigitalPlatform;
+//using DigitalPlatform.Xml;
+using DigitalPlatform.Xml;
 using System.Xml;
 using System.Xml.Linq;
-using DigitalPlatform.Xml;
 
 namespace xml2html
 {
@@ -17,7 +18,8 @@ namespace xml2html
         //  xml转html todo
         public static void Convert(
             string source_filename, // 源文件名
-                  string target_filename) //目标文件名
+                  string target_filename)//目标文件名
+
 
         {
             XmlDocument dom = new XmlDocument();
@@ -38,56 +40,81 @@ namespace xml2html
 
                 sw.WriteLine(H1_TheDebitBooks.ToString());
 
-                //读者基本信息 2022/12/7 改为使用DomUtil里的函数，避免节点不存在抛异常。
-                XmlNode patronNode = dom.DocumentElement.SelectSingleNode("patron");
-                var barcode = DomUtil.GetElementText(patronNode, "barcode");
-                var patronName = DomUtil.GetElementText(patronNode, "name");
-                var tel = DomUtil.GetElementText(patronNode, "tel");
-                var readerType = DomUtil.GetElementText(patronNode, "readerType");
-                var refID = DomUtil.GetElementText(patronNode, "refID");
-                var libraryCode = DomUtil.GetElementText(patronNode, "libraryCode");
-                var borrowedNum = DomUtil.GetElementText(patronNode, "info/item[@name='可借总册数']");
-                var canBorrowNum = DomUtil.GetElementText(patronNode, "info/item[@name='当前还可借']");
-
-                //var barcode_node = dom.DocumentElement.SelectSingleNode("patron/barcode"); //证条码号
-                //var barcode =barcode_node.InnerText;
-                //var name_node = dom.DocumentElement.SelectSingleNode("patron/name");   //名字
-                //var Name = name_node.InnerText;
-                //var tel_node = dom.DocumentElement.SelectSingleNode("patron/tel");  //电话
-                //var tel = tel_node.InnerText;
-                //var readerType_node = dom.DocumentElement.SelectSingleNode("patron/readerType");   //读者类型
-                //var readerType = readerType_node.InnerText;
-                //var refID_node = dom.DocumentElement.SelectSingleNode("patron/refID");  //refID
-                //var refID = refID_node.InnerText;
-                //var libraryCode_node = dom.DocumentElement.SelectSingleNode("patron/libraryCode");  //图书馆代码
-                //var libraryCode = libraryCode_node.InnerText;
-                //var borrowNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='可借总册数']"); //可借总册数
-                //var borrowNum = borrowNum_node.Attributes["value"].Value;
-                //var returnBookNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='当前还可借']"); //当前还可借
-                //var returnBookNum = returnBookNum_node.Attributes["value"].Value;
-
-
-                var H2_readersInformation = new HtmlTagger("H2")
-                    .AddCssClass("headline")
-                    .SetInnerText("读者基本信息");
-                sw.WriteLine(H2_readersInformation.ToString());
-                var table_readersInformation = new HtmlTagger("table").AddCssClass("readersInformationTable");
-                void getLabel(string a, string b, string c)
+                //读者基本信息
+                void parton()
                 {
-                    var tr = HtmlTagger.Create("tr")
-                  .AddChild(HtmlTagger.Create("td", a))
-                   .AddCssClass(b)
-                  .AddChild(HtmlTagger.Create("td", c));
-                    table_readersInformation.AddChild(tr);
-                };
-                getLabel("证条码号", "code", barcode);
-                getLabel("姓名", "name", patronName);
-                getLabel("电话", "tel", tel);
-                getLabel("读者类型", "readerType", readerType);
-                getLabel("refID", "refID", refID);
-                getLabel("图书馆代码", "libraryCode", libraryCode);
-                getLabel("可借总册数", "borrowNum", borrowedNum);
-                getLabel("当前还可借", "returnBookNum", canBorrowNum);
+                    XmlNode patronNode = dom.DocumentElement.SelectSingleNode("patron");
+                    var barcode = DomUtil.GetElementText(patronNode, "barcode");
+                    var patronName = DomUtil.GetElementText(patronNode, "name");
+                    var tel = DomUtil.GetElementText(patronNode, "tel");
+                    var readerType = DomUtil.GetElementText(patronNode, "readerType");
+                    var refID = DomUtil.GetElementText(patronNode, "refID");
+                    var libraryCode = DomUtil.GetElementText(patronNode, "libraryCode");
+                   
+                    /*
+                    var borrowedNum = DomUtil.GetElementText(patronNode, "info/item[@name='可借总册数']");
+                    var canBorrowNum = DomUtil.GetElementText(patronNode, "info/item[@name='当前还可借']");
+                    */
+                    var borrowedNum = DomUtil.GetElementAttr(patronNode, "info/item[@name='可借总册数']", "value");
+                    var canBorrowNum = DomUtil.GetElementAttr(patronNode, "info/item[@name='当前还可借']", "value");
+
+
+                    var H2_readersInformation = new HtmlTagger("H2")
+                        .AddCssClass("headline")
+                        .SetInnerText("读者基本信息");
+                    sw.WriteLine(H2_readersInformation.ToString());
+                    var table_readersInformation = new HtmlTagger("table").AddCssClass("readersInformationTable");
+                    void getLabel(string a, string b, string c)
+                    {
+                        var tr = HtmlTagger.Create("tr")
+                      .AddChild(HtmlTagger.Create("td", a))
+                       .AddCssClass(b)
+                      .AddChild(HtmlTagger.Create("td", c));
+                        table_readersInformation.AddChild(tr);
+                    };
+
+                    getLabel("证条码号", "code", barcode);
+                    getLabel("姓名", "name", patronName);
+                    getLabel("电话", "tel", tel);
+                    getLabel("读者类型", "readerType", readerType);
+                    getLabel("refID", "refID", refID);
+                    getLabel("图书馆代码", "libraryCode", libraryCode);
+                    getLabel("可借总册数", "borrowNum", borrowedNum);
+                    getLabel("当前还可借", "returnBookNum", canBorrowNum);
+                    sw.WriteLine(table_readersInformation.ToString());
+
+                    /*
+                   var barcode_node = dom.DocumentElement.SelectSingleNode("patron/barcode"); //证条码号
+                   var barcode = barcode_node.InnerText;
+                   var name_node = dom.DocumentElement.SelectSingleNode("patron/name");   //名字
+                   var Name = name_node.InnerText;
+                   var tel_node = dom.DocumentElement.SelectSingleNode("patron/tel");  //电话
+                   var tel = tel_node.InnerText;
+                   var readerType_node = dom.DocumentElement.SelectSingleNode("patron/readerType");   //读者类型
+                   var readerType = readerType_node.InnerText;
+                   var refID_node = dom.DocumentElement.SelectSingleNode("patron/refID");  //refID
+                   var refID = refID_node.InnerText;
+                   var libraryCode_node = dom.DocumentElement.SelectSingleNode("patron/libraryCode");  //图书馆代码
+                   var libraryCode = libraryCode_node.InnerText;
+                   var borrowNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='可借总册数']"); //可借总册数
+                   var borrowNum = borrowNum_node.Attributes["value"].Value;
+                   var returnBookNum_node = dom.DocumentElement.SelectSingleNode("patron/info/item[@name='当前还可借']"); //当前还可借
+                   var returnBookNum = returnBookNum_node.Attributes["value"].Value;
+                   
+                    getLabel("证条码号", "code", barcode);
+                    getLabel("姓名", "name", Name);
+                    getLabel("电话", "tel", tel);
+                    getLabel("读者类型", "readerType", readerType);
+                    getLabel("refID", "refID", refID);
+                    getLabel("图书馆代码", "libraryCode", libraryCode);
+                    getLabel("可借总册数", "borrowNum", borrowNum);
+                    getLabel("当前还可借", "returnBookNum", returnBookNum);
+                    sw.WriteLine(table_readersInformation.ToString());
+                    */
+
+                }
+                parton();
+
                 /*
                 var tr_code = HtmlTagger.Create("tr")
                     .AddChild(HtmlTagger.Create("td", "证条码号"))
@@ -138,222 +165,289 @@ namespace xml2html
                  .AddChild(HtmlTagger.Create("td", returnBookNum));
                 table_readersInformation.AddChild(tr_returnBookNum);
                 */
-                sw.WriteLine(table_readersInformation.ToString());
+
 
                 //第一次借书时间
-                var borrowInfo_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@firstBorrowDate]");
-                var borrowInfotime = borrowInfo_node.Attributes["firstBorrowDate"].Value;
-                var borrowInfos_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@totalBorrowedCount]");
-                var totalBorrowedCount = borrowInfos_node.Attributes["totalBorrowedCount"].Value;
-                var p_borrowInfo = new HtmlTagger("p")
-                    .AddCssClass("borrowInfo")
-                    .SetInnerText("您首次借阅时间为" + borrowInfotime + ",共借阅" + totalBorrowedCount + "册。");
-                sw.WriteLine(p_borrowInfo.ToString());
+                void fast_borrow()
+                {
+                    var borrowInfo_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@firstBorrowDate]");
+                    var borrowInfotime = borrowInfo_node.Attributes["firstBorrowDate"].Value;
+                    var borrowInfos_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@totalBorrowedCount]");
+                    var totalBorrowedCount = borrowInfos_node.Attributes["totalBorrowedCount"].Value;
+                    var timeRange_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@timeRange]");
+                    var timeRange = timeRange_node.Attributes["timeRange"].Value;
+                    var title_node = dom.DocumentElement.SelectSingleNode("borrowInfo[@title]");
+                    var title = title_node.Attributes["title"].Value;
 
-                //在借图书
-                var H2_TheDebitBooks = new HtmlTagger("H2")
-                    .AddCssClass("headline")
-                   .SetInnerText("在借图书");
-                sw.WriteLine(H2_TheDebitBooks.ToString());
+                    //判断是否有借书
+                    if (string.IsNullOrEmpty(borrowInfotime) == false)
+                    {
+
+                        var p_borrowInfo = new HtmlTagger("p")
+                        .AddCssClass("borrowInfo")
+                        .SetInnerText("您首次借阅时间为" + borrowInfotime + ",共借阅" + totalBorrowedCount + "册。报告统计范围"+timeRange+"，恭喜您获得：“"+title+"”称号");
+                        sw.WriteLine(p_borrowInfo.ToString());
+                    }
+                }
+
+                fast_borrow();
+
                 var borrows_list = dom.DocumentElement.SelectNodes("borrows/borrowItem");
-                var table_TheDebitBooks = new HtmlTagger("table");
-                var th_TheDebitBooks = HtmlTagger.Create("tr")
-                    .AddCssClass("title")
-                    .AddChild(HtmlTagger.Create("td", "册条码"))
-                    .AddChild(HtmlTagger.Create("td", "题名与责任者"))
-                    .AddChild(HtmlTagger.Create("td", "索取号"))
-                    .AddChild(HtmlTagger.Create("td", "借书时间"))
-                    .AddChild(HtmlTagger.Create("td", "还书时间"));
-                table_TheDebitBooks.AddChild(th_TheDebitBooks);
-                foreach (XmlElement item in borrows_list)
+                //在借图书
+                void borrow()
                 {
-                    var itemBarcode = item.GetAttribute("itemBarcode");
-                    var title = item.GetAttribute("title");
-                    var accessNo = item.GetAttribute("accessNo");
-                    var borrowTime = item.GetAttribute("borrowTime");
-                    var returnTime = item.GetAttribute("returnTime");
+                    var H2_TheDebitBooks = new HtmlTagger("H2")
+                        .AddCssClass("headline")
+                       .SetInnerText("在借图书");
 
-                    var tr_TheDebitBooks = HtmlTagger.Create("tr")
+                    sw.WriteLine(H2_TheDebitBooks.ToString());
 
-                        .AddChild(HtmlTagger.Create("td", itemBarcode))
-                        .AddChild(HtmlTagger.Create("td", title))
-                        .AddChild(HtmlTagger.Create("td", accessNo))
-                        .AddChild(HtmlTagger.Create("td", borrowTime))
-                        .AddChild(HtmlTagger.Create("td", returnTime));
+                    var table_TheDebitBooks = new HtmlTagger("table");
+                    var th_TheDebitBooks = HtmlTagger.Create("tr")
+                        .AddCssClass("title")
+                        .AddChild(HtmlTagger.Create("td", "册条码"))
+                        .AddChild(HtmlTagger.Create("td", "题名与责任者"))
+                        .AddChild(HtmlTagger.Create("td", "索取号"))
+                        .AddChild(HtmlTagger.Create("td", "借书时间"))
+                        .AddChild(HtmlTagger.Create("td", "还书时间"));
 
-                    table_TheDebitBooks.AddChild(tr_TheDebitBooks);
+                    table_TheDebitBooks.AddChild(th_TheDebitBooks);
+
+                    foreach (XmlElement item in borrows_list)
+                    {
+                        var itemBarcode = item.GetAttribute("itemBarcode");
+                        var title = item.GetAttribute("title");
+                        var accessNo = item.GetAttribute("accessNo");
+                        var borrowTime = item.GetAttribute("borrowTime");
+                        var returnTime = item.GetAttribute("returnTime");
+
+                        var tr_TheDebitBooks = HtmlTagger.Create("tr")
+
+                            .AddChild(HtmlTagger.Create("td", itemBarcode))
+                            .AddChild(HtmlTagger.Create("td", title))
+                            .AddChild(HtmlTagger.Create("td", accessNo))
+                            .AddChild(HtmlTagger.Create("td", borrowTime))
+                            .AddChild(HtmlTagger.Create("td", returnTime));
+
+                        table_TheDebitBooks.AddChild(tr_TheDebitBooks);
+                    }
+                    //borrow();
+                    sw.WriteLine(table_TheDebitBooks.ToString());
+
                 }
-                sw.WriteLine(table_TheDebitBooks.ToString());
+                if (borrows_list.Count > 0)
+                    borrow();
+
+                //if(_borrow==1)
+                //borrow();
                 //借阅历史
-                var H2_BorrowHistory = new HtmlTagger("H2")
-                    .AddCssClass("headline")
-                  .SetInnerText("借阅历史");
-                sw.WriteLine(H2_BorrowHistory.ToString());
                 var history_list = dom.DocumentElement.SelectNodes("borrowHistory/borrowItem");
-                var table_BorrowHistory = new HtmlTagger("table");
-                var th_BorrowHistory = HtmlTagger.Create("tr")
-                     .AddCssClass("title")
-                      .AddChild(HtmlTagger.Create("td", "册条码"))
-                      .AddChild(HtmlTagger.Create("td", "题名与责任者"))
-                      .AddChild(HtmlTagger.Create("td", "索取号"))
-                      .AddChild(HtmlTagger.Create("td", "借书时间"))
-                      .AddChild(HtmlTagger.Create("td", "还书时间"));
-                table_BorrowHistory.AddChild(th_BorrowHistory);
-                foreach (XmlElement item in history_list)
+
+                void borrwHistory()
                 {
-                    var itemBarcode = item.GetAttribute("itemBarcode");
-                    var title = item.GetAttribute("title");
-                    var accessNo = item.GetAttribute("accessNo");
-                    var borrowTime = item.GetAttribute("borrowTime");
-                    var returnTime = item.GetAttribute("returnTime");
+                    var H2_BorrowHistory = new HtmlTagger("H2")
+                        .AddCssClass("headline")
+                      .SetInnerText("借阅历史");
+                    sw.WriteLine(H2_BorrowHistory.ToString());
+                    var table_BorrowHistory = new HtmlTagger("table");
+                    var th_BorrowHistory = HtmlTagger.Create("tr")
+                         .AddCssClass("title")
+                          .AddChild(HtmlTagger.Create("td", "册条码"))
+                          .AddChild(HtmlTagger.Create("td", "题名与责任者"))
+                          .AddChild(HtmlTagger.Create("td", "索取号"))
+                          .AddChild(HtmlTagger.Create("td", "借书时间"))
+                          .AddChild(HtmlTagger.Create("td", "还书时间"));
+                    table_BorrowHistory.AddChild(th_BorrowHistory);
+                    foreach (XmlElement item in history_list)
+                    {
+                        var itemBarcode = item.GetAttribute("itemBarcode");
+                        var title = item.GetAttribute("title");
+                        var accessNo = item.GetAttribute("accessNo");
+                        var borrowTime = item.GetAttribute("borrowTime");
+                        var returnTime = item.GetAttribute("returnTime");
 
-                    var tr_BorrowHistory = HtmlTagger.Create("tr")
+                        var tr_BorrowHistory = HtmlTagger.Create("tr")
 
-                        .AddChild(HtmlTagger.Create("td").SetInnerText(itemBarcode)) // 这是复杂形态
-                        .AddChild(HtmlTagger.Create("td", title))   // 这是简化的形态
-                        .AddChild(HtmlTagger.Create("td", accessNo))
-                        .AddChild(HtmlTagger.Create("td", borrowTime))
-                        .AddChild(HtmlTagger.Create("td", returnTime));
+                            .AddChild(HtmlTagger.Create("td").SetInnerText(itemBarcode)) // 这是复杂形态
+                            .AddChild(HtmlTagger.Create("td", title))   // 这是简化的形态
+                            .AddChild(HtmlTagger.Create("td", accessNo))
+                            .AddChild(HtmlTagger.Create("td", borrowTime))
+                            .AddChild(HtmlTagger.Create("td", returnTime));
 
-                    table_BorrowHistory.AddChild(tr_BorrowHistory);
+                        table_BorrowHistory.AddChild(tr_BorrowHistory);
+                    }
+                    if (history_list != null)
+                        sw.WriteLine(table_BorrowHistory.ToString());
                 }
-                sw.WriteLine(table_BorrowHistory.ToString());
-
-                //中图法分类统计
+                if (history_list.Count > 0)
+                    borrwHistory();
 
                 var div_overall = new HtmlTagger("div").AddCssClass("overall");
 
-                var div_CLC = HtmlTagger.Create("div").AddCssClass("CLC");
-                var H2_CLC = HtmlTagger.Create("H2")
-                    .AddCssClass("headline")
-                .SetInnerText("中图法分类统计");
-                div_CLC.AddChild(H2_CLC);
-                var table_CLC = HtmlTagger.Create("table");
+                //中图法分类统计
                 var clcGroup_list = dom.DocumentElement.SelectNodes("clcGroup/clcItem");
-                var th_CLC = HtmlTagger.Create("tr")
-                    .AddCssClass("title")
-                     .AddChild(HtmlTagger.Create("td", "分类"))
-                     .AddChild(HtmlTagger.Create("td", "分类名称"))
-                     .AddChild(HtmlTagger.Create("td", "数量"));
 
-                table_CLC.AddChild(th_CLC);
-                foreach (XmlElement item in clcGroup_list)
+                void clc()
                 {
-                    var name = item.GetAttribute("name");
-                    var caption = item.GetAttribute("caption");
-                    var count = item.GetAttribute("count");
+                    var div_CLC = HtmlTagger.Create("div").AddCssClass("CLC");
+                    var H2_CLC = HtmlTagger.Create("H2")
+                        .AddCssClass("headline")
+                    .SetInnerText("中图法分类统计");
+                    div_CLC.AddChild(H2_CLC);
+                    var table_CLC = HtmlTagger.Create("table");
+                    var th_CLC = HtmlTagger.Create("tr")
+                        .AddCssClass("title")
+                         .AddChild(HtmlTagger.Create("td", "分类"))
+                         .AddChild(HtmlTagger.Create("td", "分类名称"))
+                         .AddChild(HtmlTagger.Create("td", "数量"));
 
-                    var tr_CLC = HtmlTagger.Create("tr")
-                        .AddChild(HtmlTagger.Create("td", name))
-                        .AddChild(HtmlTagger.Create("td", caption))
-                        .AddChild(HtmlTagger.Create("td", count));
-                    table_CLC.AddChild(tr_CLC);
+                    table_CLC.AddChild(th_CLC);
+                    foreach (XmlElement item in clcGroup_list)
+                    {
+                        var name = item.GetAttribute("name");
+                        var caption = item.GetAttribute("caption");
+                        var count = item.GetAttribute("count");
+
+                        var tr_CLC = HtmlTagger.Create("tr")
+                            .AddChild(HtmlTagger.Create("td", name))
+                            .AddChild(HtmlTagger.Create("td", caption))
+                            .AddChild(HtmlTagger.Create("td", count));
+                        table_CLC.AddChild(tr_CLC);
+                    }
+                    div_CLC.AddChild(table_CLC);
+                    div_overall.AddChild(div_CLC);
                 }
-                div_CLC.AddChild(table_CLC);
-                div_overall.AddChild(div_CLC);
+                if (clcGroup_list.Count > 0)
+                    clc();
 
                 //按年份统计
-
-                var div_year = HtmlTagger.Create("div").AddCssClass("year");
-                var H2_year = HtmlTagger.Create("H2")
-                    .AddCssClass("headline")
-              .SetInnerText("按年份统计");
-                div_year.AddChild(H2_year);
                 var yearGroup_list = dom.DocumentElement.SelectNodes("yearGroup/yearItem");
-                var table_year = HtmlTagger.Create("table");
-                var th_year = HtmlTagger.Create("tr")
-                     .AddCssClass("title")
-                    .AddChild(HtmlTagger.Create("td", "年份"))
-                    .AddChild(HtmlTagger.Create("td", "借阅量"));
-                table_year.AddChild(th_year);
-                foreach (XmlElement item in yearGroup_list)
+
+                void year()
                 {
-                    var name = item.GetAttribute("name");
-                    var count = item.GetAttribute("count");
+                    var div_year = HtmlTagger.Create("div").AddCssClass("year");
+                    var H2_year = HtmlTagger.Create("H2")
+                        .AddCssClass("headline")
+                  .SetInnerText("按年份统计");
+                    div_year.AddChild(H2_year);
+                    var table_year = HtmlTagger.Create("table");
+                    var th_year = HtmlTagger.Create("tr")
+                         .AddCssClass("title")
+                        .AddChild(HtmlTagger.Create("td", "年份"))
+                        .AddChild(HtmlTagger.Create("td", "借阅量"));
+                    table_year.AddChild(th_year);
+                    foreach (XmlElement item in yearGroup_list)
+                    {
+                        var name = item.GetAttribute("name");
+                        var count = item.GetAttribute("count");
 
-                    var tr_year = HtmlTagger.Create("tr")
-                        .AddChild(HtmlTagger.Create("td", name))
-                        .AddChild(HtmlTagger.Create("td", count));
-                    table_year.AddChild(tr_year);
+                        var tr_year = HtmlTagger.Create("tr")
+                            .AddChild(HtmlTagger.Create("td", name))
+                            .AddChild(HtmlTagger.Create("td", count));
+                        table_year.AddChild(tr_year);
+                    }
+                    div_year.AddChild(table_year);
+                    div_overall.AddChild(div_year);
+
                 }
-                div_year.AddChild(table_year);
-                div_overall.AddChild(div_year);
-
+                if (yearGroup_list.Count > 0)
+                    year();
 
                 //按季度统计
-                var div_quarter = HtmlTagger.Create("div").AddCssClass("quarter");
-                var H2_quarter = HtmlTagger.Create("H2")
-                    .AddCssClass("headline")
-            .SetInnerText("按季度统计");
-                div_quarter.AddChild(H2_quarter);
                 var quarterGroup_list = dom.DocumentElement.SelectNodes("quarterGroup/quarterItem");
-                var table_quarter = HtmlTagger.Create("table");
-                var th_quarter = HtmlTagger.Create("tr")
-                    .AddCssClass("title")
-                   .AddChild(HtmlTagger.Create("td", "季度"))
-                   .AddChild(HtmlTagger.Create("td", "借阅量"));
-                table_quarter.AddChild(th_quarter);
-                foreach (XmlElement item in quarterGroup_list)
+
+                void quarter()
                 {
-                    var name = item.GetAttribute("name");
-                    var count = item.GetAttribute("count");
-                    var tr_quarter = HtmlTagger.Create("tr")
-                        .AddChild(HtmlTagger.Create("td", name))
-                        .AddChild(HtmlTagger.Create("td", count));
-                    table_quarter.AddChild(tr_quarter);
+
+                    var div_quarter = HtmlTagger.Create("div").AddCssClass("quarter");
+                    var H2_quarter = HtmlTagger.Create("H2")
+                        .AddCssClass("headline")
+                .SetInnerText("按季度统计");
+                    div_quarter.AddChild(H2_quarter);
+                    var table_quarter = HtmlTagger.Create("table");
+                    var th_quarter = HtmlTagger.Create("tr")
+                        .AddCssClass("title")
+                       .AddChild(HtmlTagger.Create("td", "季度"))
+                       .AddChild(HtmlTagger.Create("td", "借阅量"));
+                    table_quarter.AddChild(th_quarter);
+                    foreach (XmlElement item in quarterGroup_list)
+                    {
+                        var name = item.GetAttribute("name");
+                        var count = item.GetAttribute("count");
+                        var tr_quarter = HtmlTagger.Create("tr")
+                            .AddChild(HtmlTagger.Create("td", name))
+                            .AddChild(HtmlTagger.Create("td", count));
+                        table_quarter.AddChild(tr_quarter);
+                    }
+                    div_quarter.AddChild(table_quarter);
+                    div_overall.AddChild(div_quarter);
                 }
-                div_quarter.AddChild(table_quarter);
-                div_overall.AddChild(div_quarter);
+                if (quarterGroup_list.Count > 0)
+                    quarter();
 
                 //按月份统计
-                var div_month = HtmlTagger.Create("div").AddCssClass("month");
-                var H2_month = HtmlTagger.Create("H2")
-                    .AddCssClass("headline")
-          .SetInnerText("按月份统计");
-                div_month.AddChild(H2_month);
                 var monthGroupGroup_list = dom.DocumentElement.SelectNodes("monthGroup/monthItem");
-                var table_month = HtmlTagger.Create("table");
-                var th_month = HtmlTagger.Create("tr")
-                    .AddCssClass("title")
-                   .AddChild(HtmlTagger.Create("td", "月份"))
-                   .AddChild(HtmlTagger.Create("td", "借阅量"));
 
-
-                table_month.AddChild(th_month);
-                foreach (XmlElement item in monthGroupGroup_list)
+                void month()
                 {
-                    var name = item.GetAttribute("name");
-                    var count = item.GetAttribute("count");
-                    var tr_month = HtmlTagger.Create("tr")
-                        .AddChild(HtmlTagger.Create("td", name))
-                        .AddChild(HtmlTagger.Create("td", count));
-                    table_month.AddChild(tr_month);
+                    var div_month = HtmlTagger.Create("div").AddCssClass("month");
+                    var H2_month = HtmlTagger.Create("H2")
+                        .AddCssClass("headline")
+              .SetInnerText("按月份统计");
+                    div_month.AddChild(H2_month);
+                    var table_month = HtmlTagger.Create("table");
+                    var th_month = HtmlTagger.Create("tr")
+                        .AddCssClass("title")
+                       .AddChild(HtmlTagger.Create("td", "月份"))
+                       .AddChild(HtmlTagger.Create("td", "借阅量"));
+
+
+                    table_month.AddChild(th_month);
+                    foreach (XmlElement item in monthGroupGroup_list)
+                    {
+                        var name = item.GetAttribute("name");
+                        var count = item.GetAttribute("count");
+                        var tr_month = HtmlTagger.Create("tr")
+                            .AddChild(HtmlTagger.Create("td", name))
+                            .AddChild(HtmlTagger.Create("td", count));
+                        table_month.AddChild(tr_month);
+                    }
+                    div_month.AddChild(table_month);
+                    div_overall.AddChild(div_month);
+                    sw.WriteLine(div_overall.ToString());
                 }
-                div_month.AddChild(table_month);
-                div_overall.AddChild(div_month);
-                sw.WriteLine(div_overall.ToString());
-
-
-
+                if (monthGroupGroup_list.Count > 0)
+                    month();
 
                 //馆长评语
-                var H2_remark = new HtmlTagger("H2")
-                   .AddCssClass("headline")
-                    .SetInnerText("馆长评语");
-                sw.WriteLine(H2_remark.ToString());
                 var comment_node = dom.DocumentElement.SelectSingleNode("comment");
                 var comment = comment_node.InnerText;
-                var p_remark = HtmlTagger.Create("p")
-                    .AddCssClass("comment")
-                    .SetInnerText(comment);
-                sw.WriteLine(p_remark.ToString());
-
-
+                void remark()
+                {
+                    var H2_remark = new HtmlTagger("H2")
+                       .AddCssClass("headline")
+                        .SetInnerText("馆长评语");
+                    sw.WriteLine(H2_remark.ToString());
+                    
+                    var p_remark = HtmlTagger.Create("p")
+                        .AddCssClass("comment")
+                        .SetInnerText(comment);
+                    sw.WriteLine(p_remark.ToString());
+                }
+                //if (XmlNode.IsNullOrEmpty(comment_node) == false)
+                if (string.IsNullOrEmpty(comment) == false)
+                    remark();
+                
                 //公司名称
-                var p_company = new HtmlTagger("p")
-                    .AddCssClass("company")
-                    .SetInnerText("数字平台（北京）软件有限责任公司");
-                sw.WriteLine(p_company.ToString());
+                void company()
+                {
+                    var p_company = new HtmlTagger("p")
+                        .AddCssClass("company")
+                        .SetInnerText("数字平台（北京）软件有限责任公司");
+                    sw.WriteLine(p_company.ToString());
+                }
+                
+                company();
             }
         }
     }
