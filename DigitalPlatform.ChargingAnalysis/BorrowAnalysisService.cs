@@ -1617,7 +1617,7 @@ namespace DigitalPlatform.ChargingAnalysis
             // 装载html模板，先layout，再加body。
             if (string.IsNullOrEmpty(this._dataDir) == true)
             {
-                error = "在用户目录里缺少阅读分析使用的'ChargingAnalysis'目录，请联系系统管理员。";
+                error = "在用户目录里缺少阅读分析使用的'chargingAnalysis'目录，请联系系统管理员。";
                 return -1;
             }
 
