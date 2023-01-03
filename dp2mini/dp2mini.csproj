@@ -15,7 +15,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>c:\publish\dp2mini\v1_dev\</PublishUrl>
+    <PublishUrl>c:\publish\dp2mini\v1\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,13 +25,13 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://dp2003.com/dp2mini/v1_dev/</InstallUrl>
-    <UpdateUrl>https://dp2003.com/dp2mini/v1_dev/</UpdateUrl>
+    <InstallUrl>https://dp2003.com/dp2mini/v1/</InstallUrl>
+    <UpdateUrl>https://dp2003.com/dp2mini/v1/</UpdateUrl>
     <ProductName>dp2mini</ProductName>
     <PublisherName>DigitalPlatform</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>83</ApplicationRevision>
+    <ApplicationRevision>95</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -82,6 +82,9 @@
     </Reference>
     <Reference Include="ExcelNumberFormat, Version=1.0.10.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.0.10\lib\net20\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ionic.Zip-1.9.1.8.1.9.1.8\lib\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.11\lib\net45\log4net.dll</HintPath>
@@ -225,7 +228,7 @@
   <ItemGroup>
     <Compile Include="api.cs" />
     <Compile Include="core\PriceUtil.cs" />
-    <Compile Include="core\StringUtil.cs" />
+    <Content Include="core\StringUtil1.txt" />
     <Compile Include="Database\EntityDbManager.cs" />
     <Compile Include="Database\EntityDb.cs" />
     <Compile Include="MarcForm.cs">
@@ -415,6 +418,9 @@
     <EmbeddedResource Include="TransferStatisForm.resx">
       <DependentUpon>TransferStatisForm.cs</DependentUpon>
     </EmbeddedResource>
+    <Content Include="chargingAnalysis_data.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -458,6 +464,18 @@
       <Project>{5bc48136-e9f9-4718-ab64-c4ca879e753c}</Project>
       <Name>HtmlTagger</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="chargingAnalysis_data.zip">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>DataFile</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.2\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />

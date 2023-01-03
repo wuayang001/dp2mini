@@ -27,6 +27,8 @@ using DigitalPlatform.ChargingAnalysis;
 using DigitalPlatform.CirculationClient;
 using System.Web;
 using xml2html;
+using System.Deployment.Application;
+using Ionic.Zip;
 
 namespace dp2mini
 {
@@ -54,16 +56,58 @@ namespace dp2mini
         private void PrepForm_Load(object sender, EventArgs e)
         {
             this._mainForm = this.MdiParent as MainForm;
+            string strError = "";
 
             // 阅读分析的数据目录
-            string chargingAnalysisDataDir = ClientInfo.UserDir + "\\ChargingAnalysis\\";
+            string chargingAnalysisDataDir = ClientInfo.UserDir + "\\chargingAnalysis\\";
+            if (Directory.Exists(chargingAnalysisDataDir) == false)
+            {
+                Directory.CreateDirectory(chargingAnalysisDataDir);
+
+                // 先找到安装程序的数据目录
+                string dataDir = "";
+                // 把几个zip文件拷进来
+                if (ApplicationDeployment.IsNetworkDeployed == true)
+                {
+                    // MessageBox.Show(this, "network");
+                    dataDir = Application.LocalUserAppDataPath;
+                }
+                else
+                {
+                    // MessageBox.Show(this, "no network");
+                    dataDir = Environment.CurrentDirectory;
+                }
+
+                string strZipFileName = Path.Combine(dataDir, "chargingAnalysis_data.zip");
+                try
+                {
+                    using (ZipFile zip = ZipFile.Read(strZipFileName))
+                    {
+                        foreach (ZipEntry one in zip)
+                        {
+                            one.Extract(chargingAnalysisDataDir, ExtractExistingFileAction.OverwriteSilently);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    strError = ExceptionUtil.GetAutoText(ex);
+                    //return -1;
+                    MessageBox.Show(this, strError);
+                    return;
+                }
+            }
+
+        
+
+
+
 
             // 把登录相关参数传到ChargingAnalysisService服务类
             string serverUrl = this._mainForm.GetPurlUrl(this._mainForm.Setting.Url);
             string userName = this._mainForm.Setting.UserName;
             string password = this._mainForm.Setting.Password;
             string parameters = "type=worker,client=dp2mini|" + ClientInfo.ClientVersion;//Program.ClientVersion;
-            string strError = "";
             int nRet = BorrowAnalysisService.Instance.Init(chargingAnalysisDataDir,
                 serverUrl, userName, password, parameters,
                 out strError);
@@ -98,6 +142,7 @@ namespace dp2mini
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = this.textBox_outputDir.Text;
             DialogResult result = dlg.ShowDialog();
 
             // todo记住上次选择的目录

@@ -1522,7 +1522,7 @@ namespace dp2mini
                 ws.Cell(index + 1, 3).Value = "";
             }
 
-            // 把没有数据的馆藏地显示在下方
+            // 把没有数据的图书类型显示在下方
             foreach (BookTypeGroup one in types)
             {
                 if (one.isConfig == false)
@@ -2366,7 +2366,7 @@ namespace dp2mini
             }
 
 
-            // sheet名：馆藏地
+            // sheet名：读者类型
             IXLWorksheet ws = this.CreateSheet("读者类型");
 
             // 设置标题
@@ -2459,7 +2459,7 @@ namespace dp2mini
             }
 
 
-            // sheet名：馆藏地
+            // sheet名：读者部门
             IXLWorksheet ws = this.CreateSheet("读者部门");
             // 设置标题
             string[] titles = {
@@ -2477,7 +2477,7 @@ namespace dp2mini
             bool bHasEmpty = false;
             // 输出读者部门到excel
             int index = 0;
-            // 把没有数据的馆藏地显示在下方
+            // 把没有数据的读者部门显示在下方
             foreach (PatronGroup one in types)
             {
                 index++;
@@ -2506,7 +2506,6 @@ namespace dp2mini
             // 将读者单位的为空的另行输出excel
             if (bHasEmpty == true)
             {
-                // sheet名：馆藏地
                 ws = this.CreateSheet("部门为空的读者");
                 // 设置标题
                 string[] titles1 = {
@@ -2526,7 +2525,7 @@ namespace dp2mini
                 ws.Column(2).Style.NumberFormat.Format = "@";
 
                 index = 0;
-                // 把没有数据的馆藏地显示在下方
+                // 把没有数据的读者部门显示在下方
                 foreach (PatronGroup one in types)
                 {
                     if (one.name != "[空]")
@@ -2649,6 +2648,7 @@ namespace dp2mini
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = this.textBox_dir.Text;
             DialogResult ret = dlg.ShowDialog();
             if (ret == DialogResult.OK)
             {
@@ -2889,7 +2889,9 @@ namespace dp2mini
                 List<simpleLoc> simpleLocs = this.GetLocation();
                 foreach (simpleLoc one in simpleLocs)
                 {
-                    if (paijiaLocs.IndexOf(one.name) == -1)
+                    // 2023/1/3 原来方式不能处理 A馆/* 这种形态，改为用正则表达式检查，用dp2拷过来的一个函数。
+                    //if (paijiaLocs.IndexOf(one.name) == -1)
+                   if (CheckLocaltionIsConfig(paijiaLocs,one.name)==false)
                     {
                         if (bFirst == true)
                         {
@@ -2914,6 +2916,32 @@ namespace dp2mini
             {
                 EnableControls(true);
             }
+        }
+
+        // 检查一个馆藏地是否已经配置
+        public static bool CheckLocaltionIsConfig(List<string> paijiaLocs, string location)
+        {
+            foreach (string pattern in paijiaLocs)
+            {
+                if (MatchLocationName(location, pattern) == true)
+                    return true;
+            }
+            return false;
+        }
+
+
+        public static bool MatchLocationName(string strLocation, string strPattern)
+        {
+            // 如果没有通配符，则要求完全一致
+            if (strPattern.IndexOf("*") == -1)
+                return strLocation == strPattern;
+
+            strPattern = strPattern.Replace("*", ".*");
+            if (StringUtil.RegexCompare(strPattern,
+                RegexOptions.None,
+                strLocation) == true)
+                return true;
+            return false;
         }
 
         // 获取脚本
@@ -3040,7 +3068,7 @@ using System.Xml;
                 }
                 else
                 {
-                    this.OutputInfo("存在ItemCanReturn函数");
+                    this.OutputInfo("不存在ItemCanReturn函数");  // 2023/1/3 笔记，应该是不存在
                 }
             }
             this.OutputInfo("\r\n功能说明：这两个函数是dp2老版本采用的C#函数方式，用来管理什么情况下允许借还。dp2 V3版本一般在馆藏地设置是否允许借还。如果存在这两个函数，建议改为新的配置方式。");
@@ -4260,11 +4288,39 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
 
             return strLocation;
         }
+
+        private void button_outputFiles_Click(object sender, EventArgs e)
+        {
+            this.textBox_info.Text = "";
+            string dir = this.textBox_dir.Text.Trim();
+            if (string.IsNullOrEmpty(dir) == true)
+            {
+                MessageBox.Show(this, "请先选择目录");
+                return;
+            }
+
+            string info = "";
+
+            string[] files = Directory.GetFiles(dir);
+            foreach (string file in files)
+            {
+                FileInfo fileInfo = new FileInfo(file);
+                string name = fileInfo.Name;
+                if (name.LastIndexOf(".") != -1)
+                    name= name.Substring(0, name.LastIndexOf("."));
+                info += name + "\r\n";
+            }
+
+            this.textBox_info.Text=info;
+               
+
+
+        }
     }
 
 
 
-        public class BookTypeGroup
+    public class BookTypeGroup
     {
         // 册类型
         public string bookType { get; set; }

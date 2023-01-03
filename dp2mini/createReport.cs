@@ -195,6 +195,8 @@ namespace dp2mini
         private void button_selectDir_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = this.textBox_outputDir.Text;
+
             DialogResult result = dlg.ShowDialog();
 
             // todo记住上次选择的目录
@@ -533,7 +535,7 @@ namespace dp2mini
                     this.SetProcessInfo);
 
                 // 执行计划
-                BorrowAnalysisService.ExecutePlan(this._cancel.Token,
+                int nRet =BorrowAnalysisService.ExecutePlan(this._cancel.Token,
                         planFile,
                         this.SetProcess,
                         this.SetProcessInfo);
@@ -545,8 +547,16 @@ namespace dp2mini
                     // 创建完成后，创建按钮就不可用了
                     this.button_plan.Enabled = false;
 
+                    if (nRet > 0)
+                    {
+                        MessageBox.Show(this, "创建报表完成，有"+nRet+"条任务出错，详情参见plan.txt文件。");
+                        System.Diagnostics.Process.Start("notepad.exe", planFile);
 
-                    MessageBox.Show(this, "创建报表完成");
+                    }
+                    else
+                    {
+                        MessageBox.Show(this, "创建报表完成。");
+                    }
                 }
                 ));
 
@@ -584,7 +594,7 @@ namespace dp2mini
                 string planFile = dir + "\\plan.txt";
 
                 // 执行计划
-                BorrowAnalysisService.ExecutePlan(token,
+                int nRet =BorrowAnalysisService.ExecutePlan(token,
                         planFile,
                         this.SetProcess,
                         this.SetProcessInfo);
@@ -597,7 +607,16 @@ namespace dp2mini
                     // 创建完成，按钮变不可用状态
                     this.button_plan.Enabled = false;
 
-                    MessageBox.Show(this, "创建报表完成");
+                    if (nRet > 0)
+                    {
+                        MessageBox.Show(this, "创建报表完成，有" + nRet + "条任务出错，详情参见plan.txt文件。");
+                        System.Diagnostics.Process.Start("notepad.exe", planFile);
+                    }
+                    else
+                    {
+                        MessageBox.Show(this, "创建报表完成。");
+                    }
+
                 }
                     ));
             }

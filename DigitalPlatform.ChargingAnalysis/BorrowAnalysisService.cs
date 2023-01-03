@@ -381,7 +381,7 @@ namespace DigitalPlatform.ChargingAnalysis
         }
 
 
-        public static void ExecutePlan(CancellationToken token,
+        public static int ExecutePlan(CancellationToken token,
             string planFile,
             SetProcessDelegate setProcess,
             ShowInfoDelegate showInfo)
@@ -405,7 +405,7 @@ namespace DigitalPlatform.ChargingAnalysis
             if (rootState == C_state_close)
             {
                 showInfo("计划的状态是close，表示之前已处理完成。");
-                return;
+                return 0;
             }
 
             // 取出参数
@@ -421,6 +421,7 @@ namespace DigitalPlatform.ChargingAnalysis
 
             int nRet = 0;
             string error = "";
+            int errorCount = 0;
 
             // 排名dom
             XmlDocument paiMingDom = null;
@@ -440,10 +441,17 @@ namespace DigitalPlatform.ChargingAnalysis
 
                 string patronXmlFile = dir + "\\" + patronBarcode + ".xml";
 
-                // 完成或出错的不处理
+                // 已完成的情况
                 string state=DomUtil.GetAttr(task, "state");
-                if (state == C_state_close  || state==C_state_error)  // 已处理完
+                if (state == C_state_close)  // 已处理完
                     continue;
+
+                // 出错的情况，统计一下数量
+                if (state == C_state_error)  // 已处理完
+                {
+                    errorCount++;
+                    continue;
+                }
 
                 // 执行任务
                 if (taskName == C_task_createXml)
@@ -524,6 +532,7 @@ namespace DigitalPlatform.ChargingAnalysis
             ERROR1:
 
                 // 把这一任务设置成出错
+                errorCount++; //错误数量
                 DomUtil.SetAttr(task, "state", C_state_error);
                 if (string.IsNullOrEmpty(error) == false)  //写错误信息
                 { 
@@ -536,6 +545,9 @@ namespace DigitalPlatform.ChargingAnalysis
             // 把plan设置成完成
             DomUtil.SetAttr(root, "state", C_state_close);
             dom.Save(planFile);// 立即保存一下plan文件。
+
+            // 返回错误数量
+            return errorCount;
 
         }
 
@@ -1617,7 +1629,7 @@ namespace DigitalPlatform.ChargingAnalysis
             // 装载html模板，先layout，再加body。
             if (string.IsNullOrEmpty(this._dataDir) == true)
             {
-                error = "在用户目录里缺少阅读分析使用的'ChargingAnalysis'目录，请联系系统管理员。";
+                error = "在用户目录里缺少阅读分析使用的'chargingAnalysis'目录，请联系系统管理员。";
                 return -1;
             }
 
