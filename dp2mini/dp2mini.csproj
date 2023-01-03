@@ -228,7 +228,7 @@
   <ItemGroup>
     <Compile Include="api.cs" />
     <Compile Include="core\PriceUtil.cs" />
-    <Compile Include="core\StringUtil.cs" />
+    <Content Include="core\StringUtil1.txt" />
     <Compile Include="Database\EntityDbManager.cs" />
     <Compile Include="Database\EntityDb.cs" />
     <Compile Include="MarcForm.cs">

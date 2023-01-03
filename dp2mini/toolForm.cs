@@ -2890,7 +2890,9 @@ namespace dp2mini
                 List<simpleLoc> simpleLocs = this.GetLocation();
                 foreach (simpleLoc one in simpleLocs)
                 {
-                    if (paijiaLocs.IndexOf(one.name) == -1)
+                    // 2023/1/3 原来方式不能处理 A馆/* 这种形态，改为用正则表达式检查，用dp2拷过来的一个函数。
+                    //if (paijiaLocs.IndexOf(one.name) == -1)
+                   if (CheckLocaltionIsConfig(paijiaLocs,one.name)==false)
                     {
                         if (bFirst == true)
                         {
@@ -2915,6 +2917,32 @@ namespace dp2mini
             {
                 EnableControls(true);
             }
+        }
+
+        // 检查一个馆藏地是否已经配置
+        public static bool CheckLocaltionIsConfig(List<string> paijiaLocs, string location)
+        {
+            foreach (string pattern in paijiaLocs)
+            {
+                if (MatchLocationName(location, pattern) == true)
+                    return true;
+            }
+            return false;
+        }
+
+
+        public static bool MatchLocationName(string strLocation, string strPattern)
+        {
+            // 如果没有通配符，则要求完全一致
+            if (strPattern.IndexOf("*") == -1)
+                return strLocation == strPattern;
+
+            strPattern = strPattern.Replace("*", ".*");
+            if (StringUtil.RegexCompare(strPattern,
+                RegexOptions.None,
+                strLocation) == true)
+                return true;
+            return false;
         }
 
         // 获取脚本
@@ -3041,7 +3069,7 @@ using System.Xml;
                 }
                 else
                 {
-                    this.OutputInfo("存在ItemCanReturn函数");
+                    this.OutputInfo("不存在ItemCanReturn函数");  // 2023/1/3 笔记，应该是不存在
                 }
             }
             this.OutputInfo("\r\n功能说明：这两个函数是dp2老版本采用的C#函数方式，用来管理什么情况下允许借还。dp2 V3版本一般在馆藏地设置是否允许借还。如果存在这两个函数，建议改为新的配置方式。");
