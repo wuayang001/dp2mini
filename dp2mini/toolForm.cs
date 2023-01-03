@@ -1522,7 +1522,7 @@ namespace dp2mini
                 ws.Cell(index + 1, 3).Value = "";
             }
 
-            // 把没有数据的馆藏地显示在下方
+            // 把没有数据的图书类型显示在下方
             foreach (BookTypeGroup one in types)
             {
                 if (one.isConfig == false)
@@ -2366,7 +2366,7 @@ namespace dp2mini
             }
 
 
-            // sheet名：馆藏地
+            // sheet名：读者类型
             IXLWorksheet ws = this.CreateSheet("读者类型");
 
             // 设置标题
@@ -2459,7 +2459,7 @@ namespace dp2mini
             }
 
 
-            // sheet名：馆藏地
+            // sheet名：读者部门
             IXLWorksheet ws = this.CreateSheet("读者部门");
             // 设置标题
             string[] titles = {
@@ -2477,7 +2477,7 @@ namespace dp2mini
             bool bHasEmpty = false;
             // 输出读者部门到excel
             int index = 0;
-            // 把没有数据的馆藏地显示在下方
+            // 把没有数据的读者部门显示在下方
             foreach (PatronGroup one in types)
             {
                 index++;
@@ -2506,7 +2506,6 @@ namespace dp2mini
             // 将读者单位的为空的另行输出excel
             if (bHasEmpty == true)
             {
-                // sheet名：馆藏地
                 ws = this.CreateSheet("部门为空的读者");
                 // 设置标题
                 string[] titles1 = {
@@ -2526,7 +2525,7 @@ namespace dp2mini
                 ws.Column(2).Style.NumberFormat.Format = "@";
 
                 index = 0;
-                // 把没有数据的馆藏地显示在下方
+                // 把没有数据的读者部门显示在下方
                 foreach (PatronGroup one in types)
                 {
                     if (one.name != "[空]")
