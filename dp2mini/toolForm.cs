@@ -1086,7 +1086,7 @@ namespace dp2mini
         }
 
         // 校验价格
-        private void CheckPrice(List<Entity> items, CancellationToken token)
+        private bool CheckPrice(List<Entity> items, CancellationToken token)
         {
             string match = "^[0-9]*([.][0-9]*)$";// this.txtMatch.Text.Trim();
 
@@ -1240,7 +1240,15 @@ namespace dp2mini
             // 仅输出到文件
             this.OnlyOutput2File(result.ToString());
 
-
+            if (emptyList.Count == 0
+                && largeList.Count == 0
+                && bracketList.Count == 0
+                && otherList.Count == 0)
+            {
+                return true;
+            }
+            else
+                return false;
         }
 
         // 获取聚合的location
@@ -1619,7 +1627,7 @@ namespace dp2mini
         #region 检查索取号
 
         // 检查索取号
-        private void CheckAccessNo(List<Entity> items, CancellationToken token)
+        private bool CheckAccessNo(List<Entity> items, CancellationToken token)
         {
 
             //空索取号的
@@ -1750,12 +1758,18 @@ namespace dp2mini
 
             }
 
+            bool ok = true;
+
             StringBuilder result = new StringBuilder();
 
 
             //空索取号的
             if (emptyList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok==true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是索取号为空的册记录，有" + emptyList.Count + "条。");
                 foreach (string li in emptyList)
                 {
@@ -1765,6 +1779,10 @@ namespace dp2mini
             //没有斜
             if (noXpList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是索取号中没有区分号/，有" + noXpList.Count + "条。");
                 foreach (string li in noXpList)
                 {
@@ -1775,6 +1793,10 @@ namespace dp2mini
             //有斜，但左或右没值
             if (hasXpNoValueList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是分类号或区分号没值的，有" + hasXpNoValueList.Count + "条。");
                 foreach (string li in hasXpNoValueList)
                 {
@@ -1784,6 +1806,10 @@ namespace dp2mini
 
             if (hasKgList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面分类号或区分号中有空格的，有" + hasXpNoValueList.Count + "条。");
                 foreach (string li in hasXpNoValueList)
                 {
@@ -1794,6 +1820,10 @@ namespace dp2mini
             //左边错误
             if (leftWrongList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是索取号中分类号错误的，有" + leftWrongList.Count + "条。");
                 foreach (string li in leftWrongList)
                 {
@@ -1805,6 +1835,10 @@ namespace dp2mini
             //右边错误
             if (rightWrongList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是索取号中区分号错误的，有" + rightWrongList.Count + "条。");
 
                 foreach (string li in rightWrongList)
@@ -1816,6 +1850,10 @@ namespace dp2mini
             //其它
             if (otherList.Count > 0)
             {
+                // 2023/1/9 加，为了无异常时提醒更清晰
+                if (ok == true)
+                    ok = false;
+
                 result.AppendLine("\r\n下面是其它索取号错误的，有" + otherList.Count + "条。");
                 foreach (string li in otherList)
                 {
@@ -1826,6 +1864,8 @@ namespace dp2mini
             // 整体输出，仅输出到文件
             this.OnlyOutput2File(result.ToString());
             //this.OutputInfo(result.ToString(),true,false);
+
+            return ok;
 
         }
 
@@ -2757,7 +2797,13 @@ namespace dp2mini
                 // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
-                this.CheckAccessNo(this._items, this._cancel.Token);
+                bool ok= this.CheckAccessNo(this._items, this._cancel.Token);
+
+                // 无异常的情况。
+                if (ok == true)
+                {
+                    this.OutputInfo("未发现异常的索取号。");
+                }
 
 
                 // 结束时间
@@ -2787,7 +2833,12 @@ namespace dp2mini
                 // 每次开头都重新 new 一个。这样避免受到上次遗留的 _cancel 对象的状态影响
                 this._cancel.Dispose();
                 this._cancel = new CancellationTokenSource();
-                this.CheckPrice(this._items, this._cancel.Token);
+                bool ok =this.CheckPrice(this._items, this._cancel.Token);
+
+                if (ok == true)
+                {
+                    this.OutputInfo("未发现异常的册价格。");
+                }
 
                 // 结束时间
                 DateTime end = DateTime.Now;
