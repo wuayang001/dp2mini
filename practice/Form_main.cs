@@ -615,6 +615,12 @@ public long SearchItem(string strItemDbName,
                 this._channelPool.ReturnChannel(channel);
             }
         }
+
+        private void z3950ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_Z3950 dlg = new Form_Z3950();
+            dlg.ShowDialog(this);
+        }
     }
 
 

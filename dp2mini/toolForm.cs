@@ -972,13 +972,14 @@ namespace dp2mini
             // 空的册条码
             List<string> emptyList = new List<string>();
 
+            // 错误的数量
+            long errorCount = 0;
 
             EnableControls(false);
             try
             {
                 string strError = "";
 
-                long errorCount = 0;
                 RestChannel channel = this._mainForm.GetChannel();
                 try
                 {
@@ -1071,6 +1072,12 @@ namespace dp2mini
             {
 
                 EnableControls(true);
+            }
+
+            // 2023/1/9 增加，为了当没有异常时，让输出信息更明确一些。
+            if (errorCount == 0 && emptyList.Count == 0)
+            {
+                this.OutputInfo("未发现异常的册条码。");
             }
 
             // 结束时间
@@ -4152,15 +4159,17 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
             DateTime start = DateTime.Now;
             this.OutputInfo(GetInfoAddTime("==开始校验读者条码==", start));
 
+            // 空的证条码
+            List<string> emptyList = new List<string>();
+
+            long errorCount = 0;
+
+
             EnableControls(false);
             try
             {
                 string strError = "";
 
-                // 空的证条码
-                List<string> emptyList = new List<string>();
-
-                long errorCount = 0;
                 RestChannel channel = this._mainForm.GetChannel();
                 try
                 {
@@ -4253,6 +4262,12 @@ dp2kernel仅开通本机访问协议，不支持外部访问。
             {
 
                 EnableControls(true);
+            }
+
+            // 2023/1/9 增加，为了当没有异常时，让输出信息更明确一些。
+            if (errorCount == 0 && emptyList.Count == 0)
+            {
+                this.OutputInfo("未发现异常的读者条码。");
             }
 
             // 结束时间
